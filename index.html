@@ -5,12 +5,27 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>My Portfolio</title>
 
-<style>
-body{
-    margin:0;
-    font-family: Arial, sans-serif;
-    background:#0f172a;
-    color:white;
+.about-container{
+display:flex;
+flex-wrap:wrap;
+gap:40px;
+align-items:flex-start;
+}
+
+.about-text{
+flex:2;
+line-height:1.6;
+}
+
+.skills{
+flex:1;
+}
+
+.skill-card{
+background:#1e293b;
+padding:10px 15px;
+margin:10px 0;
+border-radius:8px;
 }
 
 header{
@@ -66,8 +81,8 @@ footer{
 <body>
 
 <header>
-<h1>Your Name</h1>
-<p>Designer | Coder | Video Editor</p>
+<h1>Vyan Merchant</h1>
+<p>| Video Editor |</p>
 </header>
 
 <nav>
@@ -78,12 +93,37 @@ footer{
 
 <section id="about">
 <h2>About Me</h2>
-<p>
-I am a student who enjoys designing, coding and editing videos. 
-I like creating creative projects and learning new technologies.
-</p>
-</section>
 
+<div class="about-container">
+
+<div class="about-text">
+<p>
+Hi, I’m <b>Vyan</b>, a 17-year-old who is passionate about gaming and video editing. 
+I have been editing videos for the past <b>4 years</b> using <b>DaVinci Resolve</b>, 
+focusing on smooth transitions, cinematic effects, and engaging gaming montages.
+</p>
+
+<p>
+I’ve worked with several content creators, helping them produce gaming montages 
+and edited videos for their channels. I have also completed an internship in 
+video editing, where I gained professional experience in workflow, storytelling, 
+and creating high-quality content.
+</p>
+</div>
+
+<div class="skills">
+<h3>Skills</h3>
+
+<div class="skill-card">🎬 DaVinci Resolve</div>
+<div class="skill-card">🎮 Gaming Montages</div>
+<div class="skill-card">⚡ Fast-paced Edits</div>
+<div class="skill-card">🎨 Color Grading</div>
+<div class="skill-card">📹 Content Creation</div>
+
+</div>
+
+</div>
+</section>
 <section id="projects">
 <h2>Projects</h2>
 
@@ -110,7 +150,7 @@ I like creating creative projects and learning new technologies.
 
 <section id="contact">
 <h2>Contact</h2>
-<p>Email: your@email.com</p>
+<p>Email: vyanmerchant@email.com</p>
 <p>Instagram / GitHub links</p>
 </section>
 
