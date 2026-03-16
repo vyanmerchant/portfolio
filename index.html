@@ -9,12 +9,28 @@
 
 <style>
 
+html{
+scroll-behavior:smooth;
+}
+
 body{
 margin:0;
 font-family:'Poppins', sans-serif;
 color:white;
 overflow-x:hidden;
 background:#020617;
+}
+
+/* SCROLL PROGRESS BAR */
+
+.progress-bar{
+position:fixed;
+top:0;
+left:0;
+height:3px;
+width:0%;
+background:#38bdf8;
+z-index:1000;
 }
 
 /* BACKGROUND */
@@ -37,96 +53,84 @@ animation:bgMove 15s ease infinite;
 100%{background-position:0% 50%;}
 }
 
-/* PARTICLES */
-
-.particles{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-z-index:-2;
-pointer-events:none;
-}
-
-.particles span{
-position:absolute;
-display:block;
-width:3px;
-height:3px;
-background:white;
-opacity:0.3;
-animation:float 15s linear infinite;
-}
-
-@keyframes float{
-from{transform:translateY(100vh);}
-to{transform:translateY(-10vh);}
-}
-
-/* CURSOR */
-
-.cursor{
-width:20px;
-height:20px;
-border-radius:50%;
-background:#38bdf8;
-position:fixed;
-pointer-events:none;
-mix-blend-mode:screen;
-filter:blur(8px);
-z-index:999;
-}
-
-/* NEON TRAIL */
-
-.trail{
-position:fixed;
-width:8px;
-height:8px;
-background:#38bdf8;
-border-radius:50%;
-pointer-events:none;
-filter:blur(6px);
-opacity:0.8;
-z-index:998;
-animation:fadeTrail 0.6s linear forwards;
-}
-
-@keyframes fadeTrail{
-to{
-opacity:0;
-transform:scale(2);
-}
-}
-
-/* HERO */
+/* HERO VIDEO */
 
 .hero{
-height:70vh;
+position:relative;
+height:85vh;
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
 text-align:center;
+overflow:hidden;
+}
+
+.hero-video{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+object-fit:cover;
+opacity:0.25;
+z-index:-2;
+}
+
+.hero-overlay{
+position:absolute;
+width:100%;
+height:100%;
+background:linear-gradient(to bottom,#020617aa,#020617);
+z-index:-1;
 }
 
 .hero h1{
-font-size:55px;
+font-size:60px;
 margin:0;
+background:linear-gradient(90deg,#38bdf8,#9333ea,#38bdf8);
+background-size:200%;
+-webkit-background-clip:text;
+color:transparent;
+animation:glowText 6s linear infinite;
+}
+
+@keyframes glowText{
+0%{background-position:0%}
+100%{background-position:200%}
 }
 
 .hero p{
 font-size:18px;
-opacity:0.8;
+opacity:0.9;
+}
+
+.hero-btn{
+margin-top:25px;
+padding:12px 28px;
+background:#38bdf8;
+border-radius:8px;
+text-decoration:none;
+color:white;
+font-weight:bold;
+transition:0.3s;
+}
+
+.hero-btn:hover{
+transform:scale(1.08);
+background:#0ea5e9;
 }
 
 /* NAV */
 
 nav{
+position:sticky;
+top:0;
 text-align:center;
-background:#020617;
-padding:10px;
+background:rgba(2,6,23,0.7);
+backdrop-filter:blur(10px);
+padding:12px;
+z-index:100;
 }
 
 nav a{
@@ -143,7 +147,7 @@ color:#38bdf8;
 /* SECTIONS */
 
 section{
-padding:60px 20px;
+padding:70px 20px;
 max-width:1100px;
 margin:auto;
 }
@@ -195,15 +199,14 @@ display:flex;
 flex-direction:column;
 gap:10px;
 position:relative;
-transition:transform 0.2s ease;
+transition:all 0.25s ease;
 border:1px solid rgba(255,255,255,0.08);
 transform-style:preserve-3d;
-perspective:1000px;
 }
 
 .card:hover{
-transform:translateY(-6px) scale(1.02);
-box-shadow:0 8px 18px rgba(0,0,0,0.35);
+transform:translateY(-8px) scale(1.02);
+box-shadow:0 10px 20px rgba(0,0,0,0.4);
 }
 
 /* GLOW BORDER */
@@ -223,8 +226,8 @@ transition:0.3s;
 }
 
 .card:hover::before{
-opacity:0.25;
-filter:blur(3px);
+opacity:0.3;
+filter:blur(4px);
 }
 
 /* VIDEO */
@@ -234,6 +237,7 @@ position:relative;
 width:100%;
 padding-bottom:56.25%;
 height:0;
+overflow:hidden;
 }
 
 .video-container iframe{
@@ -243,6 +247,11 @@ left:0;
 width:100%;
 height:100%;
 border-radius:8px;
+transition:0.4s;
+}
+
+.card:hover iframe{
+transform:scale(1.08);
 }
 
 /* SCROLL REVEAL */
@@ -267,7 +276,39 @@ background:#020617;
 margin-top:40px;
 }
 
-/* MOBILE */
+/* CURSOR */
+
+.cursor{
+width:20px;
+height:20px;
+border-radius:50%;
+background:#38bdf8;
+position:fixed;
+pointer-events:none;
+mix-blend-mode:screen;
+filter:blur(8px);
+z-index:999;
+}
+
+.trail{
+position:fixed;
+width:8px;
+height:8px;
+background:#38bdf8;
+border-radius:50%;
+pointer-events:none;
+filter:blur(6px);
+opacity:0.8;
+z-index:998;
+animation:fadeTrail 0.6s linear forwards;
+}
+
+@keyframes fadeTrail{
+to{
+opacity:0;
+transform:scale(2);
+}
+}
 
 @media(max-width:700px){
 
@@ -286,13 +327,23 @@ flex-direction:column;
 
 <body>
 
+<div class="progress-bar" id="progress"></div>
 <div class="background"></div>
-<div class="particles" id="particles"></div>
+
 <div class="cursor" id="cursor"></div>
 
 <div class="hero">
+
+<video autoplay muted loop playsinline class="hero-video">
+<source src="montage.mp4" type="video/mp4">
+</video>
+
+<div class="hero-overlay"></div>
+
 <h1>Vyan Merchant</h1>
 <p>Gaming Video Editor • DaVinci Resolve</p>
+<a href="#projects" class="hero-btn">View My Work</a>
+
 </div>
 
 <nav>
@@ -386,21 +437,14 @@ workflow and editing techniques.
 
 <script>
 
-/* PARTICLES */
+/* SCROLL PROGRESS */
 
-const particles = document.getElementById("particles")
-
-for(let i=0;i<60;i++){
-
-let p=document.createElement("span")
-
-p.style.left=Math.random()*100+"%"
-p.style.animationDuration=10+Math.random()*10+"s"
-p.style.opacity=Math.random()
-
-particles.appendChild(p)
-
-}
+window.addEventListener("scroll",()=>{
+let scrollTop=document.documentElement.scrollTop
+let height=document.documentElement.scrollHeight-document.documentElement.clientHeight
+let scrolled=(scrollTop/height)*100
+document.getElementById("progress").style.width=scrolled+"%"
+})
 
 /* CURSOR */
 
@@ -409,18 +453,11 @@ const cursor=document.getElementById("cursor")
 document.addEventListener("mousemove",e=>{
 cursor.style.left=e.clientX+"px"
 cursor.style.top=e.clientY+"px"
-})
-
-/* NEON TRAIL */
-
-document.addEventListener("mousemove",e=>{
 
 let trail=document.createElement("div")
 trail.className="trail"
-
 trail.style.left=e.clientX+"px"
 trail.style.top=e.clientY+"px"
-
 document.body.appendChild(trail)
 
 setTimeout(()=>{
@@ -450,35 +487,6 @@ reveals[i].classList.add("active")
 }
 
 window.addEventListener("scroll",reveal)
-
-/* 3D TILT CARDS */
-
-const cards=document.querySelectorAll(".card")
-
-cards.forEach(card=>{
-
-card.addEventListener("mousemove",e=>{
-
-const rect=card.getBoundingClientRect()
-
-const x=e.clientX-rect.left
-const y=e.clientY-rect.top
-
-const centerX=rect.width/2
-const centerY=rect.height/2
-
-const rotateX=(y-centerY)/12
-const rotateY=(centerX-x)/12
-
-card.style.transform=`rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`
-
-})
-
-card.addEventListener("mouseleave",()=>{
-card.style.transform="rotateX(0) rotateY(0)"
-})
-
-})
 
 </script>
 
