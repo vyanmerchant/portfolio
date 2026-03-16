@@ -32,7 +32,7 @@ body{
   z-index:1000;
 }
 
-/* BACKGROUND */
+/* DAMASCUS STEEL BACKGROUND */
 .background{
   position:fixed;
   top:0;
@@ -40,14 +40,23 @@ body{
   width:100%;
   height:100%;
   z-index:-3;
-  background:linear-gradient(270deg,#020617,#0f172a,#1e293b,#020617);
-  background-size:600% 600%;
-  animation:bgMove 15s ease infinite;
+  background: url('damascus-steel.jpg') no-repeat center center;
+  background-size: cover;
+  filter: contrast(1.2) brightness(0.85);
 }
-@keyframes bgMove{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
+.background::after{
+  content:'';
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  background: repeating-linear-gradient(
+      45deg,
+      rgba(255,255,255,0.03) 0 2px,
+      transparent 2px 4px
+  );
+  pointer-events:none;
 }
 
 /* PARTICLES */
@@ -85,71 +94,58 @@ body{
   text-align:center;
   overflow:hidden;
 }
-.hero-video{
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  opacity:0.5;
-  z-index:-2;
-}
-.hero-overlay{
-  position:absolute;
-  width:100%;
-  height:100%;
-  background:linear-gradient(to bottom,#020617aa,#020617);
-  z-index:-1;
-}
 .hero h1{
   font-family:'Playfair Display',serif;
-  font-size:56px;
+  font-size:72px;
   margin:0;
-  background:linear-gradient(90deg,#38bdf8,#9333ea,#38bdf8);
-  background-size:200%;
+  background:linear-gradient(90deg,#38bdf8,#9333ea,#facc15,#38bdf8);
+  background-size:400%;
   -webkit-background-clip:text;
   color:transparent;
-  animation:glowText 6s linear infinite;
+  animation:glowText 8s linear infinite;
 }
 @keyframes glowText{
   0%{background-position:0%}
-  100%{background-position:200%}
+  100%{background-position:400%}
 }
 .hero p{
-  font-size:18px;
-  opacity:0.9;
+  font-size:20px;
+  color:#f0f0f0;
+  opacity:0.85;
+  margin-top:10px;
 }
 .hero-btn{
-  margin-top:25px;
-  padding:12px 28px;
+  margin-top:30px;
+  padding:14px 32px;
   background:#38bdf8;
-  border-radius:8px;
+  border-radius:12px;
   text-decoration:none;
   color:white;
   font-weight:bold;
   transition:0.3s;
+  box-shadow: 0 4px 15px rgba(56,189,248,0.3);
 }
 .hero-btn:hover{
   transform:scale(1.08);
   background:#0ea5e9;
+  box-shadow:0 6px 20px rgba(56,189,248,0.5);
 }
 
-/* NAV */
+/* NAVIGATION */
 nav{
-  position:sticky;
-  top:0;
-  text-align:center;
-  background:rgba(2,6,23,0.7);
-  backdrop-filter:blur(10px);
-  padding:12px;
+  position:fixed;
+  top:20px;
+  right:50px;
   z-index:100;
+  display:flex;
+  gap:25px;
+  font-weight:bold;
 }
 nav a{
   color:white;
-  margin:0 15px;
   text-decoration:none;
-  font-weight:bold;
+  font-size:16px;
+  transition:0.3s;
 }
 nav a:hover{
   color:#38bdf8;
@@ -180,7 +176,7 @@ h2{
   flex:1;
 }
 .skill-card{
-  background:#1e293b;
+  background:rgba(30,41,59,0.7);
   padding:10px 15px;
   margin:10px 0;
   border-radius:8px;
@@ -197,19 +193,19 @@ h2{
 
 /* CARD */
 .card{
-  background:rgba(30,41,59,0.7);
-  padding:18px;
-  border-radius:12px;
+  background:rgba(0,0,0,0.6);
+  padding:20px;
+  border-radius:15px;
   display:flex;
   flex-direction:column;
   gap:10px;
   position:relative;
-  transition:0.25s;
-  border:1px solid rgba(255,255,255,0.08);
+  transition:0.3s;
+  border:1px solid rgba(255,255,255,0.05);
 }
 .card:hover{
   transform:translateY(-6px);
-  box-shadow:0 0 15px rgba(56,189,248,0.25);
+  box-shadow:0 0 25px rgba(56,189,248,0.4);
 }
 .card::before{
   content:'';
@@ -219,7 +215,7 @@ h2{
   right:-2px;
   bottom:-2px;
   background:linear-gradient(45deg,#38bdf8,#9333ea,#38bdf8);
-  border-radius:12px;
+  border-radius:15px;
   z-index:-1;
   opacity:0;
   transition:0.3s;
@@ -303,7 +299,7 @@ footer{
 
 /* MOBILE */
 @media(max-width:700px){
-  .hero h1{font-size:40px;}
+  .hero h1{font-size:50px;}
   .about-container{flex-direction:column;}
 }
 </style>
@@ -318,10 +314,6 @@ footer{
 
 <!-- HERO -->
 <div class="hero">
-  <video autoplay muted loop playsinline class="hero-video">
-    <source src="montage.mp4" type="video/mp4">
-  </video>
-  <div class="hero-overlay"></div>
   <h1>Vyan Merchant</h1>
   <p>Gaming Video Editor • DaVinci Resolve</p>
   <a href="#projects" class="hero-btn">View My Work</a>
