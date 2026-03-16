@@ -3,13 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Portfolio</title>
+<title>Vyan Merchant Portfolio</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
 
-/* Animated background */
+/* GENERAL */
+
+body{
+margin:0;
+font-family:'Poppins', sans-serif;
+color:white;
+overflow-x:hidden;
+background:#020617;
+}
+
+/* Animated gradient background */
 
 .background{
 position:fixed;
@@ -17,7 +27,7 @@ top:0;
 left:0;
 width:100%;
 height:100%;
-z-index:-1;
+z-index:-3;
 background:linear-gradient(270deg,#020617,#0f172a,#1e293b,#020617);
 background-size:600% 600%;
 animation:bgMove 15s ease infinite;
@@ -29,62 +39,69 @@ animation:bgMove 15s ease infinite;
 100%{background-position:0% 50%;}
 }
 
-body{
-margin:0;
-font-family:'Poppins', sans-serif;
-color:white;
-}
+/* PARTICLES */
 
-.video-container{
-position:relative;
-width:100%;
-padding-bottom:56.25%;
-height:0;
-overflow:hidden;
-border-radius:8px;
-}
-
-.video-container iframe{
-position:absolute;
+.particles{
+position:fixed;
 top:0;
 left:0;
 width:100%;
 height:100%;
+z-index:-2;
+pointer-events:none;
 }
 
-.about-container{
+.particles span{
+position:absolute;
+display:block;
+width:3px;
+height:3px;
+background:white;
+opacity:0.3;
+animation:float 15s linear infinite;
+}
+
+@keyframes float{
+from{transform:translateY(100vh);}
+to{transform:translateY(-10vh);}
+}
+
+/* CURSOR GLOW */
+
+.cursor{
+width:20px;
+height:20px;
+border-radius:50%;
+background:#38bdf8;
+position:fixed;
+pointer-events:none;
+mix-blend-mode:screen;
+filter:blur(8px);
+z-index:999;
+}
+
+/* HERO */
+
+.hero{
+height:70vh;
 display:flex;
-flex-wrap:wrap;
-gap:40px;
-align-items:flex-start;
-}
-
-.about-text{
-flex:2;
-line-height:1.6;
-}
-
-.skills{
-flex:1;
-}
-
-.skill-card{
-background:#1e293b;
-padding:10px 15px;
-margin:10px 0;
-border-radius:8px;
-}
-
-header{
+flex-direction:column;
+justify-content:center;
+align-items:center;
 text-align:center;
-padding:40px;
-background:#1e293b;
 }
 
-header h1{
+.hero h1{
+font-size:55px;
 margin:0;
-font-size:40px;
 }
+
+.hero p{
+font-size:18px;
+opacity:0.8;
+}
+
+/* NAV */
 
 nav{
 text-align:center;
@@ -103,9 +120,11 @@ nav a:hover{
 color:#38bdf8;
 }
 
+/* SECTION */
+
 section{
-padding:50px;
-max-width:1000px;
+padding:60px 20px;
+max-width:1100px;
 margin:auto;
 }
 
@@ -113,14 +132,39 @@ h2{
 color:#38bdf8;
 }
 
-.projects{
-display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:20px;
-align-items:start;
+/* ABOUT */
+
+.about-container{
+display:flex;
+flex-wrap:wrap;
+gap:40px;
 }
 
-/* Card styling */
+.about-text{
+flex:2;
+line-height:1.6;
+}
+
+.skills{
+flex:1;
+}
+
+.skill-card{
+background:#1e293b;
+padding:10px 15px;
+margin:10px 0;
+border-radius:8px;
+}
+
+/* PROJECT GRID */
+
+.projects{
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
+gap:20px;
+}
+
+/* CARDS */
 
 .card{
 background:#1e293b;
@@ -138,7 +182,7 @@ transform:translateY(-10px);
 box-shadow:0 0 25px rgba(56,189,248,0.6);
 }
 
-/* Glow border effect */
+/* glow border */
 
 .card::before{
 content:'';
@@ -159,10 +203,45 @@ opacity:1;
 filter:blur(10px);
 }
 
+/* VIDEO */
+
+.video-container{
+position:relative;
+width:100%;
+padding-bottom:56.25%;
+height:0;
+}
+
+.video-container iframe{
+position:absolute;
+top:0;
+left:0;
+width:100%;
+height:100%;
+border-radius:8px;
+}
+
+/* FOOTER */
+
 footer{
 text-align:center;
 padding:20px;
 background:#020617;
+margin-top:40px;
+}
+
+/* MOBILE */
+
+@media(max-width:700px){
+
+.hero h1{
+font-size:40px;
+}
+
+.about-container{
+flex-direction:column;
+}
+
 }
 
 </style>
@@ -172,16 +251,27 @@ background:#020617;
 
 <div class="background"></div>
 
-<header>
+<div class="particles" id="particles"></div>
+
+<div class="cursor" id="cursor"></div>
+
+<!-- HERO -->
+
+<div class="hero">
+
 <h1>Vyan Merchant</h1>
-<p>| Video Editor |</p>
-</header>
+
+<p>Gaming Video Editor • DaVinci Resolve</p>
+
+</div>
 
 <nav>
 <a href="#about">About</a>
 <a href="#projects">Projects</a>
 <a href="#contact">Contact</a>
 </nav>
+
+<!-- ABOUT -->
 
 <section id="about">
 
@@ -192,14 +282,15 @@ background:#020617;
 <div class="about-text">
 
 <p>
-Hi, I’m <b>Vyan</b>, a 17-year-old who is passionate about gaming and video editing.
-I have been editing videos for the past <b>4 years</b> using <b>DaVinci Resolve</b>,
-focusing on smooth transitions, cinematic effects, and engaging gaming montages.
+Hi, I’m <b>Vyan</b>, a 17-year-old passionate about gaming and video editing.
+I have been editing for the past <b>4 years</b> using <b>DaVinci Resolve</b>,
+focusing on cinematic edits, smooth transitions and gaming montages.
 </p>
 
 <p>
-I’ve worked with several content creators producing gaming montages and edited
-videos for their channels. I have also completed an internship in video editing.
+I’ve worked with several creators producing gaming montages and edited content.
+I also completed a video editing internship where I improved my storytelling,
+workflow and editing techniques.
 </p>
 
 </div>
@@ -210,7 +301,7 @@ videos for their channels. I have also completed an internship in video editing.
 
 <div class="skill-card">🎬 DaVinci Resolve</div>
 <div class="skill-card">🎮 Gaming Montages</div>
-<div class="skill-card">⚡ Fast-paced Edits</div>
+<div class="skill-card">⚡ Fast Edits</div>
 <div class="skill-card">🎨 Color Grading</div>
 <div class="skill-card">📹 Content Creation</div>
 
@@ -220,6 +311,8 @@ videos for their channels. I have also completed an internship in video editing.
 
 </section>
 
+<!-- PROJECTS -->
+
 <section id="projects">
 
 <h2>Projects</h2>
@@ -227,47 +320,86 @@ videos for their channels. I have also completed an internship in video editing.
 <div class="projects">
 
 <div class="card">
-<h3>Project 1</h3>
-<p>Describe your project here.</p>
-</div>
-
-<div class="card">
 
 <h3>Valorant Montage</h3>
 
 <div class="video-container">
 <iframe src="https://www.youtube.com/embed/d0qvLlFEEH8"
-frameborder="0"
 allowfullscreen></iframe>
 </div>
 
-<p>A fast-paced gaming montage edited in DaVinci Resolve.</p>
+<p>A fast-paced montage edited in DaVinci Resolve.</p>
 
 </div>
 
 <div class="card">
-<h3>Project 3</h3>
+
+<h3>Project 2</h3>
+
 <p>Describe your project here.</p>
+
+</div>
+
+<div class="card">
+
+<h3>Project 3</h3>
+
+<p>Describe your project here.</p>
+
 </div>
 
 </div>
 
 </section>
+
+<!-- CONTACT -->
 
 <section id="contact">
 
 <h2>Contact</h2>
 
 <p>Email: vyanmerchant@gmail.com</p>
-<p>Instagram / GitHub links</p>
+
+<p>Add your Instagram / YouTube / GitHub</p>
 
 </section>
 
 <footer>
 
-<p>© 2026 My Portfolio</p>
+<p>© 2026 Vyan Merchant</p>
 
 </footer>
+
+<script>
+
+/* PARTICLES */
+
+const particles = document.getElementById("particles")
+
+for(let i=0;i<60;i++){
+
+let p=document.createElement("span")
+
+p.style.left=Math.random()*100+"%"
+
+p.style.animationDuration=10+Math.random()*10+"s"
+
+p.style.opacity=Math.random()
+
+particles.appendChild(p)
+
+}
+
+/* CURSOR GLOW */
+
+const cursor=document.getElementById("cursor")
+
+document.addEventListener("mousemove",e=>{
+cursor.style.left=e.clientX+"px"
+cursor.style.top=e.clientY+"px"
+})
+
+</script>
 
 </body>
 </html>
