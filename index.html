@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -10,9 +9,7 @@
 
 <style>
 
-html{
-scroll-behavior:smooth;
-}
+html{scroll-behavior:smooth;}
 
 body{
 margin:0;
@@ -22,7 +19,7 @@ overflow-x:hidden;
 background:#020617;
 }
 
-/* SCROLL PROGRESS BAR */
+/* SCROLL BAR */
 
 .progress-bar{
 position:fixed;
@@ -68,17 +65,10 @@ pointer-events:none;
 
 .particles span{
 position:absolute;
-display:block;
 width:3px;
 height:3px;
 background:white;
 opacity:0.3;
-animation:float 15s linear infinite;
-}
-
-@keyframes float{
-from{transform:translateY(100vh);}
-to{transform:translateY(-10vh);}
 }
 
 /* HERO */
@@ -128,10 +118,7 @@ animation:glowText 6s linear infinite;
 100%{background-position:200%}
 }
 
-.hero p{
-font-size:18px;
-opacity:0.9;
-}
+.hero p{font-size:18px;}
 
 .hero-btn{
 margin-top:25px;
@@ -141,12 +128,7 @@ border-radius:8px;
 text-decoration:none;
 color:white;
 font-weight:bold;
-transition:0.3s;
-}
-
-.hero-btn:hover{
-transform:scale(1.08);
-background:#0ea5e9;
+transition:0.2s;
 }
 
 /* NAV */
@@ -168,9 +150,7 @@ text-decoration:none;
 font-weight:bold;
 }
 
-nav a:hover{
-color:#38bdf8;
-}
+nav a:hover{color:#38bdf8;}
 
 /* SECTIONS */
 
@@ -180,9 +160,7 @@ max-width:1100px;
 margin:auto;
 }
 
-h2{
-color:#38bdf8;
-}
+h2{color:#38bdf8;}
 
 /* ABOUT */
 
@@ -192,14 +170,9 @@ flex-wrap:wrap;
 gap:40px;
 }
 
-.about-text{
-flex:2;
-line-height:1.6;
-}
+.about-text{flex:2;}
 
-.skills{
-flex:1;
-}
+.skills{flex:1;}
 
 .skill-card{
 background:#1e293b;
@@ -227,33 +200,30 @@ display:flex;
 flex-direction:column;
 gap:10px;
 position:relative;
-transition:all 0.25s ease;
 border:1px solid rgba(255,255,255,0.08);
 transform-style:preserve-3d;
+transition:0.2s;
 }
+
+.card::after{
+content:'';
+position:absolute;
+width:200px;
+height:200px;
+background:radial-gradient(circle,#38bdf855,transparent 70%);
+top:var(--y);
+left:var(--x);
+transform:translate(-50%,-50%);
+opacity:0;
+transition:0.3s;
+pointer-events:none;
+}
+
+.card:hover::after{opacity:1;}
 
 .card:hover{
 transform:translateY(-8px) scale(1.02);
 box-shadow:0 10px 20px rgba(0,0,0,0.4);
-}
-
-.card::before{
-content:'';
-position:absolute;
-top:-2px;
-left:-2px;
-right:-2px;
-bottom:-2px;
-background:linear-gradient(45deg,#38bdf8,#9333ea,#38bdf8);
-border-radius:12px;
-z-index:-1;
-opacity:0;
-transition:0.3s;
-}
-
-.card:hover::before{
-opacity:0.3;
-filter:blur(4px);
 }
 
 /* VIDEO */
@@ -276,16 +246,14 @@ border-radius:8px;
 transition:0.4s;
 }
 
-.card:hover iframe{
-transform:scale(1.08);
-}
+.card:hover iframe{transform:scale(1.08);}
 
 /* SCROLL REVEAL */
 
 .reveal{
 opacity:0;
 transform:translateY(40px);
-transition:all 0.8s ease;
+transition:0.8s;
 }
 
 .reveal.active{
@@ -311,7 +279,6 @@ border-radius:50%;
 background:#38bdf8;
 position:fixed;
 pointer-events:none;
-mix-blend-mode:screen;
 filter:blur(8px);
 z-index:999;
 }
@@ -330,14 +297,10 @@ animation:fadeTrail 0.6s linear forwards;
 }
 
 @keyframes fadeTrail{
-to{
-opacity:0;
-transform:scale(2);
-}
+to{opacity:0;transform:scale(2);}
 }
 
 </style>
-
 </head>
 
 <body>
@@ -345,7 +308,6 @@ transform:scale(2);
 <div class="progress-bar" id="progress"></div>
 <div class="background"></div>
 <div class="particles" id="particles"></div>
-
 <div class="cursor" id="cursor"></div>
 
 <div class="hero">
@@ -375,32 +337,24 @@ transform:scale(2);
 <div class="about-container">
 
 <div class="about-text">
-
 <p>
-Hi, I’m <b>Vyan</b>, a 17-year-old passionate about gaming and video editing.
-I have been editing for the past <b>4 years</b> using <b>DaVinci Resolve</b>.
+Hi, I'm <b>Vyan</b>, a 17-year-old gaming video editor with 4 years of experience using <b>DaVinci Resolve</b>.
 </p>
-
 <p>
-I’ve worked with several creators producing gaming montages and completed a video editing internship.
+I specialize in gaming montages, cinematic edits and fast-paced highlights.
 </p>
-
 </div>
 
 <div class="skills">
-
 <h3>Skills</h3>
-
 <div class="skill-card">🎬 DaVinci Resolve</div>
 <div class="skill-card">🎮 Gaming Montages</div>
 <div class="skill-card">⚡ Fast Edits</div>
 <div class="skill-card">🎨 Color Grading</div>
 <div class="skill-card">📹 Content Creation</div>
-
 </div>
 
 </div>
-
 </section>
 
 <section id="projects">
@@ -436,11 +390,8 @@ I’ve worked with several creators producing gaming montages and completed a vi
 </section>
 
 <section id="contact" class="reveal">
-
 <h2>Contact</h2>
-
 <p>Email: vyanmerchant@gmail.com</p>
-
 </section>
 
 <footer>
@@ -451,21 +402,54 @@ I’ve worked with several creators producing gaming montages and completed a vi
 
 /* PARTICLES */
 
-const particles = document.getElementById("particles")
+const particles=document.getElementById("particles")
+let particleArray=[]
 
 for(let i=0;i<70;i++){
 
 let p=document.createElement("span")
 
-p.style.left=Math.random()*100+"%"
-p.style.animationDuration=10+Math.random()*10+"s"
-p.style.opacity=Math.random()
+let x=Math.random()*window.innerWidth
+let y=Math.random()*window.innerHeight
+
+p.style.left=x+"px"
+p.style.top=y+"px"
+
+p.dataset.x=x
+p.dataset.y=y
 
 particles.appendChild(p)
 
+particleArray.push(p)
+
 }
 
-/* SCROLL PROGRESS */
+document.addEventListener("mousemove",(e)=>{
+
+particleArray.forEach(p=>{
+
+let x=parseFloat(p.dataset.x)
+let y=parseFloat(p.dataset.y)
+
+let dx=e.clientX-x
+let dy=e.clientY-y
+
+let distance=Math.sqrt(dx*dx+dy*dy)
+
+if(distance<150){
+
+x-=dx*0.02
+y-=dy*0.02
+
+p.style.transform=`translate(${x}px,${y}px)`
+
+}
+
+})
+
+})
+
+/* SCROLL BAR */
 
 window.addEventListener("scroll",()=>{
 let scrollTop=document.documentElement.scrollTop
@@ -479,19 +463,74 @@ document.getElementById("progress").style.width=scrolled+"%"
 const cursor=document.getElementById("cursor")
 
 document.addEventListener("mousemove",e=>{
+
 cursor.style.left=e.clientX+"px"
 cursor.style.top=e.clientY+"px"
 
 let trail=document.createElement("div")
 trail.className="trail"
+
 trail.style.left=e.clientX+"px"
 trail.style.top=e.clientY+"px"
+
 document.body.appendChild(trail)
 
-setTimeout(()=>{
-trail.remove()
-},600)
+setTimeout(()=>{trail.remove()},600)
 
+})
+
+/* 3D CARD TILT */
+
+const cards=document.querySelectorAll(".card")
+
+cards.forEach(card=>{
+
+card.addEventListener("mousemove",(e)=>{
+
+const rect=card.getBoundingClientRect()
+
+const x=e.clientX-rect.left
+const y=e.clientY-rect.top
+
+const centerX=rect.width/2
+const centerY=rect.height/2
+
+const rotateX=-(y-centerY)/15
+const rotateY=(x-centerX)/15
+
+card.style.transform=`rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`
+
+card.style.setProperty("--x",x+"px")
+card.style.setProperty("--y",y+"px")
+
+})
+
+card.addEventListener("mouseleave",()=>{
+card.style.transform="rotateX(0) rotateY(0)"
+})
+
+})
+
+/* MAGNETIC BUTTON */
+
+const button=document.querySelector(".hero-btn")
+
+button.addEventListener("mousemove",(e)=>{
+
+const rect=button.getBoundingClientRect()
+
+const x=e.clientX-rect.left
+const y=e.clientY-rect.top
+
+const moveX=(x-rect.width/2)/5
+const moveY=(y-rect.height/2)/5
+
+button.style.transform=`translate(${moveX}px,${moveY}px)`
+
+})
+
+button.addEventListener("mouseleave",()=>{
+button.style.transform="translate(0,0)"
 })
 
 /* SCROLL REVEAL */
@@ -500,11 +539,17 @@ function reveal(){
 
 const reveals=document.querySelectorAll(".reveal")
 
-for(let i=0;i<reveals.length;i++){
+reveals.forEach(el=>{
+if(el.getBoundingClientRect().top < window.innerHeight-100){
+el.classList.add("active")
+}
+})
 
-const windowHeight=window.innerHeight
-const elementTop=reveals[i].getBoundingClientRect().top
-const elementVisible=100
+}
 
-if(elementTop < windowHeight - elementVisibl
+window.addEventListener("scroll",reveal)
 
+</script>
+
+</body>
+</html>
