@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Portfolio</title>
+
+<style>
+body{
+    margin:0;
+    font-family: Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+}
+
+header{
+    text-align:center;
+    padding:40px;
+    background:#1e293b;
+}
+
+header h1{
+    margin:0;
+    font-size:40px;
+}
+
+nav{
+    text-align:center;
+    background:#020617;
+    padding:10px;
+}
+
+nav a{
+    color:white;
+    margin:0 15px;
+    text-decoration:none;
+    font-weight:bold;
+}
+
+section{
+    padding:50px;
+    max-width:1000px;
+    margin:auto;
+}
+
+.projects{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+    gap:20px;
+}
+
+.card{
+    background:#1e293b;
+    padding:20px;
+    border-radius:10px;
+}
+
+footer{
+    text-align:center;
+    padding:20px;
+    background:#020617;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Your Name</h1>
+<p>Designer | Coder | Video Editor</p>
+</header>
+
+<nav>
+<a href="#about">About</a>
+<a href="#projects">Projects</a>
+<a href="#contact">Contact</a>
+</nav>
+
+<section id="about">
+<h2>About Me</h2>
+<p>
+I am a student who enjoys designing, coding and editing videos. 
+I like creating creative projects and learning new technologies.
+</p>
+</section>
+
+<section id="projects">
+<h2>Projects</h2>
+
+<div class="projects">
+
+<div class="card">
+<h3>Project 1</h3>
+<p>Describe your project here.</p>
+</div>
+
+<div class="card">
+<h3>Project 2</h3>
+<p>Describe your project here.</p>
+</div>
+
+<div class="card">
+<h3>Project 3</h3>
+<p>Describe your project here.</p>
+</div>
+
+</div>
+
+</section>
+
+<section id="contact">
+<h2>Contact</h2>
+<p>Email: your@email.com</p>
+<p>Instagram / GitHub links</p>
+</section>
+
+<footer>
+<p>© 2026 My Portfolio</p>
+</footer>
+
+</body>
+</html>
