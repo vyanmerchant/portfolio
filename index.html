@@ -9,14 +9,19 @@
 
 <style>
 
-html{scroll-behavior:smooth;}
+/* GLOBAL */
+
+html{
+scroll-behavior:smooth;
+scroll-snap-type:y mandatory;
+}
 
 body{
 margin:0;
 font-family:'Poppins', sans-serif;
+background:#020617;
 color:white;
 overflow-x:hidden;
-background:#020617;
 }
 
 /* SCROLL BAR */
@@ -35,14 +40,12 @@ z-index:1000;
 
 .background{
 position:fixed;
-top:0;
-left:0;
 width:100%;
 height:100%;
 z-index:-3;
 background:linear-gradient(270deg,#020617,#0f172a,#1e293b,#020617);
 background-size:600% 600%;
-animation:bgMove 15s ease infinite;
+animation:bgMove 18s ease infinite;
 }
 
 @keyframes bgMove{
@@ -55,8 +58,6 @@ animation:bgMove 15s ease infinite;
 
 .particles{
 position:fixed;
-top:0;
-left:0;
 width:100%;
 height:100%;
 z-index:-2;
@@ -68,8 +69,8 @@ position:absolute;
 width:3px;
 height:3px;
 background:white;
-opacity:0.3;
-animation:float 15s linear infinite;
+opacity:0.25;
+animation:float 18s linear infinite;
 }
 
 @keyframes float{
@@ -80,13 +81,14 @@ to{transform:translateY(-10vh);}
 /* HERO */
 
 .hero{
-position:relative;
-height:85vh;
+height:100vh;
 display:flex;
 flex-direction:column;
 justify-content:center;
 align-items:center;
 text-align:center;
+scroll-snap-align:start;
+position:relative;
 overflow:hidden;
 }
 
@@ -97,7 +99,7 @@ left:0;
 width:100%;
 height:100%;
 object-fit:cover;
-opacity:0.50;
+opacity:0.45;
 z-index:-2;
 }
 
@@ -110,7 +112,7 @@ z-index:-1;
 }
 
 .hero h1{
-font-size:60px;
+font-size:64px;
 margin:0;
 background:linear-gradient(90deg,#38bdf8,#9333ea,#38bdf8);
 background-size:200%;
@@ -125,26 +127,27 @@ animation:glowText 6s linear infinite;
 }
 
 .hero-btn{
-margin-top:25px;
+margin-top:30px;
 padding:12px 28px;
 background:#38bdf8;
 border-radius:8px;
-text-decoration:none;
 color:white;
+text-decoration:none;
 font-weight:bold;
 transition:0.3s;
 }
 
 .hero-btn:hover{
-transform:scale(1.08);
+transform:scale(1.1);
 background:#0ea5e9;
 }
 
 /* NAV */
 
 nav{
-position:sticky;
+position:fixed;
 top:0;
+width:100%;
 text-align:center;
 background:rgba(2,6,23,0.7);
 backdrop-filter:blur(10px);
@@ -164,12 +167,19 @@ nav a:hover{color:#38bdf8;}
 /* SECTIONS */
 
 section{
-padding:70px 20px;
-max-width:1100px;
-margin:auto;
+min-height:100vh;
+display:flex;
+flex-direction:column;
+justify-content:center;
+align-items:center;
+scroll-snap-align:start;
+padding:60px 20px;
 }
 
-h2{color:#38bdf8;}
+h2{
+color:#38bdf8;
+margin-bottom:30px;
+}
 
 /* ABOUT */
 
@@ -177,11 +187,12 @@ h2{color:#38bdf8;}
 display:flex;
 flex-wrap:wrap;
 gap:40px;
+max-width:1000px;
 }
 
-.about-text{flex:2;}
+.about-text{flex:2}
 
-.skills{flex:1;}
+.skills{flex:1}
 
 .skill-card{
 background:#1e293b;
@@ -190,28 +201,31 @@ margin:10px 0;
 border-radius:8px;
 }
 
-/* PROJECT GRID */
+/* PROJECTS */
 
 .projects{
-display:grid;
-grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
-gap:20px;
+display:flex;
+flex-direction:column;
+gap:120px;
+width:100%;
+align-items:center;
 }
 
-/* CARD */
-
 .card{
-background: rgba(30,41,59,0.65);
-backdrop-filter: blur(10px);
-padding:20px;
+width:900px;
+max-width:90%;
+height:70vh;
+background:rgba(30,41,59,0.7);
+backdrop-filter:blur(10px);
 border-radius:12px;
+padding:25px;
+position:relative;
+border:1px solid rgba(255,255,255,0.08);
+transition:all 0.3s ease;
+overflow:hidden;
 display:flex;
 flex-direction:column;
 gap:10px;
-position:relative;
-border:1px solid rgba(255,255,255,0.08);
-transition:all 0.25s ease;
-overflow:hidden;
 }
 
 /* GLOW BORDER */
@@ -225,38 +239,37 @@ right:-2px;
 bottom:-2px;
 background:linear-gradient(45deg,#38bdf8,#9333ea,#38bdf8);
 border-radius:12px;
-z-index:-1;
 opacity:0;
 transition:0.3s;
+z-index:-1;
 }
 
 .card:hover::before{
 opacity:0.35;
-filter:blur(5px);
+filter:blur(6px);
 }
 
-/* CURSOR SPOTLIGHT */
+.card:hover{
+transform:translateY(-10px) scale(1.02);
+box-shadow:0 15px 25px rgba(0,0,0,0.5);
+}
+
+/* SPOTLIGHT */
 
 .card::after{
 content:'';
 position:absolute;
-width:200px;
-height:200px;
+width:220px;
+height:220px;
 background:radial-gradient(circle,#38bdf855,transparent 70%);
 top:var(--y);
 left:var(--x);
 transform:translate(-50%,-50%);
 opacity:0;
 transition:opacity 0.3s;
-pointer-events:none;
 }
 
-.card:hover::after{opacity:1;}
-
-.card:hover{
-transform:translateY(-8px) scale(1.02);
-box-shadow:0 10px 20px rgba(0,0,0,0.4);
-}
+.card:hover::after{opacity:1}
 
 /* VIDEO */
 
@@ -281,33 +294,19 @@ transition:0.4s;
 
 .card:hover .preview-video{transform:scale(1.05);}
 
-/* SCROLL REVEAL */
-
-.reveal{
-opacity:0;
-transform:translateY(40px);
-transition:0.8s;
-}
-
-.reveal.active{
-opacity:1;
-transform:translateY(0);
-}
-
-/* FOOTER */
+/* CONTACT */
 
 footer{
 text-align:center;
 padding:20px;
 background:#020617;
-margin-top:40px;
 }
 
 /* CURSOR */
 
 .cursor{
-width:20px;
-height:20px;
+width:18px;
+height:18px;
 border-radius:50%;
 background:#38bdf8;
 position:fixed;
@@ -343,6 +342,12 @@ to{opacity:0;transform:scale(2);}
 <div class="particles" id="particles"></div>
 <div class="cursor" id="cursor"></div>
 
+<nav>
+<a href="#about">About</a>
+<a href="#projects">Projects</a>
+<a href="#contact">Contact</a>
+</nav>
+
 <div class="hero">
 
 <video autoplay muted loop playsinline class="hero-video">
@@ -357,20 +362,14 @@ to{opacity:0;transform:scale(2);}
 
 </div>
 
-<nav>
-<a href="#about">About</a>
-<a href="#projects">Projects</a>
-<a href="#contact">Contact</a>
-</nav>
-
-<section id="about" class="reveal">
+<section id="about">
 
 <h2>About Me</h2>
 
 <div class="about-container">
 
 <div class="about-text">
-<p>Hi, I'm <b>Vyan</b>, a 17-year-old gaming video editor with 4 years of experience using <b>DaVinci Resolve</b>.</p>
+<p>Hi, I'm <b>Vyan</b>, a 17-year-old gaming video editor with 4 years of experience using <b>DaVinci Resolve</b>. I specialize in fast-paced gaming montages, cinematic effects, and engaging highlight edits.</p>
 </div>
 
 <div class="skills">
@@ -382,6 +381,7 @@ to{opacity:0;transform:scale(2);}
 </div>
 
 </div>
+
 </section>
 
 <section id="projects">
@@ -390,17 +390,45 @@ to{opacity:0;transform:scale(2);}
 
 <div class="projects">
 
-<div class="card reveal">
+<div class="card">
 
-<h3>Valorant Montage</h3>
+<h3>Project 1</h3>
 
 <div class="video-container">
 <video class="preview-video" muted loop>
-<source src="valorant-preview.mp4" type="video/mp4">
+<source src="project1.mp4" type="video/mp4">
 </video>
 </div>
 
-<p>A fast-paced montage edited in DaVinci Resolve.</p>
+<p>High-energy gaming montage edited in DaVinci Resolve.</p>
+
+</div>
+
+<div class="card">
+
+<h3>Project 2</h3>
+
+<div class="video-container">
+<video class="preview-video" muted loop>
+<source src="project2.mp4" type="video/mp4">
+</video>
+</div>
+
+<p>Fast paced highlight reel with cinematic transitions.</p>
+
+</div>
+
+<div class="card">
+
+<h3>Project 3</h3>
+
+<div class="video-container">
+<video class="preview-video" muted loop>
+<source src="project3.mp4" type="video/mp4">
+</video>
+</div>
+
+<p>Creative gaming montage with smooth effects.</p>
 
 </div>
 
@@ -408,7 +436,7 @@ to{opacity:0;transform:scale(2);}
 
 </section>
 
-<section id="contact" class="reveal">
+<section id="contact">
 <h2>Contact</h2>
 <p>Email: vyanmerchant@gmail.com</p>
 </section>
@@ -445,7 +473,7 @@ trail.style.left=e.clientX+"px"
 trail.style.top=e.clientY+"px"
 document.body.appendChild(trail)
 
-setTimeout(()=>{trail.remove()},600)
+setTimeout(()=>trail.remove(),600)
 })
 
 /* SCROLL BAR */
@@ -462,7 +490,7 @@ document.getElementById("progress").style.width=scrolled+"%"
 const videos=document.querySelectorAll(".preview-video")
 
 videos.forEach(video=>{
-video.closest(".card").addEventListener("mouseenter",()=>{video.play()})
+video.closest(".card").addEventListener("mouseenter",()=>video.play())
 video.closest(".card").addEventListener("mouseleave",()=>{
 video.pause()
 video.currentTime=0
@@ -483,22 +511,7 @@ card.style.setProperty("--y",y+"px")
 })
 })
 
-/* SCROLL REVEAL */
-
-function reveal(){
-document.querySelectorAll(".reveal").forEach(el=>{
-if(el.getBoundingClientRect().top < window.innerHeight-100){
-el.classList.add("active")
-}
-})
-}
-
-window.addEventListener("scroll",reveal)
-
 </script>
-
-</body>
-</html>
 
 </body>
 </html>
