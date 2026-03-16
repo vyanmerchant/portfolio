@@ -32,7 +32,7 @@ body{
   z-index:1000;
 }
 
-/* DAMASCUS STEEL BACKGROUND */
+/* DAMASCUS STEEL WAVY BACKGROUND */
 .background{
   position:fixed;
   top:0;
@@ -41,11 +41,11 @@ body{
   height:100%;
   z-index:-3;
   background: url('damascus-steel.jpg') no-repeat center center;
-  background-size: cover;
-  filter: contrast(1.2) brightness(0.85);
-  animation:metalShimmer 15s linear infinite;
+  background-size:cover;
+  filter:contrast(1.2) brightness(0.85);
+  animation:metalWave 20s linear infinite;
 }
-@keyframes metalShimmer{
+@keyframes metalWave{
   0%{background-position:0% 50%;}
   50%{background-position:100% 50%;}
   100%{background-position:0% 50%;}
@@ -93,7 +93,7 @@ body{
   width:100%;
   height:100%;
   object-fit:cover;
-  opacity:0.35;
+  opacity:0.5; /* Increased visibility */
   z-index:-2;
   mix-blend-mode:overlay;
 }
