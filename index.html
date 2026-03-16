@@ -9,8 +9,6 @@
 
 <style>
 
-/* GENERAL */
-
 body{
 margin:0;
 font-family:'Poppins', sans-serif;
@@ -19,7 +17,7 @@ overflow-x:hidden;
 background:#020617;
 }
 
-/* Animated gradient background */
+/* BACKGROUND */
 
 .background{
 position:fixed;
@@ -66,7 +64,7 @@ from{transform:translateY(100vh);}
 to{transform:translateY(-10vh);}
 }
 
-/* CURSOR GLOW */
+/* CURSOR */
 
 .cursor{
 width:20px;
@@ -78,6 +76,28 @@ pointer-events:none;
 mix-blend-mode:screen;
 filter:blur(8px);
 z-index:999;
+}
+
+/* NEON TRAIL */
+
+.trail{
+position:fixed;
+width:8px;
+height:8px;
+background:#38bdf8;
+border-radius:50%;
+pointer-events:none;
+filter:blur(6px);
+opacity:0.8;
+z-index:998;
+animation:fadeTrail 0.6s linear forwards;
+}
+
+@keyframes fadeTrail{
+to{
+opacity:0;
+transform:scale(2);
+}
 }
 
 /* HERO */
@@ -120,7 +140,7 @@ nav a:hover{
 color:#38bdf8;
 }
 
-/* SECTION */
+/* SECTIONS */
 
 section{
 padding:60px 20px;
@@ -164,30 +184,29 @@ grid-template-columns:repeat(auto-fit,minmax(300px,1fr));
 gap:20px;
 }
 
-/* CARDS */
+/* CARD */
 
 .card{
 background: rgba(30,41,59,0.65);
 backdrop-filter: blur(10px);
--webkit-backdrop-filter: blur(10px);
 padding:20px;
 border-radius:12px;
 display:flex;
 flex-direction:column;
 gap:10px;
 position:relative;
-transition:all 0.3s ease;
+transition:transform 0.2s ease;
 border:1px solid rgba(255,255,255,0.08);
+transform-style:preserve-3d;
+perspective:1000px;
 }
-
-/* smoother hover */
 
 .card:hover{
 transform:translateY(-6px) scale(1.02);
 box-shadow:0 8px 18px rgba(0,0,0,0.35);
 }
 
-/* glow border */
+/* GLOW BORDER */
 
 .card::before{
 content:'';
@@ -204,9 +223,10 @@ transition:0.3s;
 }
 
 .card:hover::before{
-opacity:0.3;
+opacity:0.25;
 filter:blur(3px);
 }
+
 /* VIDEO */
 
 .video-container{
@@ -223,6 +243,19 @@ left:0;
 width:100%;
 height:100%;
 border-radius:8px;
+}
+
+/* SCROLL REVEAL */
+
+.reveal{
+opacity:0;
+transform:translateY(40px);
+transition:all 0.8s ease;
+}
+
+.reveal.active{
+opacity:1;
+transform:translateY(0);
 }
 
 /* FOOTER */
@@ -254,19 +287,12 @@ flex-direction:column;
 <body>
 
 <div class="background"></div>
-
 <div class="particles" id="particles"></div>
-
 <div class="cursor" id="cursor"></div>
 
-<!-- HERO -->
-
 <div class="hero">
-
 <h1>Vyan Merchant</h1>
-
 <p>Gaming Video Editor • DaVinci Resolve</p>
-
 </div>
 
 <nav>
@@ -275,9 +301,7 @@ flex-direction:column;
 <a href="#contact">Contact</a>
 </nav>
 
-<!-- ABOUT -->
-
-<section id="about">
+<section id="about" class="reveal">
 
 <h2>About Me</h2>
 
@@ -315,63 +339,49 @@ workflow and editing techniques.
 
 </section>
 
-<!-- PROJECTS -->
-
 <section id="projects">
 
 <h2>Projects</h2>
 
 <div class="projects">
 
-<div class="card">
+<div class="card reveal">
 
 <h3>Valorant Montage</h3>
 
 <div class="video-container">
-<iframe src="https://www.youtube.com/embed/d0qvLlFEEH8"
-allowfullscreen></iframe>
+<iframe src="https://www.youtube.com/embed/d0qvLlFEEH8" allowfullscreen></iframe>
 </div>
 
 <p>A fast-paced montage edited in DaVinci Resolve.</p>
 
 </div>
 
-<div class="card">
-
+<div class="card reveal">
 <h3>Project 2</h3>
-
 <p>Work in progress.</p>
-
 </div>
 
-<div class="card">
-
+<div class="card reveal">
 <h3>Project 3</h3>
-
 <p>Work in progress.</p>
-
 </div>
 
 </div>
 
 </section>
 
-<!-- CONTACT -->
-
-<section id="contact">
+<section id="contact" class="reveal">
 
 <h2>Contact</h2>
 
 <p>Email: vyanmerchant@gmail.com</p>
-
 <p>Instagram / YouTube / GitHub (soon)</p>
 
 </section>
 
 <footer>
-
 <p>© 2026 Vyan Merchant</p>
-
 </footer>
 
 <script>
@@ -385,22 +395,89 @@ for(let i=0;i<60;i++){
 let p=document.createElement("span")
 
 p.style.left=Math.random()*100+"%"
-
 p.style.animationDuration=10+Math.random()*10+"s"
-
 p.style.opacity=Math.random()
 
 particles.appendChild(p)
 
 }
 
-/* CURSOR GLOW */
+/* CURSOR */
 
 const cursor=document.getElementById("cursor")
 
 document.addEventListener("mousemove",e=>{
 cursor.style.left=e.clientX+"px"
 cursor.style.top=e.clientY+"px"
+})
+
+/* NEON TRAIL */
+
+document.addEventListener("mousemove",e=>{
+
+let trail=document.createElement("div")
+trail.className="trail"
+
+trail.style.left=e.clientX+"px"
+trail.style.top=e.clientY+"px"
+
+document.body.appendChild(trail)
+
+setTimeout(()=>{
+trail.remove()
+},600)
+
+})
+
+/* SCROLL REVEAL */
+
+function reveal(){
+
+const reveals=document.querySelectorAll(".reveal")
+
+for(let i=0;i<reveals.length;i++){
+
+const windowHeight=window.innerHeight
+const elementTop=reveals[i].getBoundingClientRect().top
+const elementVisible=100
+
+if(elementTop < windowHeight - elementVisible){
+reveals[i].classList.add("active")
+}
+
+}
+
+}
+
+window.addEventListener("scroll",reveal)
+
+/* 3D TILT CARDS */
+
+const cards=document.querySelectorAll(".card")
+
+cards.forEach(card=>{
+
+card.addEventListener("mousemove",e=>{
+
+const rect=card.getBoundingClientRect()
+
+const x=e.clientX-rect.left
+const y=e.clientY-rect.top
+
+const centerX=rect.width/2
+const centerY=rect.height/2
+
+const rotateX=(y-centerY)/12
+const rotateY=(centerX-x)/12
+
+card.style.transform=`rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.03)`
+
+})
+
+card.addEventListener("mouseleave",()=>{
+card.style.transform="rotateX(0) rotateY(0)"
+})
+
 })
 
 </script>
