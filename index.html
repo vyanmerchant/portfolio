@@ -69,10 +69,21 @@ section{
 
 .projects{
 display:grid;
-grid-template-columns:repeat(3,1fr);
+grid-template-columns:repeat(3, 1fr);
 gap:20px;
 }
 
+@media (max-width: 900px){
+.projects{
+grid-template-columns:repeat(2, 1fr);
+}
+}
+
+@media (max-width: 600px){
+.projects{
+grid-template-columns:1fr;
+}
+}
 .card{
 background:#1e293b;
 padding:20px;
@@ -163,7 +174,7 @@ and creating high-quality content.
 <h3>Valorant Montage</h3>
 
 <iframe width="100%" height="180"
-src="https://www.youtube.com/watch?v=d0qvLlFEEH8"
+src="https://www.youtube.com/embed/d0qvLlFEEH8"
 frameborder="0"
 allowfullscreen>
 </iframe>
@@ -182,7 +193,7 @@ allowfullscreen>
 
 <section id="contact">
 <h2>Contact</h2>
-<p>Email: vyanmerchant@email.com</p>
+<p>Email: vyanmerchant@gmail.com</p>
 <p>Instagram / GitHub links</p>
 </section>
 
