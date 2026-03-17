@@ -3,348 +3,639 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vyan Merchant Portfolio</title>
+<title>Vyan Merchant — Video Editor</title>
 
-<!-- Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&family=Space+Grotesk:wght@400;600&family=Playfair+Display:wght@500&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-html{
-  scroll-behavior:smooth;
+/* ─── RESET & BASE ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --black: #080808;
+  --white: #f0ede8;
+  --red: #7dd3fc;
+  --red-dim: #38bdf8;
+  --gray: #1a1a1a;
+  --gray-mid: #2a2a2a;
+  --gray-text: #777;
+  --font-display: 'Anton', sans-serif;
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-sans: 'Syne', sans-serif;
+  --font-mono: 'Space Mono', monospace;
 }
 
-body{
-  margin:0;
-  font-family:'Poppins',sans-serif;
-  color:white;
-  overflow-x:hidden;
-  background:#020617;
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  cursor: none;
 }
 
-/* SCROLL PROGRESS BAR */
-.progress-bar{
-  position:fixed;
-  top:0;
-  left:0;
-  height:3px;
-  width:0%;
-  background:#38bdf8;
-  z-index:1000;
+/* ─── CUSTOM CURSOR ─── */
+.cursor-dot {
+  width: 4px; height: 4px;
+  background: var(--white);
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  mix-blend-mode: difference;
+}
+.cursor-ring {
+  width: 1px; height: 20px;
+  background: var(--white);
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9998;
+  mix-blend-mode: difference;
+  opacity: 0.6;
+}
+.cursor-ring::after {
+  content: '';
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%) rotate(90deg);
+  width: 1px; height: 20px;
+  background: var(--white);
 }
 
-/* GRADIENT METALLIC WAVY BACKGROUND */
-.background{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  z-index:-3;
-  background: linear-gradient(270deg, #0f172a, #1e293b, #0f172a, #020617);
-  background-size:600% 600%;
-  animation:bgMove 15s ease infinite;
+/* ─── DAMASCUS BACKGROUND ─── */
+#damascus-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+  opacity: 1;
 }
-@keyframes bgMove{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
+#progress {
+  position: fixed; top: 0; left: 0;
+  height: 2px; width: 0%;
+  background: var(--red);
+  z-index: 1000;
+  transition: width 0.05s linear;
 }
 
-/* PARTICLES */
-.particles{
-  position:fixed;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  z-index:-2;
-  pointer-events:none;
+/* ─── NAVIGATION ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 48px;
+  mix-blend-mode: normal;
 }
-.particles span{
-  position:absolute;
-  display:block;
-  width:3px;
-  height:3px;
-  background:white;
-  opacity:0.3;
-  animation:float 15s linear infinite;
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0.05em;
+  color: var(--white);
+  text-decoration: none;
 }
-@keyframes float{
-  from{transform:translateY(100vh);}
-  to{transform:translateY(-10vh);}
+.nav-logo span { color: var(--red); }
+.nav-links { display: flex; gap: 36px; }
+.nav-links a {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gray-text);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--white); }
+
+/* ─── HERO ─── */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 700px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 48px 64px;
+  overflow: hidden;
 }
 
-/* HERO */
-.hero{
-  position:relative;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  text-align:center;
-  overflow:hidden;
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  filter: brightness(0.45) saturate(0.8);
+}
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.3) 50%, rgba(8,8,8,0.5) 100%);
+  z-index: 1;
 }
 
-/* HERO VIDEO */
-.hero-video{
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  opacity:0.5; /* video visibility */
-  z-index:-2;
+.hero-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hero-tag::before {
+  content: '';
+  display: inline-block;
+  width: 32px; height: 1px;
+  background: var(--red);
 }
 
-/* GRADIENT OVERLAY TO SMOOTH VIDEO-BACKGROUND BLEND */
-.hero-overlay{
-  position:absolute;
-  width:100%;
-  height:100%;
-  background: linear-gradient(to bottom, rgba(2,6,23,0.6), rgba(2,6,23,0.2), rgba(2,6,23,0.6));
-  z-index:-1;
+.hero-name {
+  font-family: var(--font-display);
+  font-size: clamp(80px, 14vw, 180px);
+  line-height: 0.92;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  position: relative;
+  z-index: 2;
+  animation: heroSlide 1s cubic-bezier(0.16,1,0.3,1) both;
+}
+@keyframes heroSlide {
+  from { opacity: 0; transform: translateY(60px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.hero-name .accent { color: var(--red); }
+
+.hero-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 32px;
+  position: relative;
+  z-index: 2;
+}
+.hero-sub {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 20px;
+  color: var(--gray-text);
+  line-height: 1.6;
+  max-width: 340px;
+  font-weight: 300;
+}
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  background: transparent;
+  border: 1px solid rgba(240,237,232,0.25);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+.hero-cta:hover {
+  background: var(--red);
+  border-color: var(--red);
+  transform: translateY(-2px);
+}
+.hero-cta svg { transition: transform 0.2s; }
+.hero-cta:hover svg { transform: translateX(4px); }
+
+/* ─── MARQUEE ─── */
+.marquee-wrap {
+  background: var(--red);
+  overflow: hidden;
+  padding: 13px 0;
+  border-top: 1px solid var(--red);
+  border-bottom: 1px solid rgba(8,8,8,0.2);
+}
+.marquee-track {
+  display: flex;
+  gap: 0;
+  animation: marquee 18s linear infinite;
+  white-space: nowrap;
+}
+.marquee-track span {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0c1a2e;
+  padding: 0 28px;
+}
+.marquee-track .dot {
+  color: rgba(12,26,46,0.35);
+  padding: 0;
+}
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
 }
 
-/* HERO TEXT WITH METALLIC SHIMMER */
-.hero h1{
-  font-family:'Playfair Display',serif;
-  font-size:72px;
-  margin:0;
-  color:white;
-  position:relative;
-  background:linear-gradient(120deg, #b0b0b0, #ffffff, #909090, #b0b0b0);
-  background-size:300% 300%;
-  -webkit-background-clip:text;
-  -webkit-text-fill-color:transparent;
-  animation:shine 6s ease-in-out infinite;
+/* ─── SECTIONS ─── */
+.section { padding: 120px 48px; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
-@keyframes shine{
-  0%{background-position:0% 50%;}
-  50%{background-position:100% 50%;}
-  100%{background-position:0% 50%;}
-}
-.hero p{
-  font-size:20px;
-  color:#f0f0f0;
-  opacity:0.85;
-  margin-top:10px;
-}
-.hero-btn{
-  margin-top:30px;
-  padding:14px 32px;
-  background:#38bdf8;
-  border-radius:12px;
-  text-decoration:none;
-  color:white;
-  font-weight:bold;
-  transition:0.3s;
-  box-shadow: 0 4px 15px rgba(56,189,248,0.3);
-}
-.hero-btn:hover{
-  transform:scale(1.08);
-  background:#0ea5e9;
-  box-shadow:0 6px 20px rgba(56,189,248,0.5);
+.section-label::after {
+  content: '';
+  flex: 1;
+  max-width: 80px;
+  height: 1px;
+  background: var(--red);
+  opacity: 0.4;
 }
 
-/* NAVIGATION */
-nav{
-  position:fixed;
-  top:20px;
-  right:50px;
-  z-index:100;
-  display:flex;
-  gap:25px;
-  font-weight:bold;
+/* ─── ABOUT ─── */
+#about {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+  max-width: 1200px;
+  margin: 0 auto;
 }
-nav a{
-  color:white;
-  text-decoration:none;
-  font-size:16px;
-  transition:0.3s;
+.about-left .big-text {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 6vw, 82px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  margin-bottom: 32px;
 }
-nav a:hover{
-  color:#38bdf8;
+.about-left .big-text .accent { color: var(--red); }
+.about-body {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--gray-text);
+  margin-bottom: 48px;
+}
+.about-body b { color: var(--white); font-weight: 400; font-style: italic; }
+
+/* STATS */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--gray-mid);
+  border: 1px solid var(--gray-mid);
+  margin-bottom: 48px;
+}
+.stat-item {
+  background: var(--black);
+  padding: 28px 24px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 52px;
+  color: var(--white);
+  line-height: 1;
+  display: block;
+}
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gray-text);
+  margin-top: 6px;
+  display: block;
 }
 
-/* SECTIONS */
-section{
-  padding:70px 20px;
-  max-width:1100px;
-  margin:auto;
+/* SKILLS */
+.skills-right .section-label { margin-top: 0; }
+.skill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--gray-mid);
 }
-h2{
-  font-family:'Space Grotesk',sans-serif;
-  color:#38bdf8;
-}
-
-/* ABOUT */
-.about-container{
-  display:flex;
-  flex-wrap:wrap;
-  gap:40px;
-}
-.about-text{
-  flex:2;
-  line-height:1.6;
-}
-.skills{
-  flex:1;
-}
-.skill-card{
-  background:rgba(30,41,59,0.7);
-  padding:10px 15px;
-  margin:10px 0;
-  border-radius:8px;
+.skill-row:first-of-type { border-top: 1px solid var(--gray-mid); }
+.skill-name {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--white);
 }
 
-/* PROJECTS GRID */
-.projects{
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-  gap:30px;
-  max-width:1000px;
-  margin:auto;
+/* ─── DIVIDER ─── */
+.divider {
+  height: 1px;
+  background: var(--gray-mid);
+  margin: 0 48px;
 }
 
-/* CARD */
-.card{
-  background:rgba(0,0,0,0.6);
-  padding:20px;
-  border-radius:15px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  position:relative;
-  transition:0.3s;
-  border:1px solid rgba(255,255,255,0.05);
-  overflow:hidden;
+/* ─── PROJECTS ─── */
+#projects {
+  max-width: 1200px;
+  margin: 0 auto;
 }
-.card:hover{
-  transform:translateY(-6px);
-  box-shadow:0 0 25px rgba(56,189,248,0.4);
-}
-.card::before{
-  content:'';
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  background:rgba(0,0,0,0.5);
-  opacity:0;
-  transition:0.3s;
-  z-index:2;
-}
-.card:hover::before{
-  opacity:1;
-}
-.card:hover .video-container iframe{
-  transform:scale(1.1);
-}
-.view-btn{
-  position:absolute;
-  top:50%;
-  left:50%;
-  transform:translate(-50%, -50%);
-  padding:12px 24px;
-  background:#38bdf8;
-  color:white;
-  font-weight:bold;
-  border-radius:8px;
-  text-decoration:none;
-  opacity:0;
-  transition:0.3s;
-  z-index:3;
-}
-.card:hover .view-btn{
-  opacity:1;
+#projects .section-label { margin-bottom: 60px; }
+
+.work-layout {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+  align-items: start;
+  min-height: 420px;
 }
 
-/* VIDEO CONTAINER */
-.video-container{
-  position:relative;
-  width:100%;
-  padding-bottom:56.25%;
-  height:0;
-  overflow:hidden;
-  border-radius:8px;
+/* Left: project list */
+.work-list { border-top: 1px solid var(--gray-mid); }
+
+.work-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 28px 0;
+  border-bottom: 1px solid var(--gray-mid);
+  cursor: none;
+  position: relative;
+  transition: padding-left 0.3s cubic-bezier(0.16,1,0.3,1);
 }
-.video-container iframe{
-  position:absolute;
-  top:0;
-  left:0;
-  width:100%;
-  height:100%;
-  border:0;
-  transition:0.4s;
+.work-item::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 0;
+  background: var(--red);
+  opacity: 0.12;
+  transition: width 0.3s cubic-bezier(0.16,1,0.3,1);
+}
+.work-item:hover::before { width: 100%; }
+.work-item.active::before { width: 100%; opacity: 0.08; }
+.work-item:hover { padding-left: 16px; }
+.work-item.active { padding-left: 16px; }
+
+.work-item-left { display: flex; align-items: center; gap: 20px; }
+.work-num {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--gray-text);
+  letter-spacing: 0.1em;
+  min-width: 24px;
+}
+.work-item.active .work-num { color: var(--red); }
+.work-title {
+  font-family: var(--font-display);
+  font-size: clamp(22px, 2.8vw, 34px);
+  letter-spacing: 0.02em;
+  color: var(--gray-text);
+  transition: color 0.2s;
+  line-height: 1;
+}
+.work-item:hover .work-title,
+.work-item.active .work-title { color: var(--white); }
+
+.work-meta {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--gray-text);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+.work-item:hover .work-meta,
+.work-item.active .work-meta { opacity: 1; }
+
+.work-arrow {
+  font-family: var(--font-mono);
+  font-size: 16px;
+  color: var(--red);
+  opacity: 0;
+  transform: translateX(-8px);
+  transition: opacity 0.2s, transform 0.3s;
+  text-decoration: none;
+}
+.work-item:hover .work-arrow,
+.work-item.active .work-arrow {
+  opacity: 1;
+  transform: translateX(0);
 }
 
-/* SCROLL REVEAL */
-.reveal{
-  opacity:0;
-  transform:translateY(40px);
-  transition:all 0.8s ease;
+/* Right: preview panel */
+.work-preview {
+  position: sticky;
+  top: 80px;
+  padding-left: 48px;
 }
-.reveal.active{
-  opacity:1;
-  transform:translateY(0);
+.work-preview-inner {
+  position: relative;
+  width: 100%;
+  padding-bottom: 58%;
+  background: var(--gray);
+  overflow: hidden;
+}
+.work-preview-inner iframe {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  border: none;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  pointer-events: none;
+}
+.work-preview-inner iframe.active {
+  opacity: 1;
+  pointer-events: none;
+}
+.work-preview-placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 12px;
+  transition: opacity 0.3s;
+}
+.work-preview-placeholder.hidden { opacity: 0; }
+.work-preview-placeholder span {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gray-text);
+}
+.preview-line {
+  width: 32px; height: 1px;
+  background: var(--gray-mid);
+}
+.work-preview-caption {
+  margin-top: 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.work-preview-caption-title {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--gray-text);
+  transition: color 0.3s;
+}
+.work-preview-caption-title.visible { color: var(--white); }
+.work-open {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--red);
+  text-decoration: none;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.work-open.visible { opacity: 1; }
+
+@media (max-width: 768px) {
+  .work-layout { grid-template-columns: 1fr; }
+  .work-preview { display: none; }
 }
 
-/* FOOTER */
-footer{
-  text-align:center;
-  padding:20px;
-  background:#020617;
-  margin-top:40px;
+/* ─── CONTACT ─── */
+#contact {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.contact-big {
+  font-family: var(--font-display);
+  font-size: clamp(56px, 9vw, 130px);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  margin-bottom: 48px;
+}
+.contact-big .accent { color: var(--red); }
+
+.contact-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 32px;
+  padding-top: 48px;
+  border-top: 1px solid var(--gray-mid);
+}
+.contact-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.contact-link {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gray-text);
+  text-decoration: none;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.contact-link:hover { color: var(--white); }
+.contact-link svg { opacity: 0.4; transition: opacity 0.2s; }
+.contact-link:hover svg { opacity: 1; }
+
+.contact-email {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(22px, 3vw, 38px);
+  font-weight: 300;
+  color: var(--white);
+  text-decoration: none;
+  transition: color 0.2s;
+  display: inline-block;
+}
+.contact-email:hover { color: var(--red); }
+
+/* ─── FOOTER ─── */
+footer {
+  padding: 32px 48px;
+  border-top: 1px solid var(--gray-mid);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+footer p {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--gray-text);
+  letter-spacing: 0.12em;
 }
 
-/* CURSOR + NEON TRAIL */
-.cursor{
-  width:20px;
-  height:20px;
-  border-radius:50%;
-  background:#38bdf8;
-  position:fixed;
-  pointer-events:none;
-  mix-blend-mode:screen;
-  filter:blur(8px);
-  z-index:999;
+/* ─── REVEAL ANIMATION ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
 }
-.trail{
-  position:fixed;
-  width:8px;
-  height:8px;
-  background:#38bdf8;
-  border-radius:50%;
-  pointer-events:none;
-  filter:blur(6px);
-  opacity:0.8;
-  z-index:998;
-  animation:fadeTrail 0.6s linear forwards;
-}
-@keyframes fadeTrail{
-  to{
-    opacity:0;
-    transform:scale(2);
-  }
+.reveal.visible {
+  opacity: 1;
+  transform: none;
 }
 
-/* MOBILE */
-@media(max-width:700px){
-  .hero h1{font-size:50px;}
-  .about-container{flex-direction:column;}
+/* ─── MOBILE ─── */
+@media (max-width: 768px) {
+  nav { padding: 20px 24px; }
+  .hero { padding: 0 24px 48px; }
+  #about { grid-template-columns: 1fr; padding: 60px 24px; }
+  .section { padding: 60px 24px; }
+  .projects-row-2 { grid-template-columns: 1fr; }
+  footer { padding: 24px; }
+  .divider { margin: 0 24px; }
+  .contact-big { font-size: clamp(48px, 12vw, 80px); }
+  .nav-links { display: none; }
 }
 </style>
 </head>
 
 <body>
 
-<div class="progress-bar" id="progress"></div>
-<div class="background"></div>
-<div class="particles" id="particles"></div>
-<div class="cursor" id="cursor"></div>
+<div id="progress"></div>
+<canvas id="damascus-bg"></canvas>
+<div class="cursor-dot" id="dot"></div>
+<div class="cursor-ring" id="ring"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">VM<span>.</span></a>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#projects">Work</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
 
 <!-- HERO -->
 <div class="hero">
@@ -352,127 +643,349 @@ footer{
     <source src="montage.mp4" type="video/mp4">
   </video>
   <div class="hero-overlay"></div>
-  <h1>Vyan Merchant</h1>
-  <p>Gaming Video Editor • DaVinci Resolve</p>
-  <a href="#projects" class="hero-btn">View My Work</a>
+
+  <div class="hero-tag">Gaming Video Editor · DaVinci Resolve · Est. 2021</div>
+  <div class="hero-name">VYAN<br>MER<span class="accent">CHANT</span></div>
+  <div class="hero-bottom">
+    <p class="hero-sub">Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages.</p>
+    <a href="#projects" class="hero-cta">
+      View My Work
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </a>
+  </div>
 </div>
 
-<!-- NAV -->
-<nav>
-  <a href="#about">About</a>
-  <a href="#projects">Projects</a>
-  <a href="#contact">Contact</a>
-</nav>
+<!-- MARQUEE -->
+<div class="marquee-wrap">
+  <div class="marquee-track">
+    <span>DaVinci Resolve</span><span class="dot">✦</span>
+    <span>Gaming Montages</span><span class="dot">✦</span>
+    <span>Color Grading</span><span class="dot">✦</span>
+    <span>Fast Edits</span><span class="dot">✦</span>
+    <span>Content Creation</span><span class="dot">✦</span>
+    <span>Valorant</span><span class="dot">✦</span>
+    <span>Motion Design</span><span class="dot">✦</span>
+    <span>4 Years Experience</span><span class="dot">✦</span>
+    <!-- duplicate for seamless loop -->
+    <span>DaVinci Resolve</span><span class="dot">✦</span>
+    <span>Gaming Montages</span><span class="dot">✦</span>
+    <span>Color Grading</span><span class="dot">✦</span>
+    <span>Fast Edits</span><span class="dot">✦</span>
+    <span>Content Creation</span><span class="dot">✦</span>
+    <span>Valorant</span><span class="dot">✦</span>
+    <span>Motion Design</span><span class="dot">✦</span>
+    <span>4 Years Experience</span><span class="dot">✦</span>
+  </div>
+</div>
 
 <!-- ABOUT -->
-<section id="about" class="reveal">
-<h2>About Me</h2>
-<div class="about-container">
-  <div class="about-text">
-    <p>Hi, I’m <b>Vyan</b>, a 17-year-old passionate about gaming and video editing. I have been editing for the past <b>4 years</b> using <b>DaVinci Resolve</b>.</p>
-    <p>I’ve worked with several creators producing gaming montages and completed a video editing internship.</p>
+<section class="section" id="about">
+  <!-- Left -->
+  <div class="about-left reveal">
+    <div class="section-label">About</div>
+    <div class="big-text">EDIT.<br>FAST.<br><span class="accent">HARD.</span></div>
+    <p class="about-body">
+      I'm <b>Vyan</b>, a 17-year-old video editor obsessed with making gaming content that actually slaps. 
+      I've been editing for <b>4 years</b> using <b>DaVinci Resolve</b> — cutting, grading, and syncing footage 
+      to create montages that keep viewers locked in from the first frame to the last.
+      <br><br>
+      Worked with multiple creators, shipped a video editing internship, and I'm always looking for the next 
+      collab that pushes what gaming edits can be.
+    </p>
+
+    <div class="stats-grid">
+      <div class="stat-item">
+        <span class="stat-num">4</span>
+        <span class="stat-label">Years Editing</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-num">∞</span>
+        <span class="stat-label">Hours in Resolve</span>
+      </div>
+    </div>
   </div>
-  <div class="skills">
-    <h3>Skills</h3>
-    <div class="skill-card">🎬 DaVinci Resolve</div>
-    <div class="skill-card">🎮 Gaming Montages</div>
-    <div class="skill-card">⚡ Fast Edits</div>
-    <div class="skill-card">🎨 Color Grading</div>
-    <div class="skill-card">📹 Content Creation</div>
+
+  <!-- Right -->
+  <div class="skills-right reveal" style="transition-delay: 0.15s">
+    <div class="section-label">Skills</div>
+
+    <div class="skill-row">
+      <span class="skill-name">DaVinci Resolve</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-name">Gaming Montages</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-name">Color Grading</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-name">Motion & SFX</span>
+    </div>
+    <div class="skill-row">
+      <span class="skill-name">Content Creation</span>
+    </div>
   </div>
-</div>
 </section>
+
+<div class="divider"></div>
 
 <!-- PROJECTS -->
-<section id="projects" class="reveal">
-<h2>Projects</h2>
-<div class="projects">
+<section class="section" id="projects">
+  <div class="section-label reveal">Work</div>
 
-  <div class="card">
-    <h3>Valorant Montage</h3>
-    <div class="video-container">
-      <iframe src="https://www.youtube.com/embed/d0qvLlFEEH8" allowfullscreen></iframe>
+  <div class="work-layout reveal" style="transition-delay:0.1s">
+    <!-- Left: list -->
+    <div class="work-list">
+
+      <div class="work-item active" data-id="val" data-url="https://www.youtube.com/watch?v=d0qvLlFEEH8">
+        <div class="work-item-left">
+          <span class="work-num">01</span>
+          <div>
+            <div class="work-title">Valorant Montage</div>
+            <div class="work-meta">DaVinci Resolve · Fast Edits · Color Grade</div>
+          </div>
+        </div>
+        <a href="https://www.youtube.com/watch?v=d0qvLlFEEH8" target="_blank" class="work-arrow">↗</a>
+      </div>
+
+      <div class="work-item" data-id="proj2" data-url="#">
+        <div class="work-item-left">
+          <span class="work-num">02</span>
+          <div>
+            <div class="work-title">Project 2</div>
+            <div class="work-meta">Gaming Montage · DaVinci Resolve</div>
+          </div>
+        </div>
+        <a href="#" target="_blank" class="work-arrow">↗</a>
+      </div>
+
+      <div class="work-item" data-id="proj3" data-url="#">
+        <div class="work-item-left">
+          <span class="work-num">03</span>
+          <div>
+            <div class="work-title">Project 3</div>
+            <div class="work-meta">Creative Edit · Motion Design</div>
+          </div>
+        </div>
+        <a href="#" target="_blank" class="work-arrow">↗</a>
+      </div>
+
     </div>
-    <a href="https://www.youtube.com/embed/d0qvLlFEEH8" target="_blank" class="view-btn">View Project</a>
-    <p>Fast‑paced Valorant montage edited in DaVinci Resolve.</p>
-  </div>
 
-  <div class="card">
-    <h3>Project 2</h3>
-    <div class="video-container">
-      <iframe src="https://www.youtube.com/embed/YOUTUBE_ID" allowfullscreen></iframe>
+    <!-- Right: preview -->
+    <div class="work-preview">
+      <div class="work-preview-inner">
+        <div class="work-preview-placeholder" id="work-placeholder">
+          <div class="preview-line"></div>
+          <span>Hover to preview</span>
+          <div class="preview-line"></div>
+        </div>
+        <!-- iframes injected by JS -->
+      </div>
+      <div class="work-preview-caption">
+        <span class="work-preview-caption-title" id="preview-caption">—</span>
+        <a class="work-open" id="preview-link" href="#" target="_blank">Open ↗</a>
+      </div>
     </div>
-    <a href="https://www.youtube.com/embed/YOUTUBE_ID" target="_blank" class="view-btn">View Project</a>
-    <p>Gaming montage project.</p>
   </div>
-
-  <div class="card">
-    <h3>Project 3</h3>
-    <div class="video-container">
-      <iframe src="https://www.youtube.com/embed/YOUTUBE_ID" allowfullscreen></iframe>
-    </div>
-    <a href="https://www.youtube.com/embed/YOUTUBE_ID" target="_blank" class="view-btn">View Project</a>
-    <p>Creative editing showcase.</p>
-  </div>
-
-</div>
 </section>
+
+<div class="divider"></div>
 
 <!-- CONTACT -->
-<section id="contact" class="reveal">
-<h2>Contact</h2>
-<p>Email: vyanmerchant@gmail.com</p>
+<section class="section" id="contact">
+  <div class="section-label reveal">Contact</div>
+  <div class="contact-big reveal" style="transition-delay:0.1s">
+    LET'S<br>BUILD<br><span class="accent">SOMETHING.</span>
+  </div>
+  <div class="contact-row reveal" style="transition-delay:0.2s">
+    <a href="/cdn-cgi/l/email-protection#483e312926252d3a2b2029263c082f25292124662b2725" class="contact-email"><span class="__cf_email__" data-cfemail="86f0ffe7e8ebe3f4e5eee7e8f2c6e1ebe7efeaa8e5e9eb">[email&#160;protected]</span></a>
+    <div class="contact-links">
+      <a href="/cdn-cgi/l/email-protection#384e415956555d4a5b5059564c785f55595154165b5755" class="contact-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        Email
+      </a>
+      <a href="https://youtube.com" target="_blank" class="contact-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/><polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/></svg>
+        YouTube
+      </a>
+      <a href="https://discord.com" target="_blank" class="contact-link">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03z"/></svg>
+        Discord
+      </a>
+    </div>
+  </div>
 </section>
 
+<!-- FOOTER -->
 <footer>
-<p>© 2026 Vyan Merchant</p>
+  <p>© 2026 Vyan Merchant</p>
+  <p>Gaming Video Editor · DaVinci Resolve</p>
 </footer>
 
 <script>
-/* PARTICLES */
-const particles = document.getElementById("particles");
-for(let i=0;i<70;i++){
-  let p=document.createElement("span");
-  p.style.left=Math.random()*100+"%";
-  p.style.animationDuration=10+Math.random()*10+"s";
-  p.style.opacity=Math.random();
-  particles.appendChild(p);
-}
+/* CURSOR */
+const dot = document.getElementById('dot');
+const ring = document.getElementById('ring');
+let mx = -100, my = -100;
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  dot.style.transform = `translate(${mx - 2}px, ${my - 2}px)`;
+  ring.style.transform = `translate(${mx - 0.5}px, ${my - 10}px)`;
+});
 
 /* SCROLL PROGRESS */
-window.addEventListener("scroll",()=>{
-  let scrollTop=document.documentElement.scrollTop;
-  let height=document.documentElement.scrollHeight-document.documentElement.clientHeight;
-  let scrolled=(scrollTop/height)*100;
-  document.getElementById("progress").style.width=scrolled+"%";
+window.addEventListener('scroll', () => {
+  const st = document.documentElement.scrollTop;
+  const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+  document.getElementById('progress').style.width = (st / h * 100) + '%';
 });
 
-/* CURSOR + NEON TRAIL */
-const cursor=document.getElementById("cursor");
-document.addEventListener("mousemove",e=>{
-  cursor.style.left=e.clientX+"px";
-  cursor.style.top=e.clientY+"px";
-  let trail=document.createElement("div");
-  trail.className="trail";
-  trail.style.left=e.clientX+"px";
-  trail.style.top=e.clientY+"px";
-  document.body.appendChild(trail);
-  setTimeout(()=>{trail.remove()},600);
-});
-
-/* SCROLL REVEAL */
-function reveal(){
-  const reveals=document.querySelectorAll(".reveal");
-  for(let i=0;i<reveals.length;i++){
-    const windowHeight=window.innerHeight;
-    const elementTop=reveals[i].getBoundingClientRect().top;
-    const elementVisible=100;
-    if(elementTop < windowHeight - elementVisible){
-      reveals[i].classList.add("active");
+/* REVEAL */
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('visible');
+      e.target.querySelectorAll('.skill-row').forEach(row => row.classList.add('in-view'));
+      observer.unobserve(e.target);
     }
+  });
+}, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Fallback: show all hidden sections after 1.5s in case observer doesn't fire
+setTimeout(() => {
+  document.querySelectorAll('.reveal:not(.visible)').forEach(el => el.classList.add('visible'));
+}, 1500);
+
+/* WORK SECTION — hover to play */
+(function() {
+  const projects = {
+    val:   { id: 'd0qvLlFEEH8', title: 'Valorant Montage', url: 'https://www.youtube.com/watch?v=d0qvLlFEEH8' },
+    proj2: { id: null,          title: 'Project 2',        url: '#' },
+    proj3: { id: null,          title: 'Project 3',        url: '#' },
+  };
+
+  const previewWrap = document.querySelector('.work-preview-inner');
+  const placeholder = document.getElementById('work-placeholder');
+  const caption     = document.getElementById('preview-caption');
+  const openLink    = document.getElementById('preview-link');
+  const iframes     = {};
+  let currentId     = null;
+  let hoverTimer    = null;
+
+  // Pre-build iframes (paused)
+  Object.entries(projects).forEach(([key, p]) => {
+    if (!p.id) return;
+    const f = document.createElement('iframe');
+    f.src = `https://www.youtube.com/embed/${p.id}?autoplay=0&mute=1&controls=0&modestbranding=1&rel=0&enablejsapi=1&loop=1&playlist=${p.id}`;
+    f.allow = 'autoplay; encrypted-media';
+    f.setAttribute('allowfullscreen', '');
+    previewWrap.appendChild(f);
+    iframes[key] = f;
+  });
+
+  function activate(key) {
+    if (currentId === key) return;
+    currentId = key;
+
+    const p = projects[key];
+
+    // Swap iframe visibility
+    Object.entries(iframes).forEach(([k, f]) => {
+      if (k === key) {
+        f.classList.add('active');
+        // Reload src with autoplay to trigger playback
+        const base = f.src.split('?')[0];
+        f.src = `${base}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${p.id}`;
+      } else {
+        f.classList.remove('active');
+        const base = f.src.split('?')[0];
+        const pid = projects[Object.entries(iframes).find(([k2]) => k2 === k)?.[0]]?.id;
+        if (pid) f.src = `${base}?autoplay=0&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${pid}`;
+      }
+    });
+
+    // Update caption
+    placeholder.classList.toggle('hidden', !!p.id);
+    caption.textContent = p.title;
+    caption.classList.toggle('visible', true);
+    openLink.href = p.url;
+    openLink.classList.toggle('visible', p.url !== '#');
+
+    // Active state on list items
+    document.querySelectorAll('.work-item').forEach(el => {
+      el.classList.toggle('active', el.dataset.id === key);
+    });
   }
-}
-window.addEventListener("scroll",reveal);
+
+  document.querySelectorAll('.work-item').forEach(item => {
+    item.addEventListener('mouseenter', () => {
+      clearTimeout(hoverTimer);
+      hoverTimer = setTimeout(() => activate(item.dataset.id), 120);
+    });
+  });
+
+  // Activate first on load
+  activate('val');
+})();
+(function() {
+  const canvas = document.getElementById('damascus-bg');
+  const ctx = canvas.getContext('2d');
+  const SCALE = 3;
+  let W, H, t = 0;
+
+  function resize() {
+    W = Math.floor(window.innerWidth / SCALE);
+    H = Math.floor(window.innerHeight / SCALE);
+    canvas.width = W;
+    canvas.height = H;
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  function draw() {
+    t += 0.003;
+    const img = ctx.createImageData(W, H);
+    const d = img.data;
+
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const nx = x / W;
+        const ny = y / H;
+
+        const warp = Math.sin(ny * 8 + t + Math.sin(nx * 5 + t * 0.6) * 1.4) * 0.18
+                   + Math.cos(nx * 6 - t * 0.5 + Math.sin(ny * 4 + t * 0.8) * 1.2) * 0.12;
+
+        const wx = nx + warp * 0.5;
+        const wy = ny + warp * 0.3;
+
+        const band1 = Math.sin(wx * 14 + wy * 9  + t * 0.4) * 0.5 + 0.5;
+        const band2 = Math.sin(wx * 7  - wy * 11 + t * 0.25 + 1.8) * 0.5 + 0.5;
+
+        const v = band1 * 0.55 + band2 * 0.45;
+        const base = 6 + v * 16;
+        const shimmer = Math.pow(Math.max(0, Math.sin(wx * 30 + wy * 12 + t * 1.8)), 14) * 18;
+
+        const r = base + shimmer * 0.9;
+        const g = base + shimmer * 0.85;
+        const b = base + shimmer * 0.7;
+
+        const i = (y * W + x) * 4;
+        d[i]   = r;
+        d[i+1] = g;
+        d[i+2] = b;
+        d[i+3] = 255;
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+    requestAnimationFrame(draw);
+  }
+  draw();
+})();
 </script>
 
 </body>
