@@ -801,9 +801,10 @@ footer p {
     LET'S<br>BUILD<br><span class="accent">SOMETHING.</span>
   </div>
   <div class="contact-row reveal" style="transition-delay:0.2s">
-    <a href="vyanmerchant@gmail.com" class="contact-email"><span class="__cf_email__" data-cfemail="86f0ffe7e8ebe3f4e5eee7e8f2c6e1ebe7efeaa8e5e9eb">[email&#160;protected]</span></a>
-    <div class="contact-links">
-      <a href="vyanmerchant@gmail.com" class="contact-link">
+   <a href="mailto:vyanmerchant@gmail.com" class="contact-email">
+  vyanmerchant@gmail.com
+</a>
+    <a href="mailto:vyanmerchant@gmail.com" class="contact-link">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
         Email
       </a>
@@ -848,7 +849,6 @@ const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => {
     if (e.isIntersecting) {
       e.target.classList.add('visible');
-      e.target.querySelectorAll('.skill-row').forEach(row => row.classList.add('in-view'));
       observer.unobserve(e.target);
     }
   });
@@ -856,67 +856,102 @@ const observer = new IntersectionObserver((entries) => {
 
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
-// Fallback: show all hidden sections after 1.5s in case observer doesn't fire
 setTimeout(() => {
   document.querySelectorAll('.reveal:not(.visible)').forEach(el => el.classList.add('visible'));
 }, 1500);
 
-/* WORK SECTION — hover to play */
+/* 🔥 FIXED WORK SECTION (YouTube + montage.mp4 support) */
 (function() {
   const projects = {
     val:   { id: 'd0qvLlFEEH8', title: 'Valorant Montage', url: 'https://www.youtube.com/watch?v=d0qvLlFEEH8' },
-    proj2: { id: null,          title: 'Project 2',        url: '#' },
-    proj3: { id: null,          title: 'Project 3',        url: '#' },
+    proj2: { id: 'Z9FESSodKKQ', title: 'Valorant Montage', url: 'https://www.youtube.com/watch?v=Z9FESSodKKQ' },
+    proj3: { id: 'local',       title: 'Project 3',         url: 'montage.mp4' }
   };
 
   const previewWrap = document.querySelector('.work-preview-inner');
   const placeholder = document.getElementById('work-placeholder');
   const caption     = document.getElementById('preview-caption');
   const openLink    = document.getElementById('preview-link');
-  const iframes     = {};
-  let currentId     = null;
-  let hoverTimer    = null;
 
-  // Pre-build iframes (paused)
+  const players = {};
+  let currentId = null;
+
   Object.entries(projects).forEach(([key, p]) => {
-    if (!p.id) return;
-    const f = document.createElement('iframe');
-    f.src = `https://www.youtube.com/embed/${p.id}?autoplay=0&mute=1&controls=0&modestbranding=1&rel=0&enablejsapi=1&loop=1&playlist=${p.id}`;
-    f.allow = 'autoplay; encrypted-media';
-    f.setAttribute('allowfullscreen', '');
-    previewWrap.appendChild(f);
-    iframes[key] = f;
+
+    if (p.id === 'local') {
+      const video = document.createElement('video');
+      video.src = p.url;
+      video.loop = true;
+      video.muted = true;
+      video.playsInline = true;
+
+      video.style.position = 'absolute';
+      video.style.inset = '0';
+      video.style.width = '100%';
+      video.style.height = '100%';
+      video.style.objectFit = 'cover';
+      video.style.opacity = '0';
+      video.style.transition = 'opacity 0.4s ease';
+
+      previewWrap.appendChild(video);
+      players[key] = video;
+
+    } else {
+      const iframe = document.createElement('iframe');
+      iframe.src = `https://www.youtube.com/embed/${p.id}?autoplay=0&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${p.id}`;
+      iframe.allow = 'autoplay; encrypted-media';
+      iframe.setAttribute('allowfullscreen', '');
+
+      iframe.style.position = 'absolute';
+      iframe.style.inset = '0';
+      iframe.style.width = '100%';
+      iframe.style.height = '100%';
+      iframe.style.border = 'none';
+      iframe.style.opacity = '0';
+      iframe.style.transition = 'opacity 0.4s ease';
+
+      previewWrap.appendChild(iframe);
+      players[key] = iframe;
+    }
   });
 
   function activate(key) {
-    if (currentId === key) return;
     currentId = key;
-
     const p = projects[key];
 
-    // Swap iframe visibility
-    Object.entries(iframes).forEach(([k, f]) => {
+    Object.entries(players).forEach(([k, el]) => {
       if (k === key) {
-        f.classList.add('active');
-        // Reload src with autoplay to trigger playback
-        const base = f.src.split('?')[0];
-        f.src = `${base}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${p.id}`;
+        el.style.opacity = '1';
+
+        if (el.tagName === 'VIDEO') {
+          el.play();
+        } else {
+          const base = el.src.split('?')[0];
+          el.src = `${base}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${p.id}`;
+        }
+
       } else {
-        f.classList.remove('active');
-        const base = f.src.split('?')[0];
-        const pid = projects[Object.entries(iframes).find(([k2]) => k2 === k)?.[0]]?.id;
-        if (pid) f.src = `${base}?autoplay=0&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${pid}`;
+        el.style.opacity = '0';
+
+        if (el.tagName === 'VIDEO') {
+          el.pause();
+        } else {
+          const base = el.src.split('?')[0];
+          const pid = projects[k].id;
+
+          if (pid !== 'local') {
+            el.src = `${base}?autoplay=0&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${pid}`;
+          }
+        }
       }
     });
 
-    // Update caption
-    placeholder.classList.toggle('hidden', !!p.id);
+    placeholder.classList.add('hidden');
     caption.textContent = p.title;
-    caption.classList.toggle('visible', true);
+    caption.classList.add('visible');
     openLink.href = p.url;
-    openLink.classList.toggle('visible', p.url !== '#');
+    openLink.classList.add('visible');
 
-    // Active state on list items
     document.querySelectorAll('.work-item').forEach(el => {
       el.classList.toggle('active', el.dataset.id === key);
     });
@@ -924,14 +959,14 @@ setTimeout(() => {
 
   document.querySelectorAll('.work-item').forEach(item => {
     item.addEventListener('mouseenter', () => {
-      clearTimeout(hoverTimer);
-      hoverTimer = setTimeout(() => activate(item.dataset.id), 120);
+      activate(item.dataset.id);
     });
   });
 
-  // Activate first on load
   activate('val');
 })();
+
+/* DAMASCUS BACKGROUND (unchanged) */
 (function() {
   const canvas = document.getElementById('damascus-bg');
   const ctx = canvas.getContext('2d');
