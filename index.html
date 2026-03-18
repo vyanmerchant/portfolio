@@ -953,20 +953,20 @@ setTimeout(() => {
     });
   }
 
-  document.querySelectorAll('.work-item').forEach(item => {
-  item.addEventListener('mouseenter', () => {
-  clearTimeout(hoverTimer);
-  hoverTimer = setTimeout(() => activate(item.dataset.id), 120);
-});
+ document.querySelectorAll('.work-item').forEach(item => {
 
-// ADD THIS FOR MOBILE
-item.addEventListener('click', () => {
-  activate(item.dataset.id);
-});
-      clearTimeout(hoverTimer);
-      hoverTimer = setTimeout(() => activate(item.dataset.id), 120);
-    });
+  // Desktop hover
+  item.addEventListener('mouseenter', () => {
+    clearTimeout(hoverTimer);
+    hoverTimer = setTimeout(() => activate(item.dataset.id), 120);
   });
+
+  // Mobile tap
+  item.addEventListener('click', () => {
+    activate(item.dataset.id);
+  });
+
+});;
 
   // Activate first on load
   activate('val');
