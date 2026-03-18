@@ -33,38 +33,10 @@ body {
   color: var(--white);
   font-family: var(--font-sans);
   overflow-x: hidden;
-  cursor: none;
+ 
 }
 
-/* ─── CUSTOM CURSOR ─── */
-.cursor-dot {
-  width: 4px; height: 4px;
-  background: var(--white);
-  border-radius: 50%;
-  position: fixed;
-  top: 0; left: 0;
-  pointer-events: none;
-  z-index: 9999;
-  mix-blend-mode: difference;
-}
-.cursor-ring {
-  width: 1px; height: 20px;
-  background: var(--white);
-  position: fixed;
-  top: 0; left: 0;
-  pointer-events: none;
-  z-index: 9998;
-  mix-blend-mode: difference;
-  opacity: 0.6;
-}
-.cursor-ring::after {
-  content: '';
-  position: absolute;
-  top: 50%; left: 50%;
-  transform: translate(-50%, -50%) rotate(90deg);
-  width: 1px; height: 20px;
-  background: var(--white);
-}
+
 
 /* ─── DAMASCUS BACKGROUND ─── */
 #damascus-bg {
@@ -379,7 +351,6 @@ nav {
   justify-content: space-between;
   padding: 28px 0;
   border-bottom: 1px solid var(--gray-mid);
-  cursor: none;
   position: relative;
   transition: padding-left 0.3s cubic-bezier(0.16,1,0.3,1);
 }
@@ -519,7 +490,14 @@ nav {
 
 @media (max-width: 768px) {
   .work-layout { grid-template-columns: 1fr; }
-  .work-preview { display: none; }
+.work-preview {
+  display: block;
+  position: relative;
+  margin-top: 20px;
+}
+  .work-preview-inner {
+  height: 220px;
+}
 }
 
 /* ─── CONTACT ─── */
@@ -625,8 +603,7 @@ footer p {
 
 <div id="progress"></div>
 <canvas id="damascus-bg"></canvas>
-<div class="cursor-dot" id="dot"></div>
-<div class="cursor-ring" id="ring"></div>
+
 
 <!-- NAV -->
 <nav>
@@ -759,7 +736,7 @@ footer p {
             <div class="work-meta">Gaming Montage · DaVinci Resolve</div>
           </div>
         </div>
-        <a href="#" target="_blank" class="work-arrow">↗</a>
+        <a href="https://www.youtube.com/watch?v=4ZcBnbLWxvU" target="_blank" class="work-arrow">↗</a>
       </div>
 
       <div class="work-item" data-id="proj3" data-url="montage.mp4">
@@ -849,15 +826,7 @@ footer p {
 </footer>
 
 <script>
-/* CURSOR */
-const dot = document.getElementById('dot');
-const ring = document.getElementById('ring');
-let mx = -100, my = -100;
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  dot.style.transform = `translate(${mx - 2}px, ${my - 2}px)`;
-  ring.style.transform = `translate(${mx - 0.5}px, ${my - 10}px)`;
-});
+
 
 /* SCROLL PROGRESS */
 window.addEventListener('scroll', () => {
@@ -985,7 +954,15 @@ setTimeout(() => {
   }
 
   document.querySelectorAll('.work-item').forEach(item => {
-    item.addEventListener('mouseenter', () => {
+  item.addEventListener('mouseenter', () => {
+  clearTimeout(hoverTimer);
+  hoverTimer = setTimeout(() => activate(item.dataset.id), 120);
+});
+
+// ADD THIS FOR MOBILE
+item.addEventListener('click', () => {
+  activate(item.dataset.id);
+});
       clearTimeout(hoverTimer);
       hoverTimer = setTimeout(() => activate(item.dataset.id), 120);
     });
