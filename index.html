@@ -364,12 +364,10 @@ nav {
 
 .work-layout {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0;
+  grid-template-columns: 1fr 1.3fr;
+  gap: 40px;
   align-items: start;
-  min-height: 420px;
 }
-
 /* Left: project list */
 .work-list { border-top: 1px solid var(--gray-mid); }
 
@@ -447,15 +445,13 @@ nav {
 /* Right: preview panel */
 .work-preview {
   position: sticky;
-  top: 80px;
-  padding-left: 48px;
+  top: 100px;
 }
 .work-preview-inner {
   position: relative;
   width: 100%;
-  padding-bottom: 58%;
-  background: var(--gray);
-  overflow: hidden;
+  height: 420px;
+
 }
 .work-preview-inner iframe {
   position: absolute;
@@ -761,7 +757,7 @@ footer p {
         <a href="#" target="_blank" class="work-arrow">↗</a>
       </div>
 
-      div class="work-item" data-id="proj3" data-url="montage.mp4">
+      <div class="work-item" data-id="proj3" data-url="montage.mp4">
         <div class="work-item-left">
           <span class="work-num">03</span>
           <div>
