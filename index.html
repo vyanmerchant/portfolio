@@ -225,9 +225,8 @@ nav {
 }
 .marquee-track {
   display: flex;
-  gap: 0;
-  animation: marquee 18s linear infinite;
-  white-space: nowrap;
+  width: max-content;
+  animation: marquee 20s linear infinite;
 }
 .marquee-track span {
   font-family: var(--font-sans);
@@ -243,10 +242,13 @@ nav {
   padding: 0;
 }
 @keyframes marquee {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
 }
-
 /* ─── SECTIONS ─── */
 .section { padding: 120px 48px; }
 .section-label {
