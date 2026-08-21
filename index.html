@@ -8,7 +8,7 @@
 <!-- PRECONNECT & FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <!-- DEPENDENCIES -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -18,27 +18,28 @@
 
 <style>
 /* ==========================================
-   01. CORE SYSTEM & VARIABLES
+   01. CORE SYSTEM & VARIABLES (REJOUICE/OBYS VIBE)
    ========================================== */
 :root {
-  --color-bg: #050505;
-  --color-surface: #111111;
-  --color-text: #f0ede8;
-  --color-accent: #7dd3fc;
-  --color-muted: #888888;
-  --color-border: rgba(240, 237, 232, 0.08);
+  --color-bg: #030303;
+  --color-surface: #0a0a0a;
+  --color-text: #f4f4f0;
+  --color-accent: #a3a3a3; /* Sophisticated metallic accent instead of bright blue */
+  --color-muted: #666666;
+  --color-border: rgba(255, 255, 255, 0.1);
   
   --font-sans: 'Syne', sans-serif;
   --font-serif: 'Cormorant Garamond', serif;
   --font-mono: 'Space Mono', monospace;
   
   --space-xs: 0.5rem; --space-sm: 1rem; --space-md: 2.5rem;
-  --space-lg: 5rem; --space-xl: 10rem;
+  --space-lg: 5rem; --space-xl: 10vw;
   
-  --radius-md: 1.5rem;
+  --radius-md: 1rem;
   --radius-full: 100px;
   
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -50,197 +51,215 @@ html.lenis { height: auto; }
 body {
   background-color: var(--color-bg); color: var(--color-text);
   font-family: var(--font-sans); -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden; cursor: none;
 }
 
 ::selection { background: var(--color-text); color: var(--color-bg); }
 
 /* ==========================================
-   02. CUSTOM CURSOR & MAGNETIC UI
+   02. PRELOADER (AWWWARDS STANDARD)
+   ========================================== */
+#preloader {
+  position: fixed; inset: 0; background: var(--color-bg);
+  z-index: 10000; display: flex; flex-direction: column;
+  justify-content: flex-end; padding: 4vw;
+}
+.loader-text {
+  font-family: var(--font-display); font-size: clamp(4rem, 10vw, 12rem);
+  line-height: 0.8; font-weight: 800; text-transform: uppercase;
+  color: var(--color-text); overflow: hidden;
+}
+.loader-progress {
+  font-family: var(--font-mono); font-size: 1rem; color: var(--color-muted);
+  margin-top: 2rem; display: flex; justify-content: space-between;
+  border-top: 1px solid var(--color-border); padding-top: 1rem;
+}
+.loader-bar-wrap { width: 100%; height: 1px; background: var(--color-border); position: absolute; bottom: 0; left: 0; }
+.loader-bar { width: 0%; height: 100%; background: var(--color-text); }
+
+/* ==========================================
+   03. MORPHING CURSOR (CUBERTO STYLE)
    ========================================== */
 #cursor {
   position: fixed; top: 0; left: 0;
-  width: 12px; height: 12px; background: var(--color-text);
+  width: 10px; height: 10px; background: var(--color-text);
   border-radius: 50%; pointer-events: none; z-index: 9999;
-  transform: translate(-50%, -50%); mix-blend-mode: exclusion;
-  transition: width 0.3s var(--ease-out-expo), height 0.3s var(--ease-out-expo), background 0.3s;
+  transform: translate(-50%, -50%); mix-blend-mode: difference;
+  display: flex; justify-content: center; align-items: center;
+  text-align: center; font-family: var(--font-mono); font-size: 0.6rem; font-weight: 700; color: var(--color-bg);
+  transition: width 0.4s var(--ease-out-expo), height 0.4s var(--ease-out-expo), background 0.4s, opacity 0.2s;
 }
-#cursor.hovered {
-  width: 80px; height: 80px; background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.2);
-}
-.magnetic { display: inline-block; cursor: none; }
+#cursor span { opacity: 0; transition: opacity 0.2s; text-transform: uppercase; letter-spacing: 0.1em; }
+#cursor.hovered { width: 60px; height: 60px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); mix-blend-mode: normal; }
+#cursor.play-mode { width: 90px; height: 90px; background: var(--color-text); mix-blend-mode: normal; }
+#cursor.play-mode span { opacity: 1; }
 
 /* ==========================================
-   03. WEBGL BACKGROUND
+   04. WEBGL & NOISE
    ========================================== */
 #webgl-container { position: fixed; inset: 0; z-index: -2; pointer-events: none; background: var(--color-bg); }
 .noise-overlay {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.04;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.05;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 /* ==========================================
-   04. TYPOGRAPHY & UTILS
+   05. TYPOGRAPHY
    ========================================== */
-/* Adjusted Display font clamp so the name fits on mobile and scales smoothly */
-.t-display { font-size: clamp(3rem, 9.5vw, 10rem); line-height: 0.9; font-weight: 800; letter-spacing: -0.03em; text-transform: uppercase; word-wrap: break-word; }
-.t-h2 { font-size: clamp(2rem, 5vw, 4rem); line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
-.t-body { font-size: clamp(1rem, 1.5vw, 1.25rem); line-height: 1.6; color: var(--color-muted); }
+.t-display { font-size: clamp(4rem, 11vw, 14rem); line-height: 0.85; font-weight: 800; letter-spacing: -0.04em; text-transform: uppercase; }
+.t-h2 { font-size: clamp(2.5rem, 6vw, 6rem); line-height: 0.9; font-weight: 700; letter-spacing: -0.03em; text-transform: uppercase; }
+.t-body { font-size: clamp(1.1rem, 1.8vw, 1.5rem); line-height: 1.6; color: var(--color-muted); font-weight: 400; }
 .t-serif { font-family: var(--font-serif); font-style: italic; font-weight: 300; }
-.t-mono { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; }
-.accent { color: var(--color-accent); }
+.t-mono { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; }
+
 .grid-layout { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--space-sm); padding: 0 4vw; }
-.line-reveal { overflow: hidden; display: block; } /* Changed to block for proper wrapping */
-.line-reveal-inner { display: inline-block; transform: translateY(110%); }
+.line-reveal { overflow: hidden; display: block; }
+.line-reveal-inner { display: inline-block; transform: translateY(115%); transform-origin: top left; }
 
 /* ==========================================
-   05. NAVIGATION (Squarespace Pillar Style)
+   06. HIDE-ON-SCROLL NAVIGATION
    ========================================== */
 nav {
   position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%);
-  width: 92%; max-width: 1400px;
-  padding: 1.25rem 2.5rem;
-  display: flex; justify-content: space-between; align-items: center;
-  z-index: 100; 
-  background: rgba(10, 10, 10, 0.6);
-  backdrop-filter: blur(20px);
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-full);
+  width: calc(100% - 4vw); max-width: 1600px;
+  padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center;
+  z-index: 100; background: rgba(5, 5, 5, 0.4); backdrop-filter: blur(12px);
+  border: 1px solid var(--color-border); border-radius: var(--radius-full);
+  transition: transform 0.6s var(--ease-out-expo), opacity 0.6s;
 }
-.nav-logo { font-size: 1.25rem; font-weight: 800; color: var(--color-text); text-decoration: none; }
-.nav-links { display: flex; gap: 2.5rem; }
-.nav-links a { color: var(--color-text); text-decoration: none; position: relative; overflow: hidden; padding-bottom: 4px; }
+nav.hidden { transform: translate(-50%, -150%); opacity: 0; }
+.nav-logo { font-size: 1.2rem; font-weight: 800; color: var(--color-text); text-decoration: none; }
+.nav-links { display: flex; gap: 3rem; }
+.nav-links a { color: var(--color-text); text-decoration: none; position: relative; overflow: hidden; padding-bottom: 2px; }
 .nav-links a::after {
-  content: ''; position: absolute; bottom: 0; left: 0;
-  width: 100%; height: 1px; background: var(--color-accent);
+  content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; background: var(--color-text);
   transform: translateX(-100%); transition: transform 0.4s var(--ease-out-expo);
 }
 .nav-links a:hover::after { transform: translateX(0); }
 
 /* ==========================================
-   06. HERO SECTION
+   07. HERO SECTION
    ========================================== */
-.hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; padding-top: 5rem; }
-.hero-meta { grid-column: 1 / -1; display: flex; justify-content: space-between; margin-bottom: 2rem; }
-.hero-title-wrapper { grid-column: 1 / 13; } /* Expanded to full width to prevent premature wrapping */
-.hero-subtitle { grid-column: 8 / 13; margin-top: 4rem; text-align: right; }
-.scroll-indicator { position: absolute; bottom: 3vw; left: 4vw; display: flex; align-items: center; gap: 1rem; }
-.scroll-line { width: 60px; height: 1px; background: var(--color-border); overflow: hidden; position: relative; }
-.scroll-line::after {
-  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background: var(--color-accent); animation: scrollLine 2s infinite cubic-bezier(0.65, 0, 0.35, 1);
-}
-@keyframes scrollLine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+.hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; padding-top: 4rem; }
+.hero-meta { grid-column: 1 / -1; display: flex; justify-content: space-between; margin-bottom: 3rem; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; }
+.hero-title-wrapper { grid-column: 1 / 13; }
+.hero-subtitle { grid-column: 7 / 13; margin-top: 5rem; text-align: left; }
+.hero-subtitle .t-body { max-width: 500px; }
 
 /* ==========================================
-   07. ABOUT SECTION (Modular Cards)
+   08. REFINED ABOUT SECTION
    ========================================== */
 .about { padding: var(--space-xl) 0; }
 .about-label { grid-column: 1 / 3; }
-.about-content { grid-column: 4 / 11; }
-.about-stats {
-  grid-column: 4 / 11; display: grid; grid-template-columns: 1fr 1fr;
-  gap: 1.5rem; margin-top: 4rem;
-}
-.stat {
-  background: var(--color-surface);
-  padding: 3rem;
-  border-radius: var(--radius-md);
-  border: 1px solid var(--color-border);
-  display: flex; flex-direction: column; justify-content: center;
-}
-.stat h4 { font-size: 4.5rem; font-family: var(--font-serif); color: var(--color-text); line-height: 1; margin-bottom: 0.5rem; }
+.about-content { grid-column: 4 / 12; }
+.about-stats { grid-column: 4 / 12; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 5rem; background: var(--color-border); border: 1px solid var(--color-border); }
+.stat { background: var(--color-bg); padding: 4rem 3rem; display: flex; flex-direction: column; justify-content: center; transition: background 0.4s; }
+.stat:hover { background: var(--color-surface); }
+.stat h4 { font-size: clamp(4rem, 8vw, 7rem); font-family: var(--font-serif); color: var(--color-text); line-height: 0.8; margin-bottom: 1rem; }
 
 /* ==========================================
-   08. HORIZONTAL WORK SLIDER
+   09. CINEMATIC WORK SECTION (THE UPGRADE)
    ========================================== */
-.work-slider-section { position: relative; padding: var(--space-xl) 0; overflow: hidden; }
-.work-header { margin-bottom: var(--space-md); }
-.slider-viewport { width: 100vw; height: 75vh; overflow: hidden; }
-.slider-track { display: flex; width: max-content; height: 100%; padding: 0 4vw; gap: 2vw; } /* Reduced gap for sleeker look */
-.slider-item { width: 55vw; height: 100%; display: flex; flex-direction: column; gap: 1.5rem; }
-.slider-visual { 
-  flex: 1; position: relative; overflow: hidden; 
-  border-radius: var(--radius-md); 
-  cursor: none; background: var(--color-surface); 
-  border: 1px solid var(--color-border);
-}
-.parallax-img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.15); }
+.work-section { position: relative; background: var(--color-bg); }
+.work-header { padding: var(--space-xl) 4vw 2rem; display: flex; justify-content: space-between; align-items: flex-end; }
+.work-header h2 { margin: 0; }
 
-.play-overlay {
-  position: absolute; inset: 0; background: rgba(5,5,5,0.3);
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; transition: opacity 0.4s var(--ease-out-expo); z-index: 2;
+.work-slider-wrap { height: 100vh; width: 100%; overflow: hidden; position: relative; display: flex; align-items: center; }
+.work-track { display: flex; gap: 4vw; padding: 0 4vw; height: 75vh; width: max-content; will-change: transform; }
+
+.work-item { 
+  width: 65vw; height: 100%; display: flex; flex-direction: column; 
+  position: relative; cursor: none;
 }
-.play-overlay span { 
-  padding: 1.25rem 2.5rem; 
-  background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
-  border: 1px solid rgba(255,255,255,0.2); 
-  border-radius: var(--radius-full); 
-  color: var(--color-text);
+.work-image-container { 
+  flex: 1; width: 100%; overflow: hidden; position: relative; 
+  border-radius: 4px; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  transition: filter 0.5s;
 }
-.slider-visual:hover .play-overlay { opacity: 1; }
-.slider-meta { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 0.5rem; }
+.work-image-container img { 
+  width: 100%; height: 100%; object-fit: cover; 
+  transform: scale(1.3); will-change: transform;
+  filter: grayscale(80%) contrast(1.2); transition: filter 0.5s, transform 0.8s var(--ease-out-expo);
+}
+.work-item:hover .work-image-container img { filter: grayscale(0%) contrast(1); transform: scale(1.15); }
+
+.work-meta { 
+  display: flex; justify-content: space-between; align-items: center; 
+  padding-top: 1.5rem; overflow: hidden;
+}
+.work-meta h3 { margin: 0; font-size: clamp(1.5rem, 3vw, 3rem); font-weight: 700; text-transform: uppercase; letter-spacing: -0.02em; }
+.work-meta span { color: var(--color-muted); }
 
 /* ==========================================
-   09. VIDEO MODAL
+   10. VIDEO MODAL (FULLSCREEN EXPANSION)
    ========================================== */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.98); backdrop-filter: blur(15px);
-  z-index: 1000; display: flex; justify-content: center; align-items: center;
-  opacity: 0; pointer-events: none; transition: opacity 0.4s;
+  position: fixed; inset: 0; background: var(--color-bg);
+  z-index: 10000; display: flex; justify-content: center; align-items: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.6s var(--ease-out-expo);
 }
 .modal-overlay.active { opacity: 1; pointer-events: all; }
 #close-modal { 
-  position: absolute; top: 2rem; right: 2rem; 
-  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); 
-  color: var(--color-text); border-radius: var(--radius-full);
-  padding: 0.75rem 1.5rem; cursor: none; 
+  position: absolute; top: 2rem; right: 4vw; 
+  background: none; border: none; color: var(--color-text); 
+  font-family: var(--font-mono); font-size: 1rem; text-transform: uppercase;
+  cursor: none; z-index: 2; mix-blend-mode: difference;
 }
-.modal-content { 
-  width: 85vw; height: 48vw; background: var(--color-surface); 
-  border-radius: var(--radius-md); overflow: hidden;
-  box-shadow: 0 30px 60px rgba(0,0,0,0.8); 
-  border: 1px solid var(--color-border);
-}
+.modal-content { width: 100vw; height: 100vh; }
 .modal-content iframe { width: 100%; height: 100%; border: none; }
 
 /* ==========================================
-   10. CONTACT & FOOTER
+   11. CONTACT & FOOTER
    ========================================== */
-.contact { padding: var(--space-xl) 0 3rem; min-height: 80vh; display: flex; flex-direction: column; justify-content: space-between; }
-.contact-cta { grid-column: 1 / -1; text-align: center; margin: auto 0; }
+.contact { padding: var(--space-xl) 0 3rem; min-height: 90vh; display: flex; flex-direction: column; justify-content: space-between; border-top: 1px solid var(--color-border); }
+.contact-cta { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; margin: auto 0; }
+.contact-cta h2 { font-size: clamp(3rem, 12vw, 14rem); line-height: 0.8; font-weight: 800; letter-spacing: -0.04em; text-transform: uppercase; }
 .contact-cta a { 
   color: var(--color-text); text-decoration: none; 
-  font-size: clamp(3rem, 10vw, 10rem); font-family: var(--font-serif); 
-  transition: color 0.4s;
+  font-family: var(--font-serif); font-size: clamp(2rem, 5vw, 5rem); font-style: italic;
+  margin-top: 2rem; position: relative;
 }
-.contact-cta a:hover { color: var(--color-accent); }
-.footer-bottom { 
-  grid-column: 1 / -1; display: flex; justify-content: space-between; 
-  padding-top: 2rem; border-top: 1px solid var(--color-border); 
-}
+.contact-cta a::after { content: ''; position: absolute; bottom: 10%; left: 0; width: 100%; height: 2px; background: var(--color-text); transform: scaleX(0); transform-origin: right; transition: transform 0.6s var(--ease-out-expo); }
+.contact-cta a:hover::after { transform: scaleX(1); transform-origin: left; }
+
+.footer-bottom { grid-column: 1 / -1; display: flex; justify-content: space-between; padding-top: 3rem; border-top: 1px solid var(--color-border); }
+.footer-links { display: flex; gap: 3rem; }
 
 @media (max-width: 768px) {
-  nav { width: 90%; padding: 1rem 1.5rem; top: 1rem; }
+  nav { width: 92%; padding: 1rem; top: 1rem; }
+  .nav-links { display: none; } /* Hamburger menu implied for mobile */
   .hero-meta { flex-direction: column; gap: 0.5rem; }
-  .hero-subtitle { grid-column: 1 / -1; text-align: left; margin-top: 2rem; }
+  .hero-subtitle { grid-column: 1 / -1; margin-top: 3rem; }
   .about-stats { grid-template-columns: 1fr; }
-  .slider-item { width: 85vw; }
-  .modal-content { width: 95vw; height: 53vw; border-radius: 0.5rem; }
+  .work-item { width: 85vw; }
+  .footer-bottom { flex-direction: column; gap: 2rem; }
 }
 </style>
 </head>
 <body>
 
-<div id="cursor"></div>
+<!-- PRELOADER -->
+<div id="preloader">
+  <div class="loader-text"><span class="line-reveal-inner">Vyan</span></div>
+  <div class="loader-text"><span class="line-reveal-inner">Merchant</span></div>
+  <div class="loader-progress">
+    <span class="t-mono">Loading Experience</span>
+    <span class="t-mono" id="loader-percent">0%</span>
+  </div>
+  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
+</div>
+
+<!-- CURSOR -->
+<div id="cursor"><span>Play</span></div>
+
+<!-- WEBGL -->
 <div id="webgl-container"></div>
 <div class="noise-overlay"></div>
 
 <!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo magnetic magnetic-hover">VM<span class="accent">.</span></a>
+<nav id="navbar">
+  <a href="#" class="nav-logo magnetic magnetic-hover">VM.</a>
   <div class="nav-links t-mono">
     <a href="#about" class="magnetic magnetic-hover">About</a>
     <a href="#work" class="magnetic magnetic-hover">Work</a>
@@ -258,29 +277,26 @@ nav {
   
   <div class="hero-title-wrapper">
     <h1 class="t-display">
-      <span class="line-reveal"><span class="line-reveal-inner">Vyan</span></span>
-      <span class="line-reveal"><span class="line-reveal-inner">Mer<span class="accent">chant</span></span></span>
+      <span class="line-reveal"><span class="line-reveal-inner">Cinematic</span></span>
+      <span class="line-reveal"><span class="line-reveal-inner" style="color: var(--color-muted)">Cuts.</span></span>
     </h1>
   </div>
   
   <div class="hero-subtitle">
-    <p class="t-body t-serif">Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages.</p>
-  </div>
-  
-  <div class="scroll-indicator t-mono">
-    <span>Scroll</span>
-    <div class="scroll-line"></div>
+    <p class="t-body">Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages designed to retain attention.</p>
   </div>
 </section>
 
 <!-- ABOUT -->
 <section id="about" class="about grid-layout">
-  <div class="about-label t-mono accent">01 / Profile</div>
+  <div class="about-label t-mono">01 / Profile</div>
   <div class="about-content">
     <h2 class="t-h2 line-reveal" style="margin-bottom: 2rem;">
-      <span class="line-reveal-inner">Edit. Fast. Hard.</span>
+      <span class="line-reveal-inner">Edit.</span>
+      <span class="line-reveal-inner" style="color: var(--color-muted)">Fast.</span>
+      <span class="line-reveal-inner">Hard.</span>
     </h2>
-    <p class="t-body" style="font-size: 1.5rem;">
+    <p class="t-body">
       I'm a video editor obsessed with making gaming content that actually slaps. Working extensively with DaVinci Resolve, I cut, grade, and sync footage to create cinematic montages that keep viewers locked in from the first frame to the last.
     </p>
   </div>
@@ -296,102 +312,122 @@ nav {
   </div>
 </section>
 
-<!-- WORK SLIDER -->
-<section id="work" class="work-slider-section">
-  <div class="work-header grid-layout">
-    <div class="t-mono accent" style="grid-column: 1 / -1;">02 / Selected Works</div>
+<!-- WORK SECTION (AWWWARDS SLIDER) -->
+<section id="work" class="work-section">
+  <div class="work-header">
+    <span class="t-mono">02 / Selected Works</span>
+    <h2 class="t-h2">Archives</h2>
   </div>
   
-  <div class="slider-viewport">
-    <div class="slider-track">
+  <div class="work-slider-wrap">
+    <div class="work-track">
       
-      <!-- Project 01 -->
-      <div class="slider-item">
-        <div class="slider-visual magnetic-hover" data-video="d0qvLlFEEH8">
-          <div class="play-overlay"><span class="t-mono">Play Edit</span></div>
-          <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Valorant Montage" class="parallax-img">
+      <!-- ITEM 01 -->
+      <div class="work-item hover-play" data-video="d0qvLlFEEH8">
+        <div class="work-image-container">
+          <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Valorant Montage">
         </div>
-        <div class="slider-meta">
-          <h3 class="t-h2">Valorant Montage</h3>
-          <span class="t-mono t-serif">01</span>
-        </div>
-      </div>
-
-      <!-- Project 02 -->
-      <div class="slider-item">
-        <div class="slider-visual magnetic-hover" data-video="4ZcBnbLWxvU">
-          <div class="play-overlay"><span class="t-mono">Play Edit</span></div>
-          <img src="https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg" alt="Legacy Edit" class="parallax-img">
-        </div>
-        <div class="slider-meta">
-          <h3 class="t-h2">Legacy Edit</h3>
-          <span class="t-mono t-serif">02</span>
+        <div class="work-meta">
+          <h3>Valorant Montage</h3>
+          <span class="t-mono">01</span>
         </div>
       </div>
 
-      <!-- Project 03 -->
-      <div class="slider-item">
-        <div class="slider-visual magnetic-hover" data-video="d0qvLlFEEH8">
-          <div class="play-overlay"><span class="t-mono">Play Edit</span></div>
-          <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Practice Reel" class="parallax-img">
+      <!-- ITEM 02 -->
+      <div class="work-item hover-play" data-video="4ZcBnbLWxvU">
+        <div class="work-image-container">
+          <img src="https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg" alt="Legacy Edit">
         </div>
-        <div class="slider-meta">
-          <h3 class="t-h2">Practice Reel</h3>
-          <span class="t-mono t-serif">03</span>
+        <div class="work-meta">
+          <h3>Legacy Edit</h3>
+          <span class="t-mono">02</span>
         </div>
       </div>
 
+      <!-- ITEM 03 -->
+      <div class="work-item hover-play" data-video="d0qvLlFEEH8">
+        <div class="work-image-container">
+          <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Practice Reel">
+        </div>
+        <div class="work-meta">
+          <h3>Practice Reel</h3>
+          <span class="t-mono">03</span>
+        </div>
+      </div>
+      
     </div>
   </div>
 </section>
 
 <!-- MODAL -->
 <div id="video-modal" class="modal-overlay">
-  <button id="close-modal" class="t-mono magnetic magnetic-hover">Close [X]</button>
+  <button id="close-modal" class="magnetic magnetic-hover">Close [X]</button>
   <div class="modal-content"></div>
 </div>
 
 <!-- CONTACT -->
 <section id="contact" class="contact grid-layout">
-  <div class="about-label t-mono accent">03 / Initiate</div>
+  <div class="about-label t-mono">03 / Initiate</div>
   <div class="contact-cta">
-    <a href="mailto:vyanmerchant@gmail.com" class="magnetic magnetic-hover">Let's Build.</a>
+    <h2>Let's Build</h2>
+    <a href="mailto:vyanmerchant@gmail.com" class="magnetic magnetic-hover">vyanmerchant@gmail.com</a>
   </div>
   <div class="footer-bottom t-mono">
-    <span>© 2026 Vyan Merchant</span>
-    <div style="display:flex; gap: 2rem;">
-      <a href="https://youtube.com" class="magnetic magnetic-hover">YouTube</a>
-      <a href="https://discord.com/users/1111715392461738034" class="magnetic magnetic-hover">Discord</a>
+    <span>© 2026 Vyan Merchant. Pune, India.</span>
+    <div class="footer-links">
+      <a href="https://youtube.com" class="magnetic magnetic-hover" style="color:var(--color-text); text-decoration:none;">YouTube</a>
+      <a href="https://discord.com/users/1111715392461738034" class="magnetic magnetic-hover" style="color:var(--color-text); text-decoration:none;">Discord</a>
     </div>
   </div>
 </section>
 
 <script>
 /* ==========================================
-   SYSTEM INITIALIZATION
+   JS ARCHITECTURE (GSAP + THREEJS + LENIS)
    ========================================== */
+gsap.registerPlugin(ScrollTrigger);
+
 document.addEventListener("DOMContentLoaded", () => {
-  initSmoothScroll();
+  initPreloader();
   initCustomCursor();
   initWebGLBackground();
-  initGSAPAnimations();
-  initSliderScroll();
-  initVideoModal();
+  initNavScroll();
 });
 
 let lenis;
-
 function initSmoothScroll() {
   lenis = new Lenis({
-    duration: 1.2,
+    duration: 1.5, // Slower, more cinematic scroll
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
     direction: 'vertical', smooth: true
   });
-  function raf(time) {
-    lenis.raf(time);
-    requestAnimationFrame(raf);
-  }
+  function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
   requestAnimationFrame(raf);
+}
+
+function initPreloader() {
+  const tl = gsap.timeline({
+    onComplete: () => {
+      initSmoothScroll();
+      initGSAPAnimations();
+      initHorizontalSlider();
+      initVideoModal();
+    }
+  });
+
+  // Fake loading progress
+  let progress = { value: 0 };
+  tl.to(progress, {
+    value: 100, duration: 2, ease: "power2.inOut",
+    onUpdate: () => {
+      document.getElementById('loader-percent').innerText = Math.round(progress.value) + '%';
+      document.querySelector('.loader-bar').style.width = progress.value + '%';
+    }
+  })
+  .to('.loader-text .line-reveal-inner', { y: '0%', duration: 1, stagger: 0.1, ease: "power4.out" }, "-=1")
+  .to('#preloader', { yPercent: -100, duration: 1.2, ease: "expo.inOut", delay: 0.5 })
+  .from('.hero .line-reveal-inner', { y: '115%', duration: 1.5, stagger: 0.1, ease: "power4.out" }, "-=0.8")
+  .from('.hero-meta, .hero-subtitle, #navbar', { opacity: 0, y: 20, duration: 1, ease: "power2.out", stagger: 0.1 }, "-=1");
 }
 
 function initCustomCursor() {
@@ -401,27 +437,49 @@ function initCustomCursor() {
   window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
   
   gsap.ticker.add(() => {
-    const dt = 1.0 - Math.pow(1.0 - 0.2, gsap.ticker.deltaRatio());
+    const dt = 1.0 - Math.pow(1.0 - 0.25, gsap.ticker.deltaRatio());
     cursorX += (mouseX - cursorX) * dt;
     cursorY += (mouseY - cursorY) * dt;
     cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
   });
 
+  // Standard Hover
   document.querySelectorAll('.magnetic-hover').forEach(el => {
     el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
     el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
   });
 
+  // Play Hover (For Work Images)
+  document.querySelectorAll('.hover-play').forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('play-mode'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('play-mode'));
+  });
+
+  // Magnetic Pull Logic
   document.querySelectorAll('.magnetic').forEach(el => {
     el.addEventListener('mousemove', function(e) {
       const rect = this.getBoundingClientRect();
-      const x = e.clientX - rect.left - rect.width/2;
-      const y = e.clientY - rect.top - rect.height/2;
-      gsap.to(this, { x: x * 0.3, y: y * 0.3, duration: 0.4, ease: "power2.out" });
+      const x = (e.clientX - rect.left - rect.width/2) * 0.4;
+      const y = (e.clientY - rect.top - rect.height/2) * 0.4;
+      gsap.to(this, { x: x, y: y, duration: 0.4, ease: "power2.out" });
     });
     el.addEventListener('mouseleave', function() {
       gsap.to(this, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" });
     });
+  });
+}
+
+function initNavScroll() {
+  const nav = document.getElementById('navbar');
+  let lastScrollY = window.scrollY;
+
+  window.addEventListener('scroll', () => {
+    if(window.scrollY > 100 && window.scrollY > lastScrollY) {
+      nav.classList.add('hidden');
+    } else {
+      nav.classList.remove('hidden');
+    }
+    lastScrollY = window.scrollY;
   });
 }
 
@@ -433,21 +491,48 @@ function initWebGLBackground() {
   renderer.setSize(window.innerWidth, window.innerHeight);
   container.appendChild(renderer.domElement);
 
+  // Mouse interaction for Shader
+  const mouse = new THREE.Vector2(0.5, 0.5);
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX / window.innerWidth;
+    mouse.y = 1.0 - (e.clientY / window.innerHeight); // Invert Y for WebGL
+  });
+
   const material = new THREE.ShaderMaterial({
-    uniforms: { u_time: { value: 0 }, u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) } },
+    uniforms: { 
+      u_time: { value: 0 }, 
+      u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+      u_mouse: { value: mouse }
+    },
     vertexShader: `void main() { gl_Position = vec4(position, 1.0); }`,
     fragmentShader: `
       uniform float u_time;
       uniform vec2 u_resolution;
+      uniform vec2 u_mouse;
+      
       void main() {
         vec2 st = gl_FragCoord.xy / u_resolution.xy;
         st.x *= u_resolution.x / u_resolution.y;
+        
+        vec2 mouse_adj = u_mouse;
+        mouse_adj.x *= u_resolution.x / u_resolution.y;
+        
+        // Fluid distortion heavily influenced by mouse proximity
+        float dist = distance(st, mouse_adj);
+        float interaction = smoothstep(0.6, 0.0, dist);
+        
         vec2 q = vec2(0.);
-        q.x = sin(st.x * 2.0 + u_time * 0.15) + cos(st.y * 3.0 + u_time * 0.08);
-        q.y = cos(st.x * 3.0 + u_time * 0.2) + sin(st.y * 2.0 + u_time * 0.1);
-        float colorValue = smoothstep(0.0, 2.0, length(q) * 0.5);
-        // Softened colors to match cleaner aesthetic
-        vec3 color = mix(vec3(0.01, 0.01, 0.01), vec3(0.03, 0.04, 0.05), colorValue);
+        q.x = sin(st.x * 3.0 + u_time * 0.1) + cos(st.y * 2.0 + u_time * 0.05) + interaction * 0.5;
+        q.y = cos(st.x * 2.0 + u_time * 0.15) + sin(st.y * 3.0 + u_time * 0.1) - interaction * 0.5;
+        
+        float colorValue = smoothstep(0.0, 2.5, length(q));
+        
+        // Ultra dark, cinematic aesthetic
+        vec3 color = mix(vec3(0.012, 0.012, 0.012), vec3(0.04, 0.04, 0.04), colorValue);
+        
+        // Add subtle glow near mouse
+        color += vec3(0.02) * interaction;
+        
         gl_FragColor = vec4(color, 1.0);
       }
     `
@@ -461,6 +546,7 @@ function initWebGLBackground() {
     requestAnimationFrame(animate);
   }
   animate();
+  
   window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     material.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
@@ -468,64 +554,85 @@ function initWebGLBackground() {
 }
 
 function initGSAPAnimations() {
-  gsap.registerPlugin(ScrollTrigger);
-  const tl = gsap.timeline();
-  tl.to('.line-reveal-inner', { y: '0%', duration: 1.4, ease: "power4.out", stagger: 0.1, delay: 0.2 })
-    .from('.hero-meta', { opacity: 0, y: 20, duration: 1, ease: "power2.out" }, "-=1")
-    .from('.hero-subtitle', { opacity: 0, duration: 1 }, "-=0.8")
-    .from('nav', { y: -20, opacity: 0, duration: 1, ease: "power2.out" }, "-=1.2");
-
-  gsap.utils.toArray('.line-reveal-inner').forEach(el => {
-    if(!el.closest('.hero')) {
-      gsap.to(el, {
-        scrollTrigger: { trigger: el.closest('.line-reveal'), start: "top 90%" },
-        y: '0%', duration: 1, ease: "power3.out"
-      });
-    }
-  });
-}
-
-function initSliderScroll() {
-  const track = document.querySelector('.slider-track');
-  const images = gsap.utils.toArray('.parallax-img');
-  
-  let sliderTween = gsap.to(track, {
-    x: () => -(track.scrollWidth - document.documentElement.clientWidth) + "px",
-    ease: "none",
-    scrollTrigger: {
-      trigger: ".work-slider-section", pin: true, scrub: 1, end: () => "+=" + track.scrollWidth
-    }
-  });
-
-  images.forEach(img => {
-    gsap.to(img, {
-      x: () => img.parentElement.offsetWidth * 0.15, // Smoother, less aggressive parallax
-      ease: "none",
-      scrollTrigger: {
-        trigger: ".work-slider-section", containerAnimation: sliderTween, start: "left right", end: "right left", scrub: true
-      }
+  gsap.utils.toArray('.about .line-reveal-inner').forEach(el => {
+    gsap.to(el, {
+      scrollTrigger: { trigger: el.closest('.line-reveal'), start: "top 85%" },
+      y: '0%', duration: 1.2, ease: "power4.out"
     });
   });
 }
 
+function initHorizontalSlider() {
+  const track = document.querySelector('.work-track');
+  const images = gsap.utils.toArray('.work-image-container img');
+  const items = gsap.utils.toArray('.work-item');
+  
+  // 1. Horizontal Scroll
+  let sliderTween = gsap.to(track, {
+    x: () => -(track.scrollWidth - document.documentElement.clientWidth) + "px",
+    ease: "none",
+    scrollTrigger: {
+      trigger: ".work-slider-wrap",
+      pin: true,
+      scrub: 1,
+      end: () => "+=" + track.scrollWidth
+    }
+  });
+
+  // 2. Interior Image Parallax
+  images.forEach(img => {
+    gsap.to(img, {
+      x: () => img.parentElement.offsetWidth * 0.25, // Strong parallax
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".work-slider-wrap",
+        containerAnimation: sliderTween,
+        start: "left right",
+        end: "right left",
+        scrub: true
+      }
+    });
+  });
+
+  // 3. Clip-path Reveal on Enter
+  items.forEach(item => {
+    let imgContainer = item.querySelector('.work-image-container');
+    gsap.fromTo(imgContainer, 
+      { clipPath: "polygon(10% 0, 90% 0, 90% 100%, 10% 100%)" }, // Squeezed start
+      { 
+        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", // Full expand
+        ease: "none",
+        scrollTrigger: {
+          trigger: item,
+          containerAnimation: sliderTween,
+          start: "left center+=300",
+          end: "left center-=300",
+          scrub: 1
+        }
+      }
+    );
+  });
+}
+
 function initVideoModal() {
-  const visuals = document.querySelectorAll('.slider-visual');
+  const items = document.querySelectorAll('.hover-play');
   const modal = document.getElementById('video-modal');
   const modalContent = document.querySelector('.modal-content');
   const closeBtn = document.getElementById('close-modal');
 
-  visuals.forEach(visual => {
-    visual.addEventListener('click', () => {
-      const vidId = visual.getAttribute('data-video');
+  items.forEach(item => {
+    item.addEventListener('click', () => {
+      const vidId = item.getAttribute('data-video');
       modalContent.innerHTML = `<iframe src="https://www.youtube.com/embed/${vidId}?autoplay=1&mute=0&controls=1&modestbranding=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
       modal.classList.add('active');
       lenis.stop();
+      document.getElementById('cursor').classList.remove('play-mode');
     });
   });
 
   closeBtn.addEventListener('click', () => {
     modal.classList.remove('active');
-    setTimeout(() => { modalContent.innerHTML = ''; }, 400);
+    setTimeout(() => { modalContent.innerHTML = ''; }, 600);
     lenis.start();
   });
 }
