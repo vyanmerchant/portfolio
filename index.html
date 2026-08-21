@@ -3,14 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vyan Merchant — Cinematic Video Editor & Creative Developer</title>
+<title>Vyan Merchant — Overkill Awwwards Studio Experience</title>
 
 <!-- GOOGLE FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
-<!-- EXTERNAL DEPENDENCIES (GSAP, ScrollTrigger, Lenis, Three.js) -->
+<!-- EXTERNAL DEPENDENCIES -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
@@ -18,15 +18,17 @@
 
 <style>
 /* ==========================================
-   01. DESIGN SYSTEM & TOKENS
+   01. OVERKILL DESIGN SYSTEM
    ========================================== */
 :root {
-  --bg: #040404;
-  --surface: #0a0a0a;
-  --fg: #f3f0ea;
-  --accent: #ff3c00;
-  --muted: #666666;
-  --border: rgba(243, 240, 234, 0.08);
+  --bg: #020202;
+  --surface: #080808;
+  --surface-light: #121212;
+  --fg: #f5f2eb;
+  --accent: #ff2a00;
+  --accent-blue: #00f0ff;
+  --muted: #555555;
+  --border: rgba(245, 242, 235, 0.1);
   
   --font-display: 'Anton', sans-serif;
   --font-sans: 'Syne', sans-serif;
@@ -34,7 +36,7 @@
   --font-mono: 'Space Mono', monospace;
   
   --ease-expo: cubic-bezier(0.19, 1, 0.22, 1);
-  --ease-out-quint: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.6, 0.32, 1.6);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -56,7 +58,7 @@ body {
 ::selection { background: var(--accent); color: var(--bg); }
 
 /* ==========================================
-   02. CINEMATIC LOADER
+   02. CINEMATIC MULTI-LAYER LOADER
    ========================================== */
 #loader {
   position: fixed; inset: 0; z-index: 100000;
@@ -65,62 +67,72 @@ body {
   padding: 4vw; pointer-events: none;
 }
 .loader-header { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.75rem; }
-.loader-center { font-family: var(--font-display); font-size: clamp(5rem, 15vw, 16rem); line-height: 0.85; }
-.loader-footer { display: flex; justify-content: space-between; align-items: flex-end; font-family: var(--font-mono); font-size: 0.75rem; border-top: 1px solid var(--border); padding-top: 1.5rem; }
-.loader-bar-wrap { width: 100%; height: 2px; background: var(--border); margin-top: 1rem; position: relative; overflow: hidden; }
+.loader-center { font-family: var(--font-display); font-size: clamp(6rem, 18vw, 20rem); line-height: 0.8; letter-spacing: -0.02em; }
+.loader-footer { display: flex; justify-content: space-between; align-items: flex-end; font-family: var(--font-mono); font-size: 0.75rem; border-top: 1px solid var(--border); padding-top: 2rem; }
+.loader-bar-wrap { width: 100vh; max-width: 400px; height: 2px; background: var(--border); position: relative; overflow: hidden; }
 .loader-bar { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: var(--accent); }
 
 /* ==========================================
-   03. CUSTOM DESKTOP CURSOR
+   03. CUBERTO-STYLE MORPHING CURSOR
    ========================================== */
-#cursor {
-  position: fixed; top: 0; left: 0; width: 12px; height: 12px;
-  background: var(--fg); border-radius: 50%; pointer-events: none;
-  z-index: 99999; transform: translate(-50%, -50%); mix-blend-mode: difference;
-  transition: width 0.4s var(--ease-expo), height 0.4s var(--ease-expo), background 0.4s;
+#cursor-dot {
+  position: fixed; top: 0; left: 0; width: 8px; height: 8px;
+  background: var(--accent); border-radius: 50%; pointer-events: none;
+  z-index: 99999; transform: translate(-50%, -50%);
+}
+#cursor-ring {
+  position: fixed; top: 0; left: 0; width: 45px; height: 45px;
+  border: 1px solid rgba(245, 242, 235, 0.3); border-radius: 50%; pointer-events: none;
+  z-index: 99998; transform: translate(-50%, -50%);
+  transition: width 0.4s var(--ease-expo), height 0.4s var(--ease-expo), border-color 0.4s, background 0.4s;
   display: flex; justify-content: center; align-items: center; text-align: center;
 }
-#cursor span { opacity: 0; font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--bg); text-transform: uppercase; transition: opacity 0.3s; }
-.cursor-hover #cursor { width: 70px; height: 70px; background: rgba(255,255,255,0.15); backdrop-filter: blur(6px); border: 1px solid rgba(255,255,255,0.3); mix-blend-mode: normal; }
-.cursor-play #cursor { width: 90px; height: 90px; background: var(--accent); mix-blend-mode: normal; }
-.cursor-play #cursor span { opacity: 1; }
+#cursor-ring span { opacity: 0; font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--bg); text-transform: uppercase; transition: opacity 0.3s; }
 
-@media (pointer: coarse) { #cursor { display: none; } body { cursor: auto; } }
+.cursor-hover #cursor-ring { width: 80px; height: 80px; background: rgba(245, 242, 235, 0.1); backdrop-filter: blur(8px); border-color: rgba(245, 242, 235, 0.5); }
+.cursor-play #cursor-ring { width: 110px; height: 110px; background: var(--fg); border-color: var(--fg); }
+.cursor-play #cursor-ring span { opacity: 1; }
+
+@media (pointer: coarse) { #cursor-dot, #cursor-ring { display: none; } body { cursor: auto; } }
 
 /* ==========================================
-   04. WEBGL BACKGROUND & NOISE
+   04. WEBGL BACKGROUND & SVG GLITCH FILTERS
    ========================================== */
-#webgl-canvas { position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: 0.65; }
+#webgl-canvas { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
 .noise-overlay {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.055;
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.06;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+
+svg.svg-filters { position: absolute; width: 0; height: 0; pointer-events: none; }
 
 /* ==========================================
    05. TYPOGRAPHY & UTILS
    ========================================== */
-.t-giant { font-family: var(--font-display); font-size: clamp(4.5rem, 14vw, 16rem); line-height: 0.85; text-transform: uppercase; }
-.t-h2 { font-family: var(--font-display); font-size: clamp(2.5rem, 7vw, 7rem); line-height: 0.9; text-transform: uppercase; }
-.t-body { font-size: clamp(1rem, 1.4vw, 1.35rem); line-height: 1.6; color: var(--muted); font-weight: 500; }
+.t-giant { font-family: var(--font-display); font-size: clamp(5rem, 16vw, 18rem); line-height: 0.82; text-transform: uppercase; }
+.t-h2 { font-family: var(--font-display); font-size: clamp(3rem, 8vw, 9rem); line-height: 0.88; text-transform: uppercase; }
+.t-body { font-size: clamp(1rem, 1.5vw, 1.4rem); line-height: 1.6; color: var(--muted); font-weight: 500; }
 .t-mono { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
 .t-serif { font-family: var(--font-serif); font-style: italic; font-weight: 300; }
 
 .grid-layout { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2vw; padding: 0 4vw; }
 .line-reveal { overflow: hidden; display: block; }
 .line-reveal-inner { display: inline-block; transform: translateY(115%); will-change: transform; }
+.text-outline { -webkit-text-stroke: 1.5px var(--fg); color: transparent; transition: color 0.4s; }
+.text-outline:hover { color: var(--fg); }
 
 /* ==========================================
-   06. HIDE-ON-SCROLL NAVIGATION
+   06. HIDE-ON-SCROLL DYNAMIC NAVIGATION
    ========================================== */
 nav {
   position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%);
-  width: calc(100% - 4vw); max-width: 1500px;
+  width: calc(100% - 4vw); max-width: 1600px;
   padding: 1.25rem 2.5rem; display: flex; justify-content: space-between; align-items: center;
-  z-index: 1000; background: rgba(8, 8, 8, 0.6); backdrop-filter: blur(16px);
+  z-index: 1000; background: rgba(5, 5, 5, 0.65); backdrop-filter: blur(20px);
   border: 1px solid var(--border); border-radius: 100px;
   transition: transform 0.5s var(--ease-expo), opacity 0.5s;
 }
-nav.nav-hidden { transform: translate(-50%, -180%); opacity: 0; }
+nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
 .nav-logo { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 0.05em; color: var(--fg); text-decoration: none; }
 .nav-logo span { color: var(--accent); }
 .nav-links { display: flex; gap: 3rem; }
@@ -129,52 +141,66 @@ nav.nav-hidden { transform: translate(-50%, -180%); opacity: 0; }
 .nav-links a:hover::after { transform: translateX(0); }
 
 /* ==========================================
-   07. HERO SECTION
+   07. HERO SECTION (BRUTALIST EDITORIAL)
    ========================================== */
 .hero { height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 4vw 6vh; position: relative; }
 .hero-meta { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
-.hero-title-group { position: relative; }
-.hero-title-group .t-giant { letter-spacing: -0.02em; }
-.hero-subtitle { margin-top: 2rem; max-width: 450px; }
+.hero-title-group { position: relative; z-index: 2; }
+.hero-subtitle { margin-top: 2rem; max-width: 480px; }
+
+.hero-badge-spin {
+  position: absolute; right: 6vw; top: 35vh; width: 140px; height: 140px;
+  border: 1px solid var(--border); border-radius: 50%; display: flex; justify-content: center; align-items: center;
+}
+.hero-badge-spin svg { width: 100%; height: 100%; animation: spin 12s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
 /* ==========================================
-   08. MANIFESTO SECTION (KINETIC TYPOGRAPHY)
+   08. MANIFESTO SECTION (KINETIC OBYS TYPOGRAPHY)
    ========================================== */
-.manifesto { padding: 15vw 4vw; border-top: 1px solid var(--border); position: relative; }
-.manifesto-text { font-size: clamp(2rem, 4.5vw, 5rem); line-height: 1.15; font-weight: 700; max-width: 90vw; }
+.manifesto { padding: 18vw 4vw; border-top: 1px solid var(--border); position: relative; background: var(--bg); }
+.manifesto-text { font-size: clamp(2.2rem, 5vw, 5.5rem); line-height: 1.15; font-weight: 700; max-width: 90vw; }
 .word { display: inline-block; overflow: hidden; vertical-align: bottom; }
-.char { display: inline-block; transform: translateY(115%); color: #333333; will-change: transform, color; transition: color 0.3s; }
+.char { display: inline-block; transform: translateY(115%); color: #2a2a2a; will-change: transform, color; transition: color 0.3s; }
 .char.active { color: var(--fg); }
 .manifesto-highlight { color: var(--accent) !important; font-style: italic; font-family: var(--font-serif); }
 
 /* ==========================================
-   09. WORK SECTION (HORIZONTAL PINNED SLIDER)
+   09. WORK SECTION (SKEWED PERSPECTIVE HORIZONTAL SLIDER)
    ========================================== */
-.work-section { position: relative; background: var(--surface); padding-top: 8vw; }
-.work-header { padding: 0 4vw 4vw; display: flex; justify-content: space-between; align-items: flex-end; }
-.work-slider-wrap { height: 100vh; width: 100%; overflow: hidden; position: relative; display: flex; align-items: center; }
-.work-track { display: flex; gap: 6vw; padding: 0 6vw; height: 72vh; width: max-content; will-change: transform; }
+.work-section { position: relative; background: var(--surface); padding-top: 10vw; overflow: hidden; }
+.work-header { padding: 0 4vw 5vw; display: flex; justify-content: space-between; align-items: flex-end; }
+.work-slider-wrap { height: 100vh; width: 100%; overflow: hidden; position: relative; display: flex; align-items: center; perspective: 1200px; }
+.work-track { display: flex; gap: 8vw; padding: 0 8vw; height: 72vh; width: max-content; will-change: transform; transform-style: preserve-3d; }
 
-.work-item { width: 62vw; height: 100%; display: flex; flex-direction: column; position: relative; cursor: none; }
-.work-visual { flex: 1; width: 100%; overflow: hidden; border-radius: 12px; position: relative; background: #111; border: 1px solid var(--border); }
-.work-visual img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.25); will-change: transform; filter: grayscale(80%) contrast(1.1); transition: filter 0.5s; }
-.work-item:hover .work-visual img { filter: grayscale(0%) contrast(1); }
+.work-item { width: 62vw; height: 100%; display: flex; flex-direction: column; position: relative; cursor: none; transform-origin: center; will-change: transform; }
+.work-visual { 
+  flex: 1; width: 100%; overflow: hidden; border-radius: 16px; position: relative; background: #111; 
+  border: 1px solid var(--border); filter: url(#distortion-filter);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transition: clip-path 0.6s var(--ease-expo);
+}
+.work-item:hover .work-visual { clip-path: polygon(2% 2%, 98% -2%, 102% 98%, -2% 102%); }
 
-.work-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.3); display: flex; justify-content: center; align-items: center; opacity: 0; transition: opacity 0.4s var(--ease-expo); }
-.work-overlay span { padding: 1rem 2.5rem; background: rgba(255,255,255,0.1); backdrop-filter: blur(10px); border: 1px solid rgba(255,255,255,0.2); border-radius: 100px; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; }
-.work-item:hover .work-overlay { opacity: 1; }
+.work-visual img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.3); will-change: transform; filter: grayscale(90%) contrast(1.15); transition: filter 0.6s, transform 0.6s var(--ease-expo); }
+.work-item:hover .work-visual img { filter: grayscale(0%) contrast(1); transform: scale(1.1); }
+
+/* RGB Split Glitch Effect on Hover */
+.rgb-layer { position: absolute; inset: 0; background-size: cover; background-position: center; mix-blend-mode: screen; opacity: 0; transition: transform 0.3s, opacity 0.3s; pointer-events: none; }
+.work-item:hover .rgb-layer.red { opacity: 1; transform: translate(-10px, 5px); filter: brightness(0.6) sepia(1) hue-rotate(-50deg) saturate(6); }
+.work-item:hover .rgb-layer.cyan { opacity: 1; transform: translate(10px, -5px); filter: brightness(0.6) sepia(1) hue-rotate(140deg) saturate(6); }
 
 .work-meta { display: flex; justify-content: space-between; align-items: baseline; padding-top: 1.5rem; }
-.work-meta h3 { font-family: var(--font-display); font-size: clamp(2rem, 3.5vw, 3.5rem); letter-spacing: 0.02em; text-transform: uppercase; margin: 0; }
+.work-meta h3 { font-family: var(--font-display); font-size: clamp(2.5rem, 4vw, 4rem); letter-spacing: 0.02em; text-transform: uppercase; margin: 0; }
 
 /* ==========================================
-   10. STATS & EXPERTISE SECTION
+   10. EXPERTISE & SERVICES CARDS
    ========================================== */
-.expertise { padding: 15vw 4vw; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1fr; gap: 6vw; }
+.expertise { padding: 18vw 4vw; border-top: 1px solid var(--border); display: grid; grid-template-columns: 1fr 1.2fr; gap: 8vw; background: var(--bg); }
 .expertise-left h2 { margin-bottom: 2rem; }
-.skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-top: 3rem; }
-.skill-card { background: var(--surface); border: 1px solid var(--border); padding: 2.5rem; border-radius: 12px; display: flex; flex-direction: column; justify-content: space-between; height: 180px; }
-.skill-card h4 { font-family: var(--font-display); font-size: 1.75rem; letter-spacing: 0.02em; text-transform: uppercase; }
+.skills-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+.skill-card { background: var(--surface); border: 1px solid var(--border); padding: 3rem 2.5rem; border-radius: 16px; display: flex; flex-direction: column; justify-content: space-between; height: 210px; transition: border-color 0.4s, background 0.4s; }
+.skill-card:hover { border-color: rgba(245, 242, 235, 0.3); background: var(--surface-light); }
+.skill-card h4 { font-family: var(--font-display); font-size: 2rem; letter-spacing: 0.02em; text-transform: uppercase; }
 
 /* ==========================================
    11. FULLSCREEN CINEMATIC MODAL
@@ -182,20 +208,25 @@ nav.nav-hidden { transform: translate(-50%, -180%); opacity: 0; }
 .modal {
   position: fixed; inset: 0; background: var(--bg); z-index: 100000;
   display: flex; justify-content: center; align-items: center;
-  clip-path: circle(0% at 50% 50%); transition: clip-path 0.8s var(--ease-expo); pointer-events: none;
+  clip-path: circle(0% at 50% 50%); transition: clip-path 0.9s var(--ease-expo); pointer-events: none;
 }
 .modal.active { clip-path: circle(150% at 50% 50%); pointer-events: all; }
-.modal-close { position: absolute; top: 3vw; right: 4vw; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: var(--fg); padding: 0.75rem 1.75rem; border-radius: 100px; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; cursor: none; z-index: 10; }
-.modal-content { width: 88vw; height: 50vw; max-height: 80vh; background: #000; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
+.modal-close { position: absolute; top: 3vw; right: 4vw; background: rgba(245,242,235,0.1); border: 1px solid rgba(245,242,235,0.2); color: var(--fg); padding: 0.75rem 1.75rem; border-radius: 100px; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; cursor: none; z-index: 10; }
+.modal-content { width: 90vw; height: 52vw; max-height: 82vh; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 40px 80px rgba(0,0,0,0.8); }
 .modal-content iframe { width: 100%; height: 100%; border: none; }
 
 /* ==========================================
-   12. FOOTER SECTION
+   12. INFINITE MARQUEE & CINEMATIC FOOTER
    ========================================== */
-.footer { padding: 12vw 0 3vw; border-top: 1px solid var(--border); background: var(--bg); overflow: hidden; display: flex; flex-direction: column; }
-.footer-cta { text-align: center; padding: 0 4vw 8vw; }
-.footer-cta h2 { font-size: clamp(3.5rem, 12vw, 15rem); line-height: 0.85; text-transform: uppercase; margin-bottom: 2rem; }
-.footer-email { font-family: var(--font-serif); font-size: clamp(2rem, 5vw, 6rem); font-style: italic; color: var(--fg); text-decoration: none; transition: color 0.3s; position: relative; }
+.footer { padding: 15vw 0 4vw; border-top: 1px solid var(--border); background: var(--bg); overflow: hidden; display: flex; flex-direction: column; }
+.marquee-wrap { display: flex; width: max-content; white-space: nowrap; animation: moveLeft 18s linear infinite; margin-bottom: 1.5rem; }
+.marquee-wrap.reverse { animation: moveRight 18s linear infinite; }
+.marquee-text { font-family: var(--font-display); font-size: clamp(6rem, 14vw, 16rem); line-height: 0.85; text-transform: uppercase; padding-right: 4vw; }
+@keyframes moveLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes moveRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+
+.footer-main { padding: 8vw 4vw 4vw; text-align: center; }
+.footer-email { font-family: var(--font-serif); font-size: clamp(2.5rem, 6vw, 7rem); font-style: italic; color: var(--fg); text-decoration: none; transition: color 0.3s; display: inline-block; margin-top: 2rem; }
 .footer-email:hover { color: var(--accent); }
 
 .footer-bottom { padding: 3vw 4vw 0; display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--border); }
@@ -204,35 +235,47 @@ nav.nav-hidden { transform: translate(-50%, -180%); opacity: 0; }
 
 @media (max-width: 768px) {
   .nav-links { display: none; }
-  .expertise { grid-template-columns: 1fr; gap: 4vw; }
+  .expertise { grid-template-columns: 1fr; gap: 6vw; }
   .skills-grid { grid-template-columns: 1fr; }
   .work-item { width: 85vw; }
-  .modal-content { width: 94vw; height: 56vw; }
+  .modal-content { width: 95vw; height: 58vw; }
+  .hero-badge-spin { display: none; }
 }
 </style>
 </head>
 <body>
 
-<!-- CINEMATIC LOADER -->
+<!-- SVG FILTERS FOR GLITCH DISPLACEMENT -->
+<svg class="svg-filters">
+  <defs>
+    <filter id="distortion-filter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.01 0.01" numOctaves="1" result="warp" />
+      <feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="0" in="SourceGraphic" in2="warp" id="distort-map" />
+    </filter>
+  </defs>
+</svg>
+
+<!-- OVERKILL MULTI-LAYER LOADER -->
 <div id="loader">
   <div class="loader-header">
-    <span>VYAN MERCHANT — STUDIOS</span>
+    <span>VYAN MERCHANT — 2026 EDITION</span>
     <span>PUNE, INDIA</span>
   </div>
   <div class="loader-center">
-    <span class="line-reveal"><span class="line-reveal-inner" id="loader-word">LOADING</span></span>
+    <span class="line-reveal"><span class="line-reveal-inner" id="loader-word">STUDIO</span></span>
   </div>
   <div class="loader-footer">
     <span id="loader-percent">0%</span>
-    <span>CINEMATIC ARCHITECTURE v2.6</span>
+    <span>INITIALIZING WEBGL & SHADERS</span>
     <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
   </div>
 </div>
 
-<!-- DESKTOP CURSOR -->
-<div id="cursor"><span>Play</span></div>
+<!-- CUBERTO-STYLE CUSTOM CURSOR -->
+<div id="cursor-dot"></div>
+<div id="cursor-ring"><span>Play</span></div>
 
-<!-- WEBGL BACKGROUND -->
+<!-- WEBGL BACKGROUND & NOISE -->
 <canvas id="webgl-canvas"></canvas>
 <div class="noise-overlay"></div>
 
@@ -249,66 +292,76 @@ nav.nav-hidden { transform: translate(-50%, -180%); opacity: 0; }
 
 <!-- HERO SECTION -->
 <section class="hero">
+  <div class="hero-badge-spin">
+    <svg viewBox="0 0 100 100">
+      <path id="curve" d="M 50, 50 m -35, 0 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0" fill="transparent"/>
+      <text font-family="Space Mono" font-size="11.5" fill="#f5f2eb" letter-spacing="3.5"><textPath href="#curve">DAVINCI RESOLVE · CINEMATIC ·</textPath></text>
+    </svg>
+  </div>
+
   <div class="hero-meta t-mono">
     <span>Gaming Video Editor</span>
     <span>DaVinci Resolve Specialist</span>
-    <span>Available for Collabs</span>
+    <span>Available Worldwide</span>
   </div>
   <div class="hero-title-group">
-    <h1 class="t-giant"><span class="line-reveal"><span class="line-reveal-inner">VYAN</span></span></h1>
-    <h1 class="t-giant" style="color: var(--muted);"><span class="line-reveal"><span class="line-reveal-inner">MERCHANT</span></span></h1>
+    <h1 class="t-giant"><span class="line-reveal"><span class="line-reveal-inner text-outline">VYAN</span></span></h1>
+    <h1 class="t-giant"><span class="line-reveal"><span class="line-reveal-inner">MERCHANT</span></span></h1>
   </div>
   <div class="hero-subtitle">
-    <p class="t-body">Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages designed to lock attention from frame one.</p>
+    <p class="t-body">Crafting high-octane gaming edits that hit different — from clutch montages to full creator packages engineered for absolute viewer retention.</p>
   </div>
 </section>
 
 <!-- MANIFESTO SECTION -->
 <section id="about" class="manifesto">
   <p class="manifesto-text" id="split-manifesto">
-    I'm <b>Vyan</b>, a 17-year-old video editor obsessed with making gaming content that actually slaps. Working extensively with DaVinci Resolve, I cut, grade, and sync footage to create montages that keep viewers locked in. <span class="manifesto-highlight">Edit. Fast. Hard.</span>
+    I'm <b>Vyan</b>, a 17-year-old video editor obsessed with making gaming content that actually slaps. Working extensively with DaVinci Resolve, I cut, grade, and sync footage to create montages that lock viewers in from frame one. <span class="manifesto-highlight">Edit. Fast. Hard.</span>
   </p>
 </section>
 
-<!-- WORK SECTION (HORIZONTAL SLIDER) -->
+<!-- WORK SECTION (HORIZONTAL SKEWED SLIDER) -->
 <section id="work" class="work-section">
   <div class="work-header">
-    <h2 class="t-h2">Selected Works</h2>
-    <span class="t-mono">(03 Archives)</span>
+    <h2 class="t-h2">Selected Archives</h2>
+    <span class="t-mono">(03 Projects)</span>
   </div>
   
   <div class="work-slider-wrap">
     <div class="work-track">
       
       <!-- PROJECT 01 -->
-      <div class="work-item play-trigger" data-video="d0qvLlFEEH8">
+      <div class="work-item mag-play" data-video="d0qvLlFEEH8">
         <div class="work-visual">
           <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Valorant Montage" class="parallax-img">
-          <div class="work-overlay"><span>Play Cinematic Edit</span></div>
+          <div class="rgb-layer red" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg')"></div>
+          <div class="rgb-layer cyan" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg')"></div>
         </div>
         <div class="work-meta">
           <h3>Valorant Montage</h3>
-          <span class="t-mono">01 / Resolve · Color Grade</span>
+          <span class="t-mono">01 / Color Grade · Fast Cuts</span>
         </div>
       </div>
 
       <!-- PROJECT 02 -->
-      <div class="work-item play-trigger" data-video="4ZcBnbLWxvU">
+      <div class="work-item mag-play" data-video="4ZcBnbLWxvU">
         <div class="work-visual">
           <img src="https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg" alt="Legacy Edit" class="parallax-img">
-          <div class="work-overlay"><span>Play Cinematic Edit</span></div>
+          <div class="rgb-layer red" style="background-image: url('https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg')"></div>
+          <div class="rgb-layer cyan" style="background-image: url('https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg')"></div>
         </div>
         <div class="work-meta">
           <h3>Legacy Edit</h3>
-          <span class="t-mono">02 / Fast Cuts · VFX</span>
+          <span class="t-mono">02 / Gaming Montage · VFX</span>
         </div>
       </div>
 
       <!-- PROJECT 03 -->
-      <div class="work-item play-trigger" data-video="d0qvLlFEEH8">
+      <div class="work-item mag-play" data-video="d0qvLlFEEH8">
         <div class="work-visual">
           <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Practice Reel" class="parallax-img">
-          <div class="work-overlay"><span>Play Cinematic Edit</span></div>
+          <div class="rgb-layer red" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg')"></div>
+          <div class="rgb-layer cyan" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg')"></div>
         </div>
         <div class="work-meta">
           <h3>Practice Reel</h3>
@@ -323,27 +376,27 @@ nav.nav-hidden { transform: translate(-50%, -180%); opacity: 0; }
 <!-- EXPERTISE SECTION -->
 <section id="expertise" class="expertise">
   <div class="expertise-left">
-    <span class="t-mono">03 / Core Stack</span>
-    <h2 class="t-h2" style="margin-top: 1rem;">Engineered For Impact</h2>
-    <p class="t-body">Every frame is intentionally paced, color-graded, and synced to build maximum narrative tension and visual rhythm.</p>
+    <span class="t-mono">03 / Capabilities</span>
+    <h2 class="t-h2" style="margin-top: 1rem;">Engineered For Maximum Impact</h2>
+    <p class="t-body">Every cut, audio cue, and color grade is calculated to build unrelenting narrative momentum and immersive visual depth.</p>
   </div>
   <div class="expertise-right">
     <div class="skills-grid">
-      <div class="skill-card">
+      <div class="skill-card mag">
         <span class="t-mono">01</span>
         <h4>DaVinci Resolve</h4>
       </div>
-      <div class="skill-card">
+      <div class="skill-card mag">
         <span class="t-mono">02</span>
         <h4>Color Grading</h4>
       </div>
-      <div class="skill-card">
+      <div class="skill-card mag">
         <span class="t-mono">03</span>
         <h4>Audio Sync & SFX</h4>
       </div>
-      <div class="skill-card">
+      <div class="skill-card mag">
         <span class="t-mono">04</span>
-        <h4>Fast-Paced Cuts</h4>
+        <h4>Fast Pacing</h4>
       </div>
     </div>
   </div>
@@ -357,9 +410,18 @@ nav.nav-hidden { transform: translate(-50%, -180%); opacity: 0; }
 
 <!-- FOOTER -->
 <section id="contact" class="footer">
-  <div class="footer-cta">
-    <span class="t-mono" style="display: block; margin-bottom: 2rem;">04 / Collaboration</span>
-    <h2 class="t-h2">Let's Build</h2>
+  <div class="marquee-wrap">
+    <div class="marquee-text">LET'S BUILD SOMETHING LEGENDARY <span style="color:var(--accent)">✦</span> </div>
+    <div class="marquee-text">LET'S BUILD SOMETHING LEGENDARY <span style="color:var(--accent)">✦</span> </div>
+  </div>
+  <div class="marquee-wrap reverse text-outline">
+    <div class="marquee-text">DAVINCI RESOLVE MASTERCLASS <span style="color:var(--accent); -webkit-text-stroke:0;">✦</span> </div>
+    <div class="marquee-text">DAVINCI RESOLVE MASTERCLASS <span style="color:var(--accent); -webkit-text-stroke:0;">✦</span> </div>
+  </div>
+
+  <div class="footer-main">
+    <span class="t-mono">04 / Initiation</span>
+    <br>
     <a href="mailto:vyanmerchant@gmail.com" class="footer-email mag">vyanmerchant@gmail.com</a>
   </div>
   
@@ -374,7 +436,7 @@ nav.nav-hidden { transform: translate(-50%, -180%); opacity: 0; }
 
 <script>
 /* ==========================================
-   PRODUCTION JAVASCRIPT ARCHITECTURE
+   OVERKILL PRODUCTION ARCHITECTURE
    ========================================== */
 gsap.registerPlugin(ScrollTrigger);
 
@@ -397,7 +459,7 @@ function initSmoothScroll() {
   requestAnimationFrame(raf);
 }
 
-// 2. CINEMATIC LOADER
+// 2. MULTI-LAYER CINEMATIC LOADER
 function initLoader() {
   const tl = gsap.timeline({
     onComplete: () => {
@@ -419,21 +481,23 @@ function initLoader() {
   })
   .to('#loader', { yPercent: -100, duration: 1.2, ease: "expo.inOut", delay: 0.2 })
   .to('.hero .line-reveal-inner', { y: '0%', duration: 1.4, stagger: 0.15, ease: "power4.out" }, "-=0.8")
-  .from('.hero-meta, .hero-subtitle, #navbar', { opacity: 0, y: 20, duration: 1, ease: "power2.out", stagger: 0.1 }, "-=1");
+  .from('.hero-meta, .hero-subtitle, #navbar, .hero-badge-spin', { opacity: 0, y: 20, duration: 1, ease: "power2.out", stagger: 0.1 }, "-=1");
 }
 
-// 3. CUSTOM DESKTOP CURSOR
+// 3. CUBERTO MORPHING CURSOR & MAGNETIC PHYSICS
 function initCursor() {
-  const cursor = document.getElementById('cursor');
-  let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+  const dot = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, dx = 0, dy = 0, rx = 0, ry = 0;
   
-  window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+  window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
   
   gsap.ticker.add(() => {
-    const dt = 1.0 - Math.pow(1.0 - 0.25, gsap.ticker.deltaRatio());
-    cursorX += (mouseX - cursorX) * dt;
-    cursorY += (mouseY - cursorY) * dt;
-    cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+    dx += (mx - dx) * 0.6; dy += (my - dy) * 0.6;
+    dot.style.transform = `translate3d(${dx}px, ${dy}px, 0) translate(-50%, -50%)`;
+    
+    rx += (mx - rx) * 0.18; ry += (my - ry) * 0.18;
+    ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
   });
 
   document.querySelectorAll('.mag').forEach(el => {
@@ -441,9 +505,19 @@ function initCursor() {
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
   });
 
-  document.querySelectorAll('.play-trigger').forEach(el => {
+  document.querySelectorAll('.mag-play').forEach(el => {
     el.addEventListener('mouseenter', () => document.body.classList.add('cursor-play'));
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-play'));
+
+    // SVG Glitch Distortion Mapping on Hover
+    el.addEventListener('mousemove', (e) => {
+      const rect = el.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) / rect.width;
+      gsap.to('#distort-map', { attr: { scale: relX * 45 }, duration: 0.3 });
+    });
+    el.addEventListener('mouseleave', () => {
+      gsap.to('#distort-map', { attr: { scale: 0 }, duration: 0.6, ease: 'power2.out' });
+    });
   });
 }
 
@@ -462,7 +536,7 @@ function initNavScroll() {
   });
 }
 
-// 5. WEBGL FLUID/PARTICLE BACKGROUND
+// 5. WEBGL FLUID SHADER BACKGROUND
 function initWebGLBackground() {
   const canvas = document.getElementById('webgl-canvas');
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
@@ -497,15 +571,15 @@ function initWebGLBackground() {
         m.x *= u_resolution.x / u_resolution.y;
         
         float dist = distance(st, m);
-        float interaction = smoothstep(0.5, 0.0, dist);
+        float interaction = smoothstep(0.55, 0.0, dist);
         
         vec2 q = vec2(0.);
-        q.x = sin(st.x * 2.5 + u_time * 0.15) + cos(st.y * 3.0 + u_time * 0.1);
-        q.y = cos(st.x * 3.0 + u_time * 0.2) + sin(st.y * 2.0 + u_time * 0.15);
+        q.x = sin(st.x * 3.0 + u_time * 0.15) + cos(st.y * 2.5 + u_time * 0.1);
+        q.y = cos(st.x * 2.5 + u_time * 0.2) + sin(st.y * 3.0 + u_time * 0.15);
         
-        float val = smoothstep(0.0, 2.0, length(q) * 0.4);
-        vec3 color = mix(vec3(0.015, 0.015, 0.015), vec3(0.04, 0.04, 0.04), val);
-        color += vec3(0.015, 0.005, 0.0) * interaction;
+        float val = smoothstep(0.0, 2.2, length(q) * 0.45);
+        vec3 color = mix(vec3(0.01, 0.01, 0.01), vec3(0.035, 0.035, 0.035), val);
+        color += vec3(0.02, 0.005, 0.0) * interaction;
         
         gl_FragColor = vec4(color, 1.0);
       }
@@ -527,9 +601,8 @@ function initWebGLBackground() {
   });
 }
 
-// 6. KINETIC MANIFESTO & GSAP ANIMATIONS
+// 6. KINETIC OBYS TYPOGRAPHY MANIFESTO
 function initGSAPAnimations() {
-  // Split Manifesto into words & chars
   const p = document.getElementById('split-manifesto');
   const text = p.innerHTML;
   p.innerHTML = '';
@@ -550,13 +623,11 @@ function initGSAPAnimations() {
     p.innerHTML += wHtml;
   });
 
-  // Animate manifesto characters on scroll
   gsap.to('.manifesto .char', {
     y: '0%', duration: 1, stagger: 0.01, ease: "power3.out",
     scrollTrigger: { trigger: '.manifesto', start: "top 75%", end: "center center", scrub: 1 }
   });
 
-  // Scroll active color shifting
   gsap.utils.toArray('.manifesto .char').forEach(char => {
     ScrollTrigger.create({
       trigger: char, start: "top 70%", end: "top 40%",
@@ -566,9 +637,10 @@ function initGSAPAnimations() {
   });
 }
 
-// 7. HORIZONTAL PINNED SLIDER & PARALLAX
+// 7. HORIZONTAL PINNED SLIDER + VELOCITY SKEW
 function initHorizontalSlider() {
   const track = document.querySelector('.work-track');
+  const cards = gsap.utils.toArray('.work-item');
   const images = gsap.utils.toArray('.parallax-img');
 
   let sliderTween = gsap.to(track, {
@@ -595,11 +667,26 @@ function initHorizontalSlider() {
       }
     });
   });
+
+  // Velocity-based 3D Skew Effect
+  let proxy = { skew: 0 },
+      skewSetter = gsap.quickSetter(cards, "rotationY", "deg"),
+      clamp = gsap.utils.clamp(-12, 12);
+
+  ScrollTrigger.create({
+    onUpdate: (self) => {
+      let skew = clamp(self.getVelocity() / -120);
+      if (Math.abs(skew) > Math.abs(proxy.skew)) {
+        proxy.skew = skew;
+        gsap.to(proxy, { skew: 0, duration: 0.8, ease: "power3", overwrite: true, onUpdate: () => skewSetter(proxy.skew) });
+      }
+    }
+  });
 }
 
 // 8. FULLSCREEN CINEMATIC MODAL
 function initVideoModal() {
-  const triggers = document.querySelectorAll('.play-trigger');
+  const triggers = document.querySelectorAll('.mag-play');
   const modal = document.getElementById('video-modal');
   const modalInner = document.getElementById('modal-inner');
   const closeBtn = document.getElementById('close-modal');
@@ -616,7 +703,7 @@ function initVideoModal() {
 
   closeBtn.addEventListener('click', () => {
     modal.classList.remove('active');
-    setTimeout(() => { modalInner.innerHTML = ''; }, 800);
+    setTimeout(() => { modalInner.innerHTML = ''; }, 900);
     lenis.start();
   });
 }
