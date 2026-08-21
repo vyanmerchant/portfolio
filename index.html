@@ -1,1587 +1,492 @@
 <!DOCTYPE html>
-<html lang="en" class="dark">
+<html lang="en" class="lenis lenis-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vyan Merchant — Cinematic Video Editor & Motion Designer</title>
-
-  <!-- Google Fonts & Preconnect -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=JetBrains+Mono:wght@300;400;500&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
-
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6925719089611119" crossorigin="anonymous"></script>
-
-  <style>
-    /* ==========================================================================
-       1. CORE DESIGN SYSTEM & CSS VARIABLES
-       ========================================================================== */
-    :root {
-      --bg-base: #07080a;
-      --bg-surface: #0e1014;
-      --bg-surface-elevated: #161920;
-      
-      --text-main: #f4f2ed;
-      --text-muted: #8a919e;
-      --text-subtle: #4b5260;
-      
-      --accent-cyan: #7dd3fc;
-      --accent-cyan-glow: rgba(125, 211, 252, 0.25);
-      --accent-cyan-dim: #38bdf8;
-      
-      --border-subtle: rgba(244, 242, 237, 0.08);
-      --border-active: rgba(125, 211, 252, 0.3);
-
-      --font-display: 'Anton', sans-serif;
-      --font-sans: 'Syne', sans-serif;
-      --font-serif: 'Cormorant Garamond', serif;
-      --font-mono: 'JetBrains Mono', monospace;
-
-      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-      --ease-in-out-sine: cubic-bezier(0.37, 0, 0.63, 1);
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    html {
-      scroll-behavior: smooth;
-      background-color: var(--bg-base);
-      color: var(--text-main);
-      font-family: var(--font-sans);
-      overflow-x: hidden;
-      -webkit-font-smoothing: antialiased;
-    }
-
-    body {
-      position: relative;
-      min-height: 100vh;
-      line-height: 1.5;
-      cursor: default;
-    }
-
-    /* Remove default cursor on desktop when interactive cursor is enabled */
-    @media (hover: hover) and (pointer: fine) {
-      body, a, button, input {
-        cursor: none !important;
-      }
-    }
-
-    ::selection {
-      background: var(--accent-cyan);
-      color: var(--bg-base);
-    }
-
-    /* Custom Scrollbar */
-    ::-webkit-scrollbar {
-      width: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: var(--bg-base);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: var(--bg-surface-elevated);
-      border-radius: 3px;
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--accent-cyan-dim);
-    }
-
-    /* ==========================================================================
-       2. CANVAS OVERLAYS & AMBIENT GRAPHICS
-       ========================================================================== */
-    #damascus-bg {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -2;
-      opacity: 0.85;
-      pointer-events: none;
-    }
-
-    .noise-overlay {
-      position: fixed;
-      inset: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -1;
-      opacity: 0.035;
-      pointer-events: none;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-    }
-
-    #scroll-progress {
-      position: fixed;
-      top: 0;
-      left: 0;
-      height: 2px;
-      width: 0%;
-      background: linear-gradient(90deg, var(--accent-cyan-dim), var(--accent-cyan));
-      box-shadow: 0 0 10px var(--accent-cyan-glow);
-      z-index: 1001;
-      transition: width 0.08s linear;
-    }
-
-    /* ==========================================================================
-       3. CUSTOM CURSOR ENGINE
-       ========================================================================== */
-    .cursor-dot, .cursor-follower {
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      border-radius: 50%;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: opacity 0.3s ease;
-    }
-
-    .cursor-dot {
-      width: 6px;
-      height: 6px;
-      background-color: var(--accent-cyan);
-      box-shadow: 0 0 12px var(--accent-cyan);
-    }
-
-    .cursor-follower {
-      width: 36px;
-      height: 36px;
-      border: 1px solid rgba(125, 211, 252, 0.4);
-      background: rgba(125, 211, 252, 0.02);
-      backdrop-filter: blur(2px);
-      transition: transform 0.15s var(--ease-out-expo), width 0.3s var(--ease-out-expo), height 0.3s var(--ease-out-expo), border-color 0.3s ease, background 0.3s ease;
-    }
-
-    body.cursor-hover .cursor-follower {
-      width: 64px;
-      height: 64px;
-      border-color: var(--accent-cyan);
-      background: rgba(125, 211, 252, 0.08);
-    }
-
-    body.cursor-active .cursor-follower {
-      transform: translate(-50%, -50%) scale(0.85);
-      background: rgba(125, 211, 252, 0.15);
-    }
-
-    body.cursor-view .cursor-follower {
-      width: 80px;
-      height: 80px;
-      background: var(--accent-cyan);
-      border-color: var(--accent-cyan);
-      mix-blend-mode: difference;
-    }
-    body.cursor-view .cursor-follower::after {
-      content: 'VIEW';
-      position: absolute;
-      top: 50%; left: 50%;
-      transform: translate(-50%, -50%);
-      font-family: var(--font-mono);
-      font-size: 10px;
-      font-weight: 700;
-      color: #000;
-      letter-spacing: 0.1em;
-    }
-
-    @media (max-width: 1024px) {
-      .cursor-dot, .cursor-follower { display: none !important; }
-    }
-
-    /* ==========================================================================
-       4. NAVIGATION SYSTEM
-       ========================================================================== */
-    nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 900;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 28px 48px;
-      transition: padding 0.4s var(--ease-out-expo), background-color 0.4s ease, border-color 0.4s ease;
-      border-bottom: 1px solid transparent;
-    }
-
-    nav.scrolled {
-      padding: 16px 48px;
-      background-color: rgba(7, 8, 10, 0.82);
-      backdrop-filter: blur(16px);
-      border-bottom-color: var(--border-subtle);
-    }
-
-    .nav-logo {
-      font-family: var(--font-display);
-      font-size: 26px;
-      letter-spacing: 0.05em;
-      color: var(--text-main);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 2px;
-    }
-
-    .nav-logo span { color: var(--accent-cyan); }
-
-    .nav-links {
-      display: flex;
-      gap: 36px;
-      align-items: center;
-    }
-
-    .nav-link {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      text-decoration: none;
-      position: relative;
-      padding: 6px 0;
-      transition: color 0.3s ease;
-    }
-
-    .nav-link::after {
-      content: '';
-      position: absolute;
-      bottom: 0; left: 0;
-      width: 0%; height: 1px;
-      background-color: var(--accent-cyan);
-      transition: width 0.3s var(--ease-out-expo);
-    }
-
-    .nav-link:hover {
-      color: var(--text-main);
-    }
-
-    .nav-link:hover::after {
-      width: 100%;
-    }
-
-    /* Mobile Nav Toggle */
-    .mobile-toggle {
-      display: none;
-      flex-direction: column;
-      gap: 6px;
-      background: none;
-      border: none;
-      padding: 8px;
-      z-index: 950;
-    }
-
-    .mobile-toggle span {
-      display: block;
-      width: 24px;
-      height: 1px;
-      background-color: var(--text-main);
-      transition: transform 0.3s ease, opacity 0.3s ease;
-    }
-
-    /* Mobile Fullscreen Menu */
-    .mobile-menu {
-      position: fixed;
-      inset: 0;
-      background: var(--bg-base);
-      z-index: 940;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 48px;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s var(--ease-out-expo);
-    }
-
-    .mobile-menu.open {
-      opacity: 1;
-      pointer-events: auto;
-    }
-
-    .mobile-menu-links {
-      display: flex;
-      flex-direction: column;
-      gap: 24px;
-    }
-
-    .mobile-menu-link {
-      font-family: var(--font-display);
-      font-size: 48px;
-      color: var(--text-main);
-      text-decoration: none;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      transition: color 0.2s ease, transform 0.3s var(--ease-out-expo);
-    }
-
-    .mobile-menu-link:hover {
-      color: var(--accent-cyan);
-      transform: translateX(12px);
-    }
-
-    /* ==========================================================================
-       5. HERO SECTION
-       ========================================================================== */
-    .hero {
-      position: relative;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: flex-end;
-      padding: 0 48px 80px;
-      overflow: hidden;
-      border-bottom: 1px solid var(--border-subtle);
-    }
-
-    .hero-video-wrap {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-      z-index: 0;
-      overflow: hidden;
-    }
-
-    .hero-video {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      filter: brightness(0.35) contrast(1.1) saturate(0.85);
-      transform: scale(1.05);
-      transition: transform 0.1s ease-out;
-    }
-
-    .hero-overlay {
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(
-        180deg, 
-        rgba(7, 8, 10, 0.4) 0%, 
-        rgba(7, 8, 10, 0.1) 40%, 
-        rgba(7, 8, 10, 0.85) 80%, 
-        var(--bg-base) 100%
-      );
-      z-index: 1;
-    }
-
-    .hero-content {
-      position: relative;
-      z-index: 2;
-      max-width: 1400px;
-      width: 100%;
-      margin: 0 auto;
-    }
-
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
-      color: var(--accent-cyan);
-      background: rgba(125, 211, 252, 0.06);
-      border: 1px solid rgba(125, 211, 252, 0.18);
-      padding: 6px 16px;
-      border-radius: 100px;
-      margin-bottom: 24px;
-      backdrop-filter: blur(8px);
-    }
-
-    .hero-badge-dot {
-      width: 6px;
-      height: 6px;
-      border-radius: 50%;
-      background: var(--accent-cyan);
-      box-shadow: 0 0 8px var(--accent-cyan);
-      animation: pulseDot 2s infinite;
-    }
-
-    @keyframes pulseDot {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.75); }
-    }
-
-    .hero-title-wrap {
-      overflow: hidden;
-      margin-bottom: 24px;
-    }
-
-    .hero-title {
-      font-family: var(--font-display);
-      font-size: clamp(72px, 13.5vw, 190px);
-      line-height: 0.88;
-      letter-spacing: 0.01em;
-      text-transform: uppercase;
-      color: var(--text-main);
-    }
-
-    .hero-title .accent {
-      color: var(--accent-cyan);
-      text-shadow: 0 0 40px var(--accent-cyan-glow);
-    }
-
-    .hero-bottom-grid {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 40px;
-      align-items: flex-end;
-      padding-top: 24px;
-      border-top: 1px solid rgba(244, 242, 237, 0.1);
-    }
-
-    .hero-sub {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-size: clamp(18px, 2.2vw, 26px);
-      color: var(--text-muted);
-      line-height: 1.4;
-      max-width: 520px;
-      font-weight: 300;
-    }
-
-    .magnetic-btn-wrap {
-      display: inline-block;
-      position: relative;
-    }
-
-    .btn-primary {
-      position: relative;
-      display: inline-flex;
-      align-items: center;
-      gap: 16px;
-      padding: 18px 36px;
-      background: var(--bg-surface-elevated);
-      border: 1px solid var(--border-active);
-      color: var(--text-main);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      text-decoration: none;
-      overflow: hidden;
-      border-radius: 2px;
-      transition: border-color 0.3s ease, color 0.3s ease, transform 0.2s var(--ease-out-expo);
-    }
-
-    .btn-primary::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: var(--accent-cyan);
-      transform: translateY(100%);
-      transition: transform 0.4s var(--ease-out-expo);
-      z-index: 0;
-    }
-
-    .btn-primary span, .btn-primary svg {
-      position: relative;
-      z-index: 1;
-      transition: transform 0.3s ease;
-    }
-
-    .btn-primary:hover {
-      color: var(--bg-base);
-      border-color: var(--accent-cyan);
-    }
-
-    .btn-primary:hover::before {
-      transform: translateY(0);
-    }
-
-    .btn-primary:hover svg {
-      transform: translateX(4px);
-    }
-
-    /* ==========================================================================
-       6. MARQUEE KINETIC BANNER
-       ========================================================================== */
-    .marquee-wrap {
-      background: var(--accent-cyan);
-      color: #050b14;
-      overflow: hidden;
-      padding: 14px 0;
-      position: relative;
-      z-index: 10;
-      box-shadow: 0 0 30px rgba(125, 211, 252, 0.15);
-    }
-
-    .marquee-track {
-      display: flex;
-      width: max-content;
-      animation: marquee 24s linear infinite;
-    }
-
-    .marquee-content {
-      display: flex;
-      align-items: center;
-      gap: 32px;
-      white-space: nowrap;
-    }
-
-    .marquee-item {
-      font-family: var(--font-sans);
-      font-size: 13px;
-      font-weight: 800;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      display: flex;
-      align-items: center;
-      gap: 32px;
-    }
-
-    .marquee-item .dot {
-      opacity: 0.4;
-      font-size: 10px;
-    }
-
-    @keyframes marquee {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-
-    /* ==========================================================================
-       7. EDITORIAL ABOUT SECTION & STATS
-       ========================================================================== */
-    .section {
-      padding: 140px 48px;
-      position: relative;
-    }
-
-    .section-inner {
-      max-width: 1300px;
-      margin: 0 auto;
-    }
-
-    .section-header {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin-bottom: 64px;
-    }
-
-    .section-label {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.22em;
-      text-transform: uppercase;
-      color: var(--accent-cyan);
-    }
-
-    .section-line {
-      flex: 1;
-      max-width: 120px;
-      height: 1px;
-      background: var(--border-active);
-    }
-
-    .about-grid {
-      display: grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 90px;
-      align-items: start;
-    }
-
-    .about-left .display-statement {
-      font-family: var(--font-display);
-      font-size: clamp(52px, 6.5vw, 96px);
-      line-height: 0.92;
-      letter-spacing: 0.01em;
-      text-transform: uppercase;
-      color: var(--text-main);
-      margin-bottom: 40px;
-    }
-
-    .about-left .display-statement .accent {
-      color: var(--accent-cyan);
-    }
-
-    .about-body {
-      font-family: var(--font-serif);
-      font-size: clamp(20px, 1.8vw, 24px);
-      font-weight: 300;
-      line-height: 1.7;
-      color: var(--text-muted);
-      margin-bottom: 56px;
-    }
-
-    .about-body strong {
-      color: var(--text-main);
-      font-weight: 400;
-      font-style: italic;
-    }
-
-    /* Stats Grid */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 1px;
-      background: var(--border-subtle);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .stat-card {
-      background: var(--bg-surface);
-      padding: 36px 28px;
-      position: relative;
-      overflow: hidden;
-      transition: background 0.3s ease;
-    }
-
-    .stat-card:hover {
-      background: var(--bg-surface-elevated);
-    }
-
-    .stat-number {
-      font-family: var(--font-display);
-      font-size: 64px;
-      color: var(--text-main);
-      line-height: 1;
-      display: block;
-      margin-bottom: 8px;
-    }
-
-    .stat-number .plus {
-      color: var(--accent-cyan);
-    }
-
-    .stat-label {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.16em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-    }
-
-    /* Skills Column */
-    .skills-container {
-      display: flex;
-      flex-direction: column;
-      gap: 0;
-    }
-
-    .skill-row {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 24px 0;
-      border-bottom: 1px solid var(--border-subtle);
-      transition: border-color 0.3s ease, padding 0.3s var(--ease-out-expo);
-    }
-
-    .skill-row:first-child {
-      border-top: 1px solid var(--border-subtle);
-    }
-
-    .skill-row:hover {
-      border-bottom-color: var(--accent-cyan);
-      padding-left: 12px;
-    }
-
-    .skill-name {
-      font-family: var(--font-serif);
-      font-size: 24px;
-      font-style: italic;
-      font-weight: 300;
-      color: var(--text-main);
-    }
-
-    .skill-tag {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--text-subtle);
-      border: 1px solid var(--border-subtle);
-      padding: 4px 10px;
-      border-radius: 2px;
-    }
-
-    /* ==========================================================================
-       8. WORK & PROJECT SHOWCASE (STICKY INTERACTIVE PREVIEW)
-       ========================================================================== */
-    .work-layout {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 60px;
-      align-items: start;
-    }
-
-    .work-list {
-      border-top: 1px solid var(--border-subtle);
-    }
-
-    .work-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 32px 20px 32px 0;
-      border-bottom: 1px solid var(--border-subtle);
-      position: relative;
-      text-decoration: none;
-      transition: padding 0.4s var(--ease-out-expo), background-color 0.3s ease;
-    }
-
-    .work-item::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(90deg, rgba(125, 211, 252, 0.08), transparent);
-      width: 0%;
-      transition: width 0.4s var(--ease-out-expo);
-      pointer-events: none;
-    }
-
-    .work-item:hover::before,
-    .work-item.active::before {
-      width: 100%;
-    }
-
-    .work-item:hover,
-    .work-item.active {
-      padding-left: 20px;
-    }
-
-    .work-item-meta {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      position: relative;
-      z-index: 1;
-    }
-
-    .work-num {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-subtle);
-      letter-spacing: 0.1em;
-      min-width: 28px;
-      transition: color 0.3s ease;
-    }
-
-    .work-item.active .work-num,
-    .work-item:hover .work-num {
-      color: var(--accent-cyan);
-    }
-
-    .work-title-box {
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-
-    .work-title {
-      font-family: var(--font-display);
-      font-size: clamp(26px, 3vw, 42px);
-      letter-spacing: 0.02em;
-      color: var(--text-muted);
-      text-transform: uppercase;
-      line-height: 1;
-      transition: color 0.3s ease;
-    }
-
-    .work-item:hover .work-title,
-    .work-item.active .work-title {
-      color: var(--text-main);
-    }
-
-    .work-tags {
-      font-family: var(--font-mono);
-      font-size: 10px;
-      color: var(--text-subtle);
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      transition: color 0.3s ease;
-    }
-
-    .work-item:hover .work-tags,
-    .work-item.active .work-tags {
-      color: var(--text-muted);
-    }
-
-    .work-arrow {
-      font-family: var(--font-mono);
-      font-size: 18px;
-      color: var(--accent-cyan);
-      opacity: 0;
-      transform: translateX(-12px);
-      transition: opacity 0.3s ease, transform 0.3s var(--ease-out-expo);
-      position: relative;
-      z-index: 1;
-    }
-
-    .work-item:hover .work-arrow,
-    .work-item.active .work-arrow {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    /* Sticky Preview Display Frame */
-    .work-preview-container {
-      position: sticky;
-      top: 120px;
-    }
-
-    .work-preview-stage {
-      position: relative;
-      width: 100%;
-      height: 460px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      border-radius: 4px;
-      overflow: hidden;
-      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
-    }
-
-    .work-media-item {
-      position: absolute;
-      inset: 0;
-      width: 100%; height: 100%;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.5s var(--ease-out-expo), visibility 0.5s ease;
-    }
-
-    .work-media-item.active {
-      opacity: 1;
-      visibility: visible;
-    }
-
-    .work-media-item iframe,
-    .work-media-item video {
-      width: 100%; height: 100%;
-      border: none;
-      object-fit: cover;
-    }
-
-    .work-preview-caption {
-      margin-top: 20px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 0 4px;
-    }
-
-    .work-caption-title {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-size: 18px;
-      color: var(--text-muted);
-    }
-
-    .work-caption-link {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--accent-cyan);
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      transition: gap 0.2s ease;
-    }
-
-    .work-caption-link:hover {
-      gap: 10px;
-    }
-
-    /* ==========================================================================
-       9. CONTACT SECTION & FOOTER
-       ========================================================================== */
-    .contact-section {
-      border-top: 1px solid var(--border-subtle);
-    }
-
-    .contact-title {
-      font-family: var(--font-display);
-      font-size: clamp(60px, 10vw, 150px);
-      line-height: 0.9;
-      letter-spacing: 0.01em;
-      text-transform: uppercase;
-      color: var(--text-main);
-      margin-bottom: 64px;
-    }
-
-    .contact-title .accent {
-      color: var(--accent-cyan);
-    }
-
-    .contact-main-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      flex-wrap: wrap;
-      gap: 40px;
-      padding-top: 48px;
-      border-top: 1px solid var(--border-subtle);
-    }
-
-    .contact-email-link {
-      font-family: var(--font-serif);
-      font-style: italic;
-      font-size: clamp(24px, 3.5vw, 48px);
-      font-weight: 300;
-      color: var(--text-main);
-      text-decoration: none;
-      transition: color 0.3s ease;
-      position: relative;
-    }
-
-    .contact-email-link:hover {
-      color: var(--accent-cyan);
-    }
-
-    .contact-socials {
-      display: flex;
-      gap: 20px;
-      flex-wrap: wrap;
-    }
-
-    .social-btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 12px 20px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      color: var(--text-muted);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      text-decoration: none;
-      border-radius: 2px;
-      transition: border-color 0.3s ease, color 0.3s ease, transform 0.3s var(--ease-out-expo);
-    }
-
-    .social-btn:hover {
-      border-color: var(--accent-cyan);
-      color: var(--text-main);
-      transform: translateY(-2px);
-    }
-
-    .social-btn.discord:hover {
-      border-color: #5865F2;
-      color: #5865F2;
-    }
-
-    footer {
-      padding: 40px 48px;
-      border-top: 1px solid var(--border-subtle);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 16px;
-      background: var(--bg-base);
-    }
-
-    footer p {
-      font-family: var(--font-mono);
-      font-size: 11px;
-      color: var(--text-subtle);
-      letter-spacing: 0.12em;
-    }
-
-    /* ==========================================================================
-       10. REVEAL & MOTION MECHANICS
-       ========================================================================== */
-    .reveal-type {
-      opacity: 0;
-      transform: translateY(30px);
-      transition: opacity 0.8s var(--ease-out-expo), transform 0.8s var(--ease-out-expo);
-    }
-
-    .reveal-type.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-
-    /* ==========================================================================
-       11. RESPONSIVE BREAKPOINTS
-       ========================================================================== */
-    @media (max-width: 1024px) {
-      .about-grid {
-        grid-template-columns: 1fr;
-        gap: 48px;
-      }
-
-      .work-layout {
-        grid-template-columns: 1fr;
-      }
-
-      .work-preview-container {
-        position: relative;
-        top: 0;
-        margin-top: 32px;
-      }
-
-      .work-preview-stage {
-        height: 280px;
-      }
-    }
-
-    @media (max-width: 768px) {
-      nav { padding: 20px 24px; }
-      nav.scrolled { padding: 16px 24px; }
-      .nav-links { display: none; }
-      .mobile-toggle { display: flex; }
-
-      .hero { padding: 0 24px 60px; }
-      .hero-bottom-grid {
-        grid-template-columns: 1fr;
-        gap: 24px;
-      }
-
-      .section { padding: 80px 24px; }
-      footer { padding: 24px; }
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vyan Merchant — Cinematic Video Editor[cite: 1]</title>
+
+<!-- PRECONNECT & FONTS -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+
+<!-- DEPENDENCIES -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<style>
+/* ==========================================
+   01. CORE SYSTEM & VARIABLES
+   ========================================== */
+:root {
+  --color-bg: #050505;
+  --color-text: #f0ede8;
+  --color-accent: #7dd3fc;
+  --color-muted: #888888;
+  --color-border: rgba(240, 237, 232, 0.1);
+  
+  --font-sans: 'Syne', sans-serif;
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-mono: 'Space Mono', monospace;
+  
+  --space-xs: 0.5rem; --space-sm: 1rem; --space-md: 2.5rem;
+  --space-lg: 5rem; --space-xl: 10rem;
+  
+  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html.lenis { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
+
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+  cursor: none; /* Custom Cursor */
+}
+
+::selection { background: var(--color-text); color: var(--color-bg); }
+
+/* ==========================================
+   02. CUSTOM CURSOR & MAGNETIC UI
+   ========================================== */
+#cursor {
+  position: fixed; top: 0; left: 0;
+  width: 12px; height: 12px;
+  background: var(--color-text);
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%, -50%);
+  mix-blend-mode: exclusion;
+  transition: width 0.3s var(--ease-out-expo), height 0.3s var(--ease-out-expo), background 0.3s;
+}
+#cursor.hovered {
+  width: 60px; height: 60px;
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(4px);
+  border: 1px solid rgba(255,255,255,0.2);
+}
+.magnetic { display: inline-block; cursor: none; }
+
+/* ==========================================
+   03. WEBGL BACKGROUND
+   ========================================== */
+#webgl-container {
+  position: fixed; inset: 0;
+  width: 100vw; height: 100vh;
+  z-index: -2; pointer-events: none;
+  background: var(--color-bg);
+}
+.noise-overlay {
+  position: fixed; inset: 0;
+  z-index: -1; pointer-events: none;
+  opacity: 0.04;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* ==========================================
+   04. TYPOGRAPHY & UTILS
+   ========================================== */
+.t-display { font-size: clamp(3rem, 12vw, 12rem); line-height: 0.85; font-weight: 800; letter-spacing: -0.02em; text-transform: uppercase; }
+.t-h2 { font-size: clamp(2rem, 5vw, 5rem); line-height: 1; font-weight: 700; letter-spacing: -0.01em; }
+.t-body { font-size: clamp(1rem, 1.5vw, 1.25rem); line-height: 1.5; font-weight: 400; color: var(--color-muted); }
+.t-serif { font-family: var(--font-serif); font-style: italic; font-weight: 300; }
+.t-mono { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; }
+
+.accent { color: var(--color-accent); }
+.grid-layout { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--space-sm); padding: 0 4vw; }
+
+/* ==========================================
+   05. NAVIGATION
+   ========================================== */
+nav {
+  position: fixed; top: 0; width: 100%;
+  padding: 2vw 4vw;
+  display: flex; justify-content: space-between; align-items: center;
+  z-index: 100;
+  mix-blend-mode: difference;
+}
+.nav-logo { font-size: 1.5rem; font-weight: 700; color: var(--color-text); text-decoration: none; }
+.nav-links { display: flex; gap: 2rem; }
+.nav-links a { color: var(--color-text); text-decoration: none; position: relative; overflow: hidden; padding-bottom: 4px; }
+.nav-links a::after {
+  content: ''; position: absolute; bottom: 0; left: 0;
+  width: 100%; height: 1px; background: var(--color-text);
+  transform: translateX(-100%); transition: transform 0.4s var(--ease-out-expo);
+}
+.nav-links a:hover::after { transform: translateX(0); }
+
+/* ==========================================
+   06. HERO SECTION
+   ========================================== */
+.hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; }
+.hero-meta { grid-column: 1 / -1; display: flex; justify-content: space-between; margin-bottom: 2rem; }
+.hero-title-wrapper { grid-column: 1 / 11; overflow: hidden; }
+.hero-subtitle { grid-column: 8 / 13; margin-top: 4rem; text-align: right; }
+.scroll-indicator { position: absolute; bottom: 2vw; right: 4vw; display: flex; align-items: center; gap: 1rem; }
+.scroll-line { width: 40px; height: 1px; background: var(--color-muted); overflow: hidden; position: relative; }
+.scroll-line::after {
+  content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+  background: var(--color-text); animation: scrollLine 2s infinite cubic-bezier(0.65, 0, 0.35, 1);
+}
+@keyframes scrollLine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
+
+/* ==========================================
+   07. EDITORIAL ABOUT SECTION
+   ========================================== */
+.about { padding: var(--space-xl) 0; border-top: 1px solid var(--color-border); }
+.about-label { grid-column: 1 / 3; }
+.about-content { grid-column: 4 / 11; }
+.about-stats { grid-column: 4 / 11; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 4rem; border-top: 1px solid var(--color-border); padding-top: 2rem; }
+.stat h4 { font-size: 4rem; font-family: var(--font-serif); color: var(--color-text); line-height: 1; }
+
+/* ==========================================
+   08. INTERACTIVE PROJECT GALLERY
+   ========================================== */
+.projects { padding: var(--space-xl) 0; }
+.project-container { grid-column: 1 / -1; display: flex; gap: 4vw; position: relative; }
+.project-list { flex: 1; display: flex; flex-direction: column; }
+.project-item {
+  padding: 3rem 0; border-bottom: 1px solid var(--color-border);
+  display: flex; justify-content: space-between; align-items: center;
+  transition: padding-left 0.4s var(--ease-out-expo); cursor: none;
+}
+.project-item:first-child { border-top: 1px solid var(--color-border); }
+.project-item:hover { padding-left: 2rem; }
+.project-item:hover .project-title { color: var(--color-text); }
+.project-title { font-size: clamp(2rem, 4vw, 4rem); color: var(--color-muted); transition: color 0.4s; }
+
+.project-preview-wrapper { flex: 0 0 45%; position: relative; height: 60vh; }
+.project-preview { position: sticky; top: 20vh; width: 100%; height: 100%; overflow: hidden; border-radius: 4px; background: #111; }
+.project-preview iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; opacity: 0; transition: opacity 0.4s; pointer-events: none; }
+.project-preview iframe.active { opacity: 1; }
+
+/* ==========================================
+   09. FOOTER / CONTACT
+   ========================================== */
+.contact { padding: var(--space-xl) 0 2rem; border-top: 1px solid var(--color-border); min-height: 80vh; display: flex; flex-direction: column; justify-content: space-between; }
+.contact-cta { grid-column: 1 / -1; text-align: center; }
+.contact-cta a { color: var(--color-text); text-decoration: none; font-size: clamp(3rem, 8vw, 8rem); font-family: var(--font-serif); }
+.contact-cta a:hover { color: var(--color-accent); }
+.footer-bottom { grid-column: 1 / -1; display: flex; justify-content: space-between; margin-top: auto; border-top: 1px solid var(--color-border); padding-top: 2rem; }
+
+/* Line reveal utility */
+.line-reveal { overflow: hidden; }
+.line-reveal-inner { display: inline-block; transform: translateY(100%); }
+</style>
 </head>
 <body>
 
-  <!-- Dynamic Scroll Progress Indicator -->
-  <div id="scroll-progress"></div>
+<!-- CUSTOM CURSOR -->
+<div id="cursor"></div>
 
-  <!-- Damascus Fluid Canvas & Ambient Noise -->
-  <canvas id="damascus-bg"></canvas>
-  <div class="noise-overlay"></div>
+<!-- WEBGL BACKGROUND -->
+<div id="webgl-container"></div>
+<div class="noise-overlay"></div>
 
-  <!-- Custom Cursor Engine -->
-  <div class="cursor-dot" id="cursor-dot"></div>
-  <div class="cursor-follower" id="cursor-follower"></div>
+<!-- NAVIGATION -->
+<nav>
+  <a href="#" class="nav-logo magnetic magnetic-hover">VM<span class="accent">.</span></a>
+  <div class="nav-links t-mono">
+    <a href="#about" class="magnetic magnetic-hover">About</a>
+    <a href="#work" class="magnetic magnetic-hover">Work[cite: 1]</a>
+    <a href="#contact" class="magnetic magnetic-hover">Contact</a>
+  </div>
+</nav>
 
-  <!-- Navigation Bar -->
-  <nav id="navbar">
-    <a href="#" class="nav-logo" data-magnetic>VM<span>.</span></a>
+<!-- HERO -->
+<section class="hero grid-layout">
+  <div class="hero-meta t-mono">
+    <span>Gaming Video Editor[cite: 1]</span>
+    <span>DaVinci Resolve Specialist[cite: 1]</span>
+    <span>Pune, India</span>
+  </div>
+  
+  <div class="hero-title-wrapper">
+    <h1 class="t-display">
+      <span class="line-reveal"><span class="line-reveal-inner">Vyan</span></span><br>
+      <span class="line-reveal"><span class="line-reveal-inner">Mer<span class="accent">chant</span></span></span>
+    </h1>
+  </div>
+  
+  <div class="hero-subtitle">
+    <p class="t-body t-serif">Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages.[cite: 1]</p>
+  </div>
+  
+  <div class="scroll-indicator t-mono">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about" class="about grid-layout">
+  <div class="about-label t-mono accent">01 / Profile</div>
+  <div class="about-content">
+    <h2 class="t-h2 line-reveal" style="margin-bottom: 2rem;">
+      <span class="line-reveal-inner">Edit. Fast. Hard.[cite: 1]</span>
+    </h2>
+    <p class="t-body" style="font-size: 1.5rem;">
+      I'm a video editor obsessed with making gaming content that actually slaps. Working extensively with DaVinci Resolve, I cut, grade, and sync footage to create cinematic montages that keep viewers locked in from the first frame to the last.[cite: 1]
+    </p>
+  </div>
+  <div class="about-stats">
+    <div class="stat">
+      <h4>04</h4>
+      <span class="t-mono">Years Editing[cite: 1]</span>
+    </div>
+    <div class="stat">
+      <h4>&infin;</h4>
+      <span class="t-mono">Hours in Resolve[cite: 1]</span>
+    </div>
+  </div>
+</section>
+
+<!-- PROJECTS -->
+<section id="work" class="projects grid-layout">
+  <div class="project-container">
+    <div class="project-list">
+      <div class="t-mono accent" style="margin-bottom: 2rem;">02 / Selected Works</div>
+      
+      <!-- Interactive Project Items -->
+      <div class="project-item magnetic-hover" data-video="d0qvLlFEEH8">
+        <h3 class="project-title">Valorant Montage[cite: 1]</h3>
+        <span class="t-mono t-serif">01</span>
+      </div>
+      <div class="project-item magnetic-hover" data-video="4ZcBnbLWxvU">
+        <h3 class="project-title">Legacy Edit[cite: 1]</h3>
+        <span class="t-mono t-serif">02</span>
+      </div>
+      <div class="project-item magnetic-hover" data-video="d0qvLlFEEH8">
+        <h3 class="project-title">Practice Reel[cite: 1]</h3>
+        <span class="t-mono t-serif">03</span>
+      </div>
+    </div>
     
-    <div class="nav-links">
-      <a href="#about" class="nav-link" data-magnetic>About</a>
-      <a href="#projects" class="nav-link" data-magnetic>Work</a>
-      <a href="#contact" class="nav-link" data-magnetic>Contact</a>
-    </div>
-
-    <button class="mobile-toggle" id="menu-toggle" aria-label="Toggle navigation menu">
-      <span></span>
-      <span></span>
-    </button>
-  </nav>
-
-  <!-- Fullscreen Mobile Navigation -->
-  <div class="mobile-menu" id="mobile-menu">
-    <div class="mobile-menu-links">
-      <a href="#about" class="mobile-menu-link">About</a>
-      <a href="#projects" class="mobile-menu-link">Work</a>
-      <a href="#contact" class="mobile-menu-link">Contact</a>
-    </div>
-  </div>
-
-  <!-- Hero Section -->
-  <section class="hero">
-    <div class="hero-video-wrap">
-      <video autoplay muted loop playsinline class="hero-video" id="hero-video">
-        <source src="montage.mp4" type="video/mp4">
-      </video>
-    </div>
-    <div class="hero-overlay"></div>
-
-    <div class="hero-content">
-      <div class="hero-badge reveal-type">
-        <span class="hero-badge-dot"></span>
-        Gaming Video Editor · DaVinci Resolve · Est. 2021
-      </div>
-
-      <div class="hero-title-wrap">
-        <h1 class="hero-title reveal-type">
-          VYAN<br>MER<span class="accent">CHANT</span>
-        </h1>
-      </div>
-
-      <div class="hero-bottom-grid reveal-type">
-        <p class="hero-sub">
-          Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages.
-        </p>
-
-        <div class="magnetic-btn-wrap" data-magnetic>
-          <a href="#projects" class="btn-primary">
-            <span>View My Work</span>
-            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor">
-              <path d="M3 8h10M9 4l4 4-4 4" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Marquee Kinetic Track -->
-  <div class="marquee-wrap">
-    <div class="marquee-track">
-      <div class="marquee-content">
-        <div class="marquee-item">DaVinci Resolve <span class="dot">✦</span></div>
-        <div class="marquee-item">Gaming Montages <span class="dot">✦</span></div>
-        <div class="marquee-item">Color Grading <span class="dot">✦</span></div>
-        <div class="marquee-item">Fast Edits <span class="dot">✦</span></div>
-        <div class="marquee-item">Content Creation <span class="dot">✦</span></div>
-        <div class="marquee-item">Valorant <span class="dot">✦</span></div>
-        <div class="marquee-item">Motion Design <span class="dot">✦</span></div>
-        <div class="marquee-item">4 Years Experience <span class="dot">✦</span></div>
-      </div>
-      <!-- Seamless Duplicate -->
-      <div class="marquee-content">
-        <div class="marquee-item">DaVinci Resolve <span class="dot">✦</span></div>
-        <div class="marquee-item">Gaming Montages <span class="dot">✦</span></div>
-        <div class="marquee-item">Color Grading <span class="dot">✦</span></div>
-        <div class="marquee-item">Fast Edits <span class="dot">✦</span></div>
-        <div class="marquee-item">Content Creation <span class="dot">✦</span></div>
-        <div class="marquee-item">Valorant <span class="dot">✦</span></div>
-        <div class="marquee-item">Motion Design <span class="dot">✦</span></div>
-        <div class="marquee-item">4 Years Experience <span class="dot">✦</span></div>
+    <div class="project-preview-wrapper">
+      <div class="project-preview" id="video-preview-container">
+        <!-- Iframes injected via JS for performance -->
       </div>
     </div>
   </div>
+</section>
 
-  <!-- About Section -->
-  <section class="section" id="about">
-    <div class="section-inner">
-      <div class="section-header reveal-type">
-        <span class="section-label">01 // About</span>
-        <div class="section-line"></div>
-      </div>
-
-      <div class="about-grid">
-        <div class="about-left">
-          <h2 class="display-statement reveal-type">
-            EDIT.<br>FAST.<br><span class="accent">HARD.</span>
-          </h2>
-
-          <p class="about-body reveal-type">
-            I'm <strong>Vyan</strong>, a 17-year-old video editor obsessed with making gaming content that actually slaps. 
-            I've been editing for <strong>4 years</strong> using <strong>DaVinci Resolve</strong> — cutting, grading, and syncing footage 
-            to create montages that keep viewers locked in from the first frame to the last.
-            <br><br>
-            Worked with multiple creators, shipped a video editing internship, and I'm always looking for the next 
-            collab that pushes what gaming edits can be.
-          </p>
-
-          <div class="stats-grid reveal-type">
-            <div class="stat-card">
-              <span class="stat-number">4<span class="plus">+</span></span>
-              <span class="stat-label">Years Editing</span>
-            </div>
-            <div class="stat-card">
-              <span class="stat-number">∞</span>
-              <span class="stat-label">Hours in Resolve</span>
-            </div>
-          </div>
-        </div>
-
-        <div class="skills-right reveal-type">
-          <div class="section-header" style="margin-bottom: 32px;">
-            <span class="section-label">Toolkit & Expertise</span>
-          </div>
-
-          <div class="skills-container">
-            <div class="skill-row">
-              <span class="skill-name">DaVinci Resolve</span>
-              <span class="skill-tag">Primary Suite</span>
-            </div>
-            <div class="skill-row">
-              <span class="skill-name">Gaming Montages</span>
-              <span class="skill-tag">Specialization</span>
-            </div>
-            <div class="skill-row">
-              <span class="skill-name">Color Grading</span>
-              <span class="skill-tag">Post-Production</span>
-            </div>
-            <div class="skill-row">
-              <span class="skill-name">Motion & SFX</span>
-              <span class="skill-tag">Audio/Visual Sync</span>
-            </div>
-            <div class="skill-row">
-              <span class="skill-name">Content Creation</span>
-              <span class="skill-tag">Pacing & Retention</span>
-            </div>
-          </div>
-        </div>
-      </div>
+<!-- CONTACT -->
+<section id="contact" class="contact grid-layout">
+  <div class="about-label t-mono accent">03 / Initiate</div>
+  <div class="contact-cta">
+    <a href="mailto:vyanmerchant@gmail.com" class="magnetic magnetic-hover">Let's Build.[cite: 1]</a>
+  </div>
+  <div class="footer-bottom t-mono">
+    <span>© 2026 Vyan Merchant[cite: 1]</span>
+    <div style="display:flex; gap: 2rem;">
+      <a href="https://youtube.com" class="magnetic magnetic-hover">YouTube[cite: 1]</a>
+      <a href="https://discord.com/users/1111715392461738034" class="magnetic magnetic-hover">Discord[cite: 1]</a>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- Work Section -->
-  <section class="section" id="projects" style="background: var(--bg-surface);">
-    <div class="section-inner">
-      <div class="section-header reveal-type">
-        <span class="section-label">02 // Featured Works</span>
-        <div class="section-line"></div>
-      </div>
+<script>
+/* ==========================================
+   JS ARCHITECTURE: MODULES & INITIALIZATION
+   ========================================== */
 
-      <div class="work-layout reveal-type">
-        <!-- Interactive Work List -->
-        <div class="work-list">
-          
-          <div class="work-item active" data-id="val" data-url="https://www.youtube.com/watch?v=d0qvLlFEEH8">
-            <div class="work-item-meta">
-              <span class="work-num">01</span>
-              <div class="work-title-box">
-                <span class="work-title">Valorant Montage</span>
-                <span class="work-tags">DaVinci Resolve · Fast Edits · Color Grade</span>
-              </div>
-            </div>
-            <span class="work-arrow">↗</span>
-          </div>
+document.addEventListener("DOMContentLoaded", () => {
+  initSmoothScroll();
+  initCustomCursor();
+  initWebGLBackground();
+  initGSAPAnimations();
+  initProjectInteractions();
+});
 
-          <div class="work-item" data-id="proj2" data-url="https://www.youtube.com/watch?v=4ZcBnbLWxvU">
-            <div class="work-item-meta">
-              <span class="work-num">02</span>
-              <div class="work-title-box">
-                <span class="work-title">Valorant Montage (Old)</span>
-                <span class="work-tags">Gaming Montage · DaVinci Resolve</span>
-              </div>
-            </div>
-            <span class="work-arrow">↗</span>
-          </div>
+/* --- 1. LENIS SMOOTH SCROLL --- */
+let lenis;
+function initSmoothScroll() {
+  lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    direction: 'vertical',
+    gestureDirection: 'vertical',
+    smooth: true,
+    mouseMultiplier: 1,
+    smoothTouch: false,
+  });
+  function raf(time) {
+    lenis.raf(time);
+    requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
+}
 
-          <div class="work-item" data-id="proj3" data-url="montage.mp4">
-            <div class="work-item-meta">
-              <span class="work-num">03</span>
-              <div class="work-title-box">
-                <span class="work-title">Practice Edit</span>
-                <span class="work-tags">Creative Edit · Motion Design</span>
-              </div>
-            </div>
-            <span class="work-arrow">↗</span>
-          </div>
+/* --- 2. MAGNETIC CUSTOM CURSOR --- */
+function initCustomCursor() {
+  const cursor = document.getElementById('cursor');
+  const hoverElements = document.querySelectorAll('.magnetic-hover');
+  const magneticElements = document.querySelectorAll('.magnetic');
+  
+  let mouseX = 0, mouseY = 0;
+  let cursorX = 0, cursorY = 0;
+  
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+  });
+  
+  // Smooth follow interpolation
+  gsap.ticker.add(() => {
+    const dt = 1.0 - Math.pow(1.0 - 0.2, gsap.ticker.deltaRatio());
+    cursorX += (mouseX - cursorX) * dt;
+    cursorY += (mouseY - cursorY) * dt;
+    cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+  });
 
-        </div>
+  // Hover states
+  hoverElements.forEach(el => {
+    el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
+    el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+  });
 
-        <!-- Sticky Preview Engine -->
-        <div class="work-preview-container">
-          <div class="work-preview-stage" id="preview-stage">
-            <!-- Injected active media elements via JavaScript -->
-          </div>
-          <div class="work-preview-caption">
-            <span class="work-caption-title" id="caption-title">Valorant Montage</span>
-            <a href="https://www.youtube.com/watch?v=d0qvLlFEEH8" target="_blank" rel="noopener" class="work-caption-link" id="caption-link">
-              Open Video ↗
-            </a>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Contact Section -->
-  <section class="section contact-section" id="contact">
-    <div class="section-inner">
-      <div class="section-header reveal-type">
-        <span class="section-label">03 // Get In Touch</span>
-        <div class="section-line"></div>
-      </div>
-
-      <h2 class="contact-title reveal-type">
-        LET'S<br>BUILD<br><span class="accent">SOMETHING.</span>
-      </h2>
-
-      <div class="contact-main-row reveal-type">
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vyanmerchant@gmail.com" target="_blank" rel="noopener" class="contact-email-link" data-magnetic>
-          vyanmerchant@gmail.com
-        </a>
-
-        <div class="contact-socials">
-          <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vyanmerchant@gmail.com" target="_blank" rel="noopener" class="social-btn" data-magnetic>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-              <polyline points="22,6 12,13 2,6"/>
-            </svg>
-            Email
-          </a>
-
-          <a href="https://youtube.com" target="_blank" rel="noopener" class="social-btn" data-magnetic>
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/>
-              <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/>
-            </svg>
-            YouTube
-          </a>
-
-          <a href="https://discord.com/users/1111715392461738034" target="_blank" rel="noopener" class="social-btn discord" data-magnetic>
-            💬 Discord
-          </a>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Footer -->
-  <footer>
-    <p>© 2026 Vyan Merchant</p>
-    <p>Gaming Video Editor · DaVinci Resolve</p>
-  </footer>
-
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
-
-      const initDamascusCanvas = () => {
-        const canvas = document.getElementById('damascus-bg');
-        if (!canvas) return;
-        const ctx = canvas.getContext('2d');
-        const SCALE = 3;
-        let W, H, t = 0;
-
-        const resize = () => {
-          W = Math.floor(window.innerWidth / SCALE);
-          H = Math.floor(window.innerHeight / SCALE);
-          canvas.width = W;
-          canvas.height = H;
-        };
-        resize();
-        window.addEventListener('resize', resize, { passive: true });
-
-        const renderFrame = () => {
-          t += 0.0025;
-          const img = ctx.createImageData(W, H);
-          const d = img.data;
-
-          for (let y = 0; y < H; y++) {
-            for (let x = 0; x < W; x++) {
-              const nx = x / W;
-              const ny = y / H;
-
-              const warp = Math.sin(ny * 7 + t + Math.sin(nx * 4 + t * 0.5) * 1.5) * 0.2 +
-                           Math.cos(nx * 5 - t * 0.4 + Math.sin(ny * 3 + t * 0.7) * 1.1) * 0.15;
-
-              const wx = nx + warp * 0.4;
-              const wy = ny + warp * 0.25;
-
-              const band1 = Math.sin(wx * 12 + wy * 8 + t * 0.35) * 0.5 + 0.5;
-              const band2 = Math.sin(wx * 6 - wy * 10 + t * 0.2 + 1.5) * 0.5 + 0.5;
-
-              const v = band1 * 0.5 + band2 * 0.5;
-              const base = 7 + v * 15;
-              const shimmer = Math.pow(Math.max(0, Math.sin(wx * 28 + wy * 10 + t * 1.5)), 12) * 22;
-
-              const r = base + shimmer * 0.95;
-              const g = base + shimmer * 0.9;
-              const b = base + shimmer * 0.85;
-
-              const idx = (y * W + x) * 4;
-              d[idx]     = r;
-              d[idx + 1] = g;
-              d[idx + 2] = b;
-              d[idx + 3] = 255;
-            }
-          }
-          ctx.putImageData(img, 0, 0);
-          requestAnimationFrame(renderFrame);
-        };
-        renderFrame();
-      };
-      initDamascusCanvas();
-
-      const initCursor = () => {
-        const dot = document.getElementById('cursor-dot');
-        const follower = document.getElementById('cursor-follower');
-        if (!dot || !follower) return;
-
-        let mouseX = window.innerWidth / 2;
-        let mouseY = window.innerHeight / 2;
-        let followerX = mouseX;
-        let followerY = mouseY;
-
-        window.addEventListener('mousemove', (e) => {
-          mouseX = e.clientX;
-          mouseY = e.clientY;
-          dot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
-        }, { passive: true });
-
-        const animateFollower = () => {
-          followerX += (mouseX - followerX) * 0.15;
-          followerY += (mouseY - followerY) * 0.15;
-          follower.style.transform = `translate3d(${followerX}px, ${followerY}px, 0) translate(-50%, -50%)`;
-          requestAnimationFrame(animateFollower);
-        };
-        animateFollower();
-
-        const magneticEls = document.querySelectorAll('[data-magnetic]');
-        magneticEls.forEach(el => {
-          el.addEventListener('mousemove', (e) => {
-            const rect = el.getBoundingClientRect();
-            const relX = e.clientX - rect.left - rect.width / 2;
-            const relY = e.clientY - rect.top - rect.height / 2;
-            el.style.transform = `translate3d(${relX * 0.25}px, ${relY * 0.25}px, 0)`;
-          });
-
-          el.addEventListener('mouseleave', () => {
-            el.style.transform = 'translate3d(0, 0, 0)';
-          });
-        });
-
-        const hoverTargets = document.querySelectorAll('a, button, .work-item, .stat-card');
-        hoverTargets.forEach(target => {
-          target.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-          target.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-        });
-
-        window.addEventListener('mousedown', () => document.body.classList.add('cursor-active'));
-        window.addEventListener('mouseup', () => document.body.classList.remove('cursor-active'));
-      };
-      initCursor();
-
-      const initScrollEngine = () => {
-        const progressBar = document.getElementById('scroll-progress');
-        const navbar = document.getElementById('navbar');
-        const heroVideo = document.getElementById('hero-video');
-
-        window.addEventListener('scroll', () => {
-          const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
-          const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-          const progress = (scrollTop / scrollHeight) * 100;
-
-          if (progressBar) progressBar.style.width = `${progress}%`;
-
-          if (navbar) {
-            if (scrollTop > 50) navbar.classList.add('scrolled');
-            else navbar.classList.remove('scrolled');
-          }
-
-          if (heroVideo && scrollTop < window.innerHeight) {
-            heroVideo.style.transform = `scale(1.05) translate3d(0, ${scrollTop * 0.2}px, 0)`;
-          }
-        }, { passive: true });
-      };
-      initScrollEngine();
-
-      const initWorkEngine = () => {
-        const projects = {
-          val:   { id: 'd0qvLlFEEH8', title: 'Valorant Montage', url: 'https://www.youtube.com/watch?v=d0qvLlFEEH8' },
-          proj2: { id: '4ZcBnbLWxvU', title: 'Valorant Montage (Old)', url: 'https://www.youtube.com/watch?v=4ZcBnbLWxvU' },
-          proj3: { video: 'montage.mp4', title: 'Practice Edit', url: 'montage.mp4' }
-        };
-
-        const previewStage = document.getElementById('preview-stage');
-        const captionTitle = document.getElementById('caption-title');
-        const captionLink = document.getElementById('caption-link');
-        const workItems = document.querySelectorAll('.work-item');
-
-        if (!previewStage) return;
-
-        const mediaMap = {};
-
-        Object.entries(projects).forEach(([key, project]) => {
-          const wrapper = document.createElement('div');
-          wrapper.className = 'work-media-item';
-
-          if (project.id) {
-            const iframe = document.createElement('iframe');
-            iframe.src = `https://www.youtube.com/embed/${project.id}?enablejsapi=1&autoplay=0&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${project.id}`;
-            iframe.allow = 'autoplay; encrypted-media';
-            wrapper.appendChild(iframe);
-          } else if (project.video) {
-            const video = document.createElement('video');
-            video.src = project.video;
-            video.muted = true;
-            video.loop = true;
-            video.playsInline = true;
-            wrapper.appendChild(video);
-          }
-
-          previewStage.appendChild(wrapper);
-          mediaMap[key] = wrapper;
-        });
-
-        const activateProject = (key) => {
-          const project = projects[key];
-          if (!project) return;
-
-          Object.entries(mediaMap).forEach(([k, wrapper]) => {
-            const isTarget = k === key;
-            wrapper.classList.toggle('active', isTarget);
-
-            const video = wrapper.querySelector('video');
-            const iframe = wrapper.querySelector('iframe');
-
-            if (video) {
-              if (isTarget) {
-                video.currentTime = 0;
-                video.play().catch(() => {});
-              } else {
-                video.pause();
-              }
-            }
-
-            if (iframe) {
-              const base = iframe.src.split('?')[0];
-              if (isTarget) {
-                iframe.src = `${base}?enablejsapi=1&autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${projects[k].id}`;
-              } else {
-                iframe.src = `${base}?enablejsapi=1&autoplay=0&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${projects[k].id}`;
-              }
-            }
-          });
-
-          if (captionTitle) captionTitle.textContent = project.title;
-          if (captionLink) {
-            captionLink.href = project.url;
-            captionLink.style.display = project.url === '#' ? 'none' : 'inline-flex';
-          }
-
-          workItems.forEach(item => {
-            item.classList.toggle('active', item.dataset.id === key);
-          });
-        };
-
-        workItems.forEach(item => {
-          item.addEventListener('mouseenter', () => activateProject(item.dataset.id));
-          item.addEventListener('click', (e) => {
-            activateProject(item.dataset.id);
-          });
-        });
-
-        activateProject('val');
-      };
-      initWorkEngine();
-
-      const initReveals = () => {
-        const revealElements = document.querySelectorAll('.reveal-type');
-        const observer = new IntersectionObserver((entries) => {
-          entries.forEach(entry => {
-            if (entry.isIntersecting) {
-              entry.target.classList.add('visible');
-              observer.unobserve(entry.target);
-            }
-          });
-        }, {
-          threshold: 0.1,
-          rootMargin: '0px 0px -50px 0px'
-        });
-
-        revealElements.forEach(el => observer.observe(el));
-      };
-      initReveals();
-
-      const initMobileMenu = () => {
-        const toggle = document.getElementById('menu-toggle');
-        const menu = document.getElementById('mobile-menu');
-        const links = document.querySelectorAll('.mobile-menu-link');
-
-        if (!toggle || !menu) return;
-
-        toggle.addEventListener('click', () => {
-          menu.classList.toggle('open');
-        });
-
-        links.forEach(link => {
-          link.addEventListener('click', () => {
-            menu.classList.remove('open');
-          });
-        });
-      };
-      initMobileMenu();
-
+  // Magnetic logic
+  magneticElements.forEach(el => {
+    el.addEventListener('mousemove', function(e) {
+      const rect = this.getBoundingClientRect();
+      const h = rect.width / 2;
+      const x = e.clientX - rect.left - h;
+      const y = e.clientY - rect.top - h;
+      gsap.to(this, { x: x * 0.3, y: y * 0.3, duration: 0.4, ease: "power2.out" });
     });
-  </script>
+    el.addEventListener('mouseleave', function() {
+      gsap.to(this, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" });
+    });
+  });
+}
+
+/* --- 3. CINEMATIC WEBGL BACKGROUND (THREE.JS) --- */
+// Creates a highly optimized, sophisticated fluid displacement shader (Replaces basic canvas code[cite: 1])
+function initWebGLBackground() {
+  const container = document.getElementById('webgl-container');
+  const scene = new THREE.Scene();
+  const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
+  
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  container.appendChild(renderer.domElement);
+
+  const geometry = new THREE.PlaneGeometry(2, 2);
+  const material = new THREE.ShaderMaterial({
+    uniforms: { u_time: { value: 0 }, u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) } },
+    vertexShader: `
+      varying vec2 vUv;
+      void main() { vUv = uv; gl_Position = vec4(position, 1.0); }
+    `,
+    fragmentShader: `
+      uniform float u_time;
+      uniform vec2 u_resolution;
+      varying vec2 vUv;
+      
+      // Simplex noise function omitted for brevity, using sine-wave distortion for token efficiency
+      void main() {
+        vec2 st = gl_FragCoord.xy / u_resolution.xy;
+        st.x *= u_resolution.x / u_resolution.y;
+        
+        vec2 q = vec2(0.);
+        q.x = sin(st.x * 2.0 + u_time * 0.2) + cos(st.y * 3.0 + u_time * 0.1);
+        q.y = cos(st.x * 3.0 + u_time * 0.3) + sin(st.y * 2.0 + u_time * 0.2);
+        
+        float colorValue = smoothstep(0.0, 2.0, length(q) * 0.5);
+        vec3 color = mix(vec3(0.02, 0.02, 0.02), vec3(0.04, 0.05, 0.06), colorValue);
+        
+        gl_FragColor = vec4(color, 1.0);
+      }
+    `
+  });
+
+  const mesh = new THREE.Mesh(geometry, material);
+  scene.add(mesh);
+
+  function animate() {
+    material.uniforms.u_time.value += 0.01;
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    material.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+  });
+}
+
+/* --- 4. GSAP SCROLL ANIMATIONS --- */
+function initGSAPAnimations() {
+  gsap.registerPlugin(ScrollTrigger);
+
+  // Hero Reveal
+  const tl = gsap.timeline();
+  tl.to('.line-reveal-inner', { y: '0%', duration: 1.2, ease: "power4.out", stagger: 0.1, delay: 0.2 })
+    .from('.hero-meta', { opacity: 0, y: 20, duration: 1, ease: "power2.out" }, "-=0.8")
+    .from('.hero-subtitle', { opacity: 0, duration: 1 }, "-=0.5");
+
+  // General Scroll Reveals
+  gsap.utils.toArray('.line-reveal-inner').forEach(el => {
+    if(!el.closest('.hero')) {
+      gsap.to(el, {
+        scrollTrigger: { trigger: el.closest('.line-reveal'), start: "top 90%" },
+        y: '0%', duration: 1, ease: "power3.out"
+      });
+    }
+  });
+}
+
+/* --- 5. PROJECT INTERACTIONS --- */
+function initProjectInteractions() {
+  const items = document.querySelectorAll('.project-item');
+  const previewContainer = document.getElementById('video-preview-container');
+  let currentVideo = null;
+
+  items.forEach(item => {
+    item.addEventListener('mouseenter', () => {
+      const videoId = item.getAttribute('data-video');
+      if(videoId === currentVideo) return;
+      currentVideo = videoId;
+      
+      // Deactivate siblings
+      const iframes = previewContainer.querySelectorAll('iframe');
+      iframes.forEach(iframe => iframe.classList.remove('active'));
+
+      // Check if iframe exists, otherwise create it (Lazy Loading)
+      let iframe = document.getElementById(`vid-${videoId}`);
+      if(!iframe) {
+        iframe = document.createElement('iframe');
+        iframe.id = `vid-${videoId}`;
+        // Using modestbranding and loop parameters similar to original[cite: 1]
+        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=${videoId}`;
+        iframe.allow = "autoplay; encrypted-media";
+        previewContainer.appendChild(iframe);
+      }
+      
+      // Trigger layout to ensure CSS transition applies
+      void iframe.offsetWidth;
+      iframe.classList.add('active');
+    });
+  });
+  
+  // Trigger first item hover on load
+  if(items.length > 0) {
+    items[0].dispatchEvent(new Event('mouseenter'));
+  }
+}
+</script>
 </body>
 </html>
