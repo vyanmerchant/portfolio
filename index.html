@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vyan Merchant — 360° Immersive Studio Experience</title>
+<title>Vyan Merchant — Overkill Aceternity & Studio Experience</title>
 
 <!-- GOOGLE FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,16 +18,16 @@
 
 <style>
 /* ==========================================
-   01. OVERKILL DESIGN SYSTEM
+   01. DESIGN SYSTEM & TOKENS
    ========================================== */
 :root {
-  --bg: #020202;
-  --surface: #080808;
-  --surface-light: #121212;
-  --fg: #f5f2eb;
-  --accent: #ff2a00;
-  --muted: #555555;
-  --border: rgba(245, 242, 235, 0.1);
+  --bg: #030303;
+  --surface: #0a0a0a;
+  --surface-border: rgba(255, 255, 255, 0.08);
+  --fg: #f3f0ea;
+  --accent: #ff3c00;
+  --accent-glow: rgba(255, 60, 0, 0.35);
+  --muted: #666666;
   
   --font-display: 'Anton', sans-serif;
   --font-sans: 'Syne', sans-serif;
@@ -48,7 +48,6 @@ body {
   color: var(--fg);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
   overflow-x: hidden;
   cursor: none;
 }
@@ -56,7 +55,7 @@ body {
 ::selection { background: var(--accent); color: var(--bg); }
 
 /* ==========================================
-   02. LOADER
+   02. CINEMATIC LOADER
    ========================================== */
 #loader {
   position: fixed; inset: 0; z-index: 100000;
@@ -65,13 +64,13 @@ body {
   padding: 4vw; pointer-events: none;
 }
 .loader-header { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.75rem; }
-.loader-center { font-family: var(--font-display); font-size: clamp(6rem, 18vw, 20rem); line-height: 0.8; }
-.loader-footer { display: flex; justify-content: space-between; align-items: flex-end; font-family: var(--font-mono); font-size: 0.75rem; border-top: 1px solid var(--border); padding-top: 2rem; }
-.loader-bar-wrap { width: 100vh; max-width: 400px; height: 2px; background: var(--border); position: relative; overflow: hidden; }
+.loader-center { font-family: var(--font-display); font-size: clamp(5rem, 16vw, 18rem); line-height: 0.8; }
+.loader-footer { display: flex; justify-content: space-between; align-items: flex-end; font-family: var(--font-mono); font-size: 0.75rem; border-top: 1px solid var(--surface-border); padding-top: 2rem; }
+.loader-bar-wrap { width: 100vh; max-width: 400px; height: 2px; background: var(--surface-border); position: relative; overflow: hidden; }
 .loader-bar { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: var(--accent); }
 
 /* ==========================================
-   03. CURSOR
+   03. CUSTOM DESKTOP CURSOR
    ========================================== */
 #cursor-dot {
   position: fixed; top: 0; left: 0; width: 8px; height: 8px;
@@ -80,13 +79,13 @@ body {
 }
 #cursor-ring {
   position: fixed; top: 0; left: 0; width: 45px; height: 45px;
-  border: 1px solid rgba(245, 242, 235, 0.3); border-radius: 50%; pointer-events: none;
+  border: 1px solid rgba(243, 240, 234, 0.3); border-radius: 50%; pointer-events: none;
   z-index: 99998; transform: translate(-50%, -50%);
   transition: width 0.4s var(--ease-expo), height 0.4s var(--ease-expo), border-color 0.4s, background 0.4s;
   display: flex; justify-content: center; align-items: center; text-align: center;
 }
 #cursor-ring span { opacity: 0; font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--bg); text-transform: uppercase; transition: opacity 0.3s; }
-.cursor-hover #cursor-ring { width: 80px; height: 80px; background: rgba(245, 242, 235, 0.1); backdrop-filter: blur(8px); border-color: rgba(245, 242, 235, 0.5); }
+.cursor-hover #cursor-ring { width: 80px; height: 80px; background: rgba(243, 240, 234, 0.1); backdrop-filter: blur(8px); border-color: rgba(243, 240, 234, 0.5); }
 .cursor-play #cursor-ring { width: 110px; height: 110px; background: var(--fg); border-color: var(--fg); }
 .cursor-play #cursor-ring span { opacity: 1; }
 
@@ -97,7 +96,7 @@ body {
    ========================================== */
 #webgl-canvas { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
 .noise-overlay {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.06;
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.055;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
 
@@ -116,14 +115,14 @@ body {
 .text-outline { -webkit-text-stroke: 1.5px var(--fg); color: transparent; }
 
 /* ==========================================
-   06. NAVIGATION
+   06. HIDE-ON-SCROLL NAVIGATION
    ========================================== */
 nav {
   position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%);
   width: calc(100% - 4vw); max-width: 1600px;
   padding: 1.25rem 2.5rem; display: flex; justify-content: space-between; align-items: center;
   z-index: 1000; background: rgba(5, 5, 5, 0.65); backdrop-filter: blur(20px);
-  border: 1px solid var(--border); border-radius: 100px;
+  border: 1px solid var(--surface-border); border-radius: 100px;
   transition: transform 0.5s var(--ease-expo), opacity 0.5s;
 }
 nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
@@ -138,34 +137,72 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
    07. HERO SECTION
    ========================================== */
 .hero { height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 4vw 6vh; position: relative; }
-.hero-meta { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
+.hero-meta { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; border-bottom: 1px solid var(--surface-border); padding-bottom: 1.5rem; }
 .hero-title-group { position: relative; z-index: 2; }
 .hero-subtitle { margin-top: 2rem; max-width: 480px; }
 
 /* ==========================================
-   08. 360° INTERACTIVE 3D GALLERY SECTION
+   08. ACETERNITY 3D CARD TILT & BENTO GRID SECTION
    ========================================== */
-.section-360 { position: relative; width: 100%; height: 100vh; background: var(--surface); overflow: hidden; display: flex; flex-direction: column; justify-content: space-between; padding: 4vw 0; }
-.info-360 { padding: 0 4vw; display: flex; justify-content: space-between; align-items: flex-end; z-index: 10; pointer-events: none; }
-#canvas-360-container { position: absolute; inset: 0; z-index: 1; cursor: grab; }
-#canvas-360-container:active { cursor: grabbing; }
+.bento-section { padding: 10vw 4vw; background: var(--bg); position: relative; }
+.bento-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; }
 
-.instructions-360 {
-  position: absolute; bottom: 4vw; left: 50%; transform: translateX(-50%);
-  font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.2em;
-  background: rgba(255,255,255,0.06); backdrop-filter: blur(8px); border: 1px solid var(--border);
-  padding: 0.75rem 1.5rem; border-radius: 100px; z-index: 10; pointer-events: none;
-  animation: pulseInstruction 2s infinite ease-in-out;
+.bento-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-auto-rows: 380px;
+  gap: 2rem;
 }
-@keyframes pulseInstruction { 0%, 100% { opacity: 0.6; } 50% { opacity: 1; } }
+
+/* Aceternity 3D Perspective Card Wrapper */
+.bento-card {
+  perspective: 1000px;
+  background: var(--surface);
+  border: 1px solid var(--surface-border);
+  border-radius: 20px;
+  overflow: hidden;
+  position: relative;
+  transition: border-color 0.4s, box-shadow 0.4s;
+}
+.bento-card:hover {
+  border-color: rgba(255, 60, 0, 0.4);
+  box-shadow: 0 20px 40px var(--accent-glow);
+}
+.bento-card.span-2 { grid-column: span 2; }
+
+.bento-card-inner {
+  position: relative;
+  width: 100%; height: 100%;
+  transform-style: preserve-3d;
+  transition: transform 0.1s ease-out;
+  padding: 3rem;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+
+.bento-content {
+  transform: translateZ(40px); /* 3D depth pop-out effect */
+}
+.bento-content h3 { font-family: var(--font-display); font-size: 2.5rem; letter-spacing: 0.02em; text-transform: uppercase; margin-bottom: 0.5rem; }
+
+.bento-visual {
+  position: absolute; inset: 0; z-index: 0; opacity: 0.35;
+  transition: opacity 0.4s, transform 0.6s var(--ease-expo);
+}
+.bento-card:hover .bento-visual { opacity: 0.75; transform: scale(1.05); }
+.bento-visual img { width: 100%; height: 100%; object-fit: cover; }
+.bento-gradient {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(3,3,3,0.95) 10%, rgba(3,3,3,0.4) 60%, transparent 100%);
+  z-index: 1;
+}
 
 /* ==========================================
    09. MANIFESTO SECTION
    ========================================== */
-.manifesto { padding: 18vw 4vw; border-top: 1px solid var(--border); position: relative; background: var(--bg); }
+.manifesto { padding: 15vw 4vw; border-top: 1px solid var(--surface-border); background: var(--bg); position: relative; }
 .manifesto-text { font-size: clamp(2.2rem, 5vw, 5.5rem); line-height: 1.15; font-weight: 700; max-width: 90vw; }
 .word { display: inline-block; overflow: hidden; vertical-align: bottom; }
-.char { display: inline-block; transform: translateY(115%); color: #2a2a2a; will-change: transform, color; transition: color 0.3s; }
+.char { display: inline-block; transform: translateY(115%); color: #333333; will-change: transform, color; transition: color 0.3s; }
 .char.active { color: var(--fg); }
 .manifesto-highlight { color: var(--accent) !important; font-style: italic; font-family: var(--font-serif); }
 
@@ -178,14 +215,14 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
   clip-path: circle(0% at 50% 50%); transition: clip-path 0.9s var(--ease-expo); pointer-events: none;
 }
 .modal.active { clip-path: circle(150% at 50% 50%); pointer-events: all; }
-.modal-close { position: absolute; top: 3vw; right: 4vw; background: rgba(245,242,235,0.1); border: 1px solid rgba(245,242,235,0.2); color: var(--fg); padding: 0.75rem 1.75rem; border-radius: 100px; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; cursor: none; z-index: 10; }
-.modal-content { width: 90vw; height: 52vw; max-height: 82vh; background: #000; border-radius: 16px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 40px 80px rgba(0,0,0,0.8); }
+.modal-close { position: absolute; top: 3vw; right: 4vw; background: rgba(243,240,234,0.1); border: 1px solid rgba(243,240,234,0.2); color: var(--fg); padding: 0.75rem 1.75rem; border-radius: 100px; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; cursor: none; z-index: 10; }
+.modal-content { width: 90vw; height: 52vw; max-height: 82vh; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid var(--surface-border); box-shadow: 0 40px 80px rgba(0,0,0,0.8); }
 .modal-content iframe { width: 100%; height: 100%; border: none; }
 
 /* ==========================================
    11. FOOTER
    ========================================== */
-.footer { padding: 12vw 0 4vw; border-top: 1px solid var(--border); background: var(--bg); overflow: hidden; display: flex; flex-direction: column; }
+.footer { padding: 12vw 0 4vw; border-top: 1px solid var(--surface-border); background: var(--bg); overflow: hidden; display: flex; flex-direction: column; }
 .marquee-wrap { display: flex; width: max-content; white-space: nowrap; animation: moveLeft 18s linear infinite; margin-bottom: 1.5rem; }
 .marquee-text { font-family: var(--font-display); font-size: clamp(6rem, 14vw, 16rem); line-height: 0.85; text-transform: uppercase; padding-right: 4vw; }
 @keyframes moveLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
@@ -194,12 +231,14 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
 .footer-email { font-family: var(--font-serif); font-size: clamp(2.5rem, 6vw, 7rem); font-style: italic; color: var(--fg); text-decoration: none; transition: color 0.3s; display: inline-block; margin-top: 2rem; }
 .footer-email:hover { color: var(--accent); }
 
-.footer-bottom { padding: 3vw 4vw 0; display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--border); }
+.footer-bottom { padding: 3vw 4vw 0; display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--surface-border); }
 .footer-links { display: flex; gap: 3rem; }
 .footer-links a { color: var(--fg); text-decoration: none; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; }
 
 @media (max-width: 768px) {
   .nav-links { display: none; }
+  .bento-grid { grid-template-columns: 1fr; grid-auto-rows: 320px; }
+  .bento-card.span-2 { grid-column: span 1; }
   .modal-content { width: 95vw; height: 58vw; }
 }
 </style>
@@ -209,22 +248,22 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
 <!-- LOADER -->
 <div id="loader">
   <div class="loader-header">
-    <span>VYAN MERCHANT — 360° STUDIO</span>
+    <span>VYAN MERCHANT — ACETERNITY EDITION</span>
     <span>PUNE, INDIA</span>
   </div>
   <div class="loader-center">
-    <span class="line-reveal"><span class="line-reveal-inner" id="loader-word">360° ROOM</span></span>
+    <span class="line-reveal"><span class="line-reveal-inner" id="loader-word">STUDIO</span></span>
   </div>
   <div class="loader-footer">
     <span id="loader-percent">0%</span>
-    <span>LOADING THREE.JS SPATIAL ENGINE</span>
+    <span>LOADING SPATIAL 3D CARDS</span>
     <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
   </div>
 </div>
 
 <!-- CURSOR -->
 <div id="cursor-dot"></div>
-<div id="cursor-ring"><span>Explore</span></div>
+<div id="cursor-ring"><span>Play</span></div>
 
 <!-- WEBGL BACKGROUND -->
 <canvas id="webgl-canvas"></canvas>
@@ -235,7 +274,7 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
   <a href="#" class="nav-logo mag">VM<span>.</span></a>
   <div class="nav-links">
     <a href="#about" class="mag">Profile</a>
-    <a href="#work-360" class="mag">360° Room</a>
+    <a href="#archives" class="mag">Bento Grid</a>
     <a href="#contact" class="mag">Initiate</a>
   </div>
 </nav>
@@ -245,33 +284,95 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
   <div class="hero-meta t-mono">
     <span>Gaming Video Editor</span>
     <span>DaVinci Resolve Specialist</span>
-    <span>Interactive 360° Showcase</span>
+    <span>Aceternity 3D Architecture</span>
   </div>
   <div class="hero-title-group">
     <h1 class="t-giant"><span class="line-reveal"><span class="line-reveal-inner text-outline">VYAN</span></span></h1>
     <h1 class="t-giant"><span class="line-reveal"><span class="line-reveal-inner">MERCHANT</span></span></h1>
   </div>
   <div class="hero-subtitle">
-    <p class="t-body">Step inside the spatial 360° room. Drag to rotate around cinematic cuts and click any project panel to launch the high-octane edit.</p>
+    <p class="t-body">Crafting high-octane gaming edits with 3D interactive bento grids, depth cards, and uncompromising visual rhythm.</p>
   </div>
 </section>
 
-<!-- 360° SPATIAL ROOM SECTION -->
-<section id="work-360" class="section-360">
-  <div class="info-360">
-    <h2 class="t-h2">360° Archives</h2>
-    <span class="t-mono">(Interactive Spatial Carousel)</span>
+<!-- ACETERNITY BENTO GRID & 3D CARD ARCHIVES -->
+<section id="archives" class="bento-section">
+  <div class="bento-header">
+    <h2 class="t-h2">Selected Archives</h2>
+    <span class="t-mono">(Interactive 3D Bento Grid)</span>
   </div>
-  
-  <div id="canvas-360-container"></div>
-  
-  <div class="instructions-360">Drag / Swipe to Rotate Room — Click Panel to Play</div>
+
+  <div class="bento-grid">
+    
+    <!-- CARD 1 (Span 2) -->
+    <div class="bento-card span-2 tilt-card play-trigger" data-video="d0qvLlFEEH8">
+      <div class="bento-card-inner">
+        <div class="bento-visual">
+          <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Valorant Montage">
+          <div class="bento-gradient"></div>
+        </div>
+        <div class="bento-content">
+          <span class="t-mono">01 / Featured Project</span>
+          <h3>Valorant Montage</h3>
+        </div>
+        <div class="bento-content" style="display:flex; justify-content:space-between; align-items:flex-end;">
+          <span class="t-mono">DaVinci Resolve · Color Grade</span>
+          <span class="t-mono" style="color:var(--accent);">Play Edit →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 2 -->
+    <div class="bento-card tilt-card play-trigger" data-video="4ZcBnbLWxvU">
+      <div class="bento-card-inner">
+        <div class="bento-visual">
+          <img src="https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg" alt="Legacy Edit">
+          <div class="bento-gradient"></div>
+        </div>
+        <div class="bento-content">
+          <span class="t-mono">02 / Fast Cuts</span>
+          <h3>Legacy Edit</h3>
+        </div>
+        <div class="bento-content">
+          <span class="t-mono" style="color:var(--accent);">Play Edit →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 3 -->
+    <div class="bento-card tilt-card play-trigger" data-video="d0qvLlFEEH8">
+      <div class="bento-card-inner">
+        <div class="bento-visual">
+          <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Practice Reel">
+          <div class="bento-gradient"></div>
+        </div>
+        <div class="bento-content">
+          <span class="t-mono">03 / Motion Design</span>
+          <h3>Practice Reel</h3>
+        </div>
+        <div class="bento-content">
+          <span class="t-mono" style="color:var(--accent);">Play Edit →</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- CARD 4 (Span 2) -->
+    <div class="bento-card span-2 tilt-card">
+      <div class="bento-card-inner" style="justify-content: center; align-items: center; text-align: center;">
+        <div class="bento-content">
+          <span class="t-mono" style="color:var(--accent);">4 Years Experience[cite: 1]</span>
+          <h3 style="font-size:3.5rem; margin-top:1rem;">Endless Hours In Resolve[cite: 1]</h3>
+        </div>
+      </div>
+    </div>
+
+  </div>
 </section>
 
 <!-- MANIFESTO -->
 <section id="about" class="manifesto">
   <p class="manifesto-text" id="split-manifesto">
-    I'm <b>Vyan</b>, a 17-year-old video editor obsessed with making gaming content that actually slaps. Working extensively with DaVinci Resolve, I cut, grade, and sync footage to create montages that lock viewers in from frame one. <span class="manifesto-highlight">Edit. Fast. Hard.</span>
+    I'm <b>Vyan</b>, a 17-year-old video editor obsessed with making gaming content that actually slaps. Working extensively with DaVinci Resolve, I cut, grade, and sync footage to create montages that lock viewers in from frame one[cite: 1]. <span class="manifesto-highlight">Edit. Fast. Hard[cite: 1].</span>
   </p>
 </section>
 
@@ -284,8 +385,8 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
 <!-- FOOTER -->
 <section id="contact" class="footer">
   <div class="marquee-wrap">
-    <div class="marquee-text">STEP INSIDE THE 360° EXPERIENCE <span style="color:var(--accent)">✦</span> </div>
-    <div class="marquee-text">STEP INSIDE THE 360° EXPERIENCE <span style="color:var(--accent)">✦</span> </div>
+    <div class="marquee-text">ENGINEERED FOR IMPACT <span style="color:var(--accent)">✦</span> </div>
+    <div class="marquee-text">ENGINEERED FOR IMPACT <span style="color:var(--accent)">✦</span> </div>
   </div>
 
   <div class="footer-main">
@@ -295,17 +396,17 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
   </div>
   
   <div class="footer-bottom">
-    <span class="t-mono">© 2026 Vyan Merchant. All rights reserved.</span>
+    <span class="t-mono">© 2026 Vyan Merchant. All rights reserved[cite: 1].</span>
     <div class="footer-links">
-      <a href="https://youtube.com" target="_blank" class="mag">YouTube</a>
-      <a href="https://discord.com/users/1111715392461738034" target="_blank" class="mag">Discord</a>
+      <a href="https://youtube.com" target="_blank" class="mag">YouTube[cite: 1]</a>
+      <a href="https://discord.com/users/1111715392461738034" target="_blank" class="mag">Discord[cite: 1]</a>
     </div>
   </div>
 </section>
 
 <script>
 /* ==========================================
-   360° SPATIAL GALLERY ARCHITECTURE
+   ACETERNITY 3D CARD & INTERACTION ENGINE
    ========================================== */
 gsap.registerPlugin(ScrollTrigger);
 
@@ -313,7 +414,7 @@ document.addEventListener("DOMContentLoaded", () => {
   initLoader();
   initCursor();
   initBackgroundShader();
-  init360Room();
+  init3DCards();
   initNavScroll();
 });
 
@@ -373,6 +474,11 @@ function initCursor() {
     el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
   });
+
+  document.querySelectorAll('.play-trigger').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-play'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-play'));
+  });
 }
 
 // 4. HIDE-ON-SCROLL NAVIGATION
@@ -408,9 +514,9 @@ function initBackgroundShader() {
       void main() {
         vec2 st = gl_FragCoord.xy / u_resolution.xy;
         st.x *= u_resolution.x / u_resolution.y;
-        vec2 q = vec2(sin(st.x * 3.0 + u_time * 0.1), cos(st.y * 3.0 + u_time * 0.1));
-        float val = length(q) * 0.3;
-        vec3 color = mix(vec3(0.01, 0.01, 0.01), vec3(0.03, 0.03, 0.03), val);
+        vec2 q = vec2(sin(st.x * 2.5 + u_time * 0.1), cos(st.y * 2.5 + u_time * 0.1));
+        float val = length(q) * 0.35;
+        vec3 color = mix(vec3(0.01, 0.01, 0.01), vec3(0.035, 0.02, 0.01), val);
         gl_FragColor = vec4(color, 1.0);
       }
     `
@@ -429,144 +535,41 @@ function initBackgroundShader() {
   });
 }
 
-// 6. 360° SPATIAL THREE.JS ROOM
-function init360Room() {
-  const container = document.getElementById('canvas-360-container');
-  const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(60, container.clientWidth / container.clientHeight, 0.1, 1000);
-  camera.position.z = 0; // Inside the cylinder
+// 6. ACETERNITY 3D TILT EFFECT FOR CARDS
+function init3DCards() {
+  const cards = document.querySelectorAll('.tilt-card');
 
-  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-  renderer.setSize(container.clientWidth, container.clientHeight);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-  container.appendChild(renderer.domElement);
+  cards.forEach(card => {
+    const inner = card.querySelector('.bento-card-inner');
 
-  // Lighting
-  const ambientLight = new THREE.AmbientLight(0xffffff, 1.5);
-  scene.add(ambientLight);
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const xc = rect.width / 2;
+      const yc = rect.height / 2;
+      
+      const dx = (x - xc) / xc;
+      const dy = (y - yc) / yc;
 
-  // Projects Data for 360° Panels
-  const projects = [
-    { title: "Valorant Montage", id: "d0qvLlFEEH8", img: "https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" },
-    { title: "Legacy Edit", id: "4ZcBnbLWxvU", img: "https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg" },
-    { title: "Practice Reel", id: "d0qvLlFEEH8", img: "https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" },
-    { title: "Cinematic Cut", id: "d0qvLlFEEH8", img: "https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" }
-  ];
+      gsap.to(inner, {
+        rotationY: dx * 12,
+        rotationX: -dy * 12,
+        transformPerspective: 1000,
+        duration: 0.1,
+        ease: "power1.out"
+      });
+    });
 
-  const group = new THREE.Group();
-  scene.add(group);
-
-  const radius = 6;
-  const count = projects.length;
-  const planes = [];
-
-  const textureLoader = new THREE.TextureLoader();
-
-  projects.forEach((proj, i) => {
-    const angle = (i / count) * Math.PI * 2;
-    const x = Math.sin(angle) * radius;
-    const z = Math.cos(angle) * radius;
-
-    const planeGeo = new THREE.PlaneGeometry(4.5, 2.6);
-    
-    // Load image texture
-    const texture = textureLoader.load(proj.img);
-    const planeMat = new THREE.MeshBasicMaterial({ map: texture, side: THREE.DoubleSide });
-    
-    const mesh = new THREE.Mesh(planeGeo, planeMat);
-    mesh.position.set(x, 0, z);
-    mesh.lookAt(0, 0, 0); // Face inward to center camera
-    
-    mesh.userData = { id: proj.id, title: proj.title };
-    group.add(mesh);
-    planes.push(mesh);
-  });
-
-  // Interaction: Drag to Rotate 360°
-  let isDragging = false;
-  let previousMousePosition = { x: 0, y: 0 };
-  let targetRotationY = 0;
-
-  container.addEventListener('mousedown', e => {
-    isDragging = true;
-    previousMousePosition = { x: e.clientX, y: e.clientY };
-  });
-
-  window.addEventListener('mousemove', e => {
-    if (!isDragging) return;
-    const deltaX = e.clientX - previousMousePosition.x;
-    targetRotationY += deltaX * 0.005;
-    previousMousePosition = { x: e.clientX, y: e.clientY };
-  });
-
-  window.addEventListener('mouseup', () => { isDragging = false; });
-
-  // Touch Support for Mobile/Tablet
-  container.addEventListener('touchstart', e => {
-    isDragging = true;
-    previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  });
-  window.addEventListener('touchmove', e => {
-    if (!isDragging) return;
-    const deltaX = e.touches[0].clientX - previousMousePosition.x;
-    targetRotationY += deltaX * 0.005;
-    previousMousePosition = { x: e.touches[0].clientX, y: e.touches[0].clientY };
-  });
-  window.addEventListener('touchend', () => { isDragging = false; });
-
-  // Raycasting for Clicking Panels
-  const raycaster = new THREE.Raycaster();
-  const mouse = new THREE.Vector2();
-
-  container.addEventListener('click', e => {
-    const rect = container.getBoundingClientRect();
-    mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
-    mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(group.children);
-
-    if (intersects.length > 0) {
-      const selected = intersects[0].object;
-      openModal(selected.userData.id);
-    }
-  });
-
-  // Cursor Hover Reaction over 3D Panels
-  container.addEventListener('mousemove', e => {
-    const rect = container.getBoundingClientRect();
-    mouse.x = ((e.clientX - rect.left) / container.clientWidth) * 2 - 1;
-    mouse.y = -((e.clientY - rect.top) / container.clientHeight) * 2 + 1;
-
-    raycaster.setFromCamera(mouse, camera);
-    const intersects = raycaster.intersectObjects(group.children);
-    if (intersects.length > 0) {
-      document.body.classList.add('cursor-play');
-    } else {
-      document.body.classList.remove('cursor-play');
-    }
-  });
-
-  // Render Loop with Inertia / Dampening
-  function animate() {
-    requestAnimationFrame(animate);
-    
-    // Smooth dampening towards target rotation
-    group.rotation.y += (targetRotationY - group.rotation.y) * 0.05;
-    
-    // Subtle idle auto-rotation when not dragging
-    if (!isDragging) {
-      targetRotationY += 0.001;
-    }
-
-    renderer.render(scene, camera);
-  }
-  animate();
-
-  window.addEventListener('resize', () => {
-    camera.aspect = container.clientWidth / container.clientHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(container.clientWidth, container.clientHeight);
+    card.addEventListener('mouseleave', () => {
+      gsap.to(inner, {
+        rotationY: 0,
+        rotationX: 0,
+        duration: 0.6,
+        ease: "power3.out"
+      });
+    });
   });
 }
 
@@ -599,19 +602,22 @@ function initGSAPAnimations() {
 }
 
 // 8. MODAL CONTROLLER
-function openModal(vidId) {
-  const modal = document.getElementById('video-modal');
-  const modalInner = document.getElementById('modal-inner');
-  modalInner.innerHTML = `<iframe src="https://www.youtube.com/embed/${vidId}?autoplay=1&mute=0&controls=1&modestbranding=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-  modal.classList.add('active');
-  if(lenis) lenis.stop();
-  document.body.classList.remove('cursor-play');
-}
-
 function initVideoModal() {
+  const triggers = document.querySelectorAll('.play-trigger');
   const modal = document.getElementById('video-modal');
   const modalInner = document.getElementById('modal-inner');
   const closeBtn = document.getElementById('close-modal');
+
+  triggers.forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const vidId = trigger.getAttribute('data-video');
+      if (!vidId) return;
+      modalInner.innerHTML = `<iframe src="https://www.youtube.com/embed/${vidId}?autoplay=1&mute=0&controls=1&modestbranding=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+      modal.classList.add('active');
+      if(lenis) lenis.stop();
+      document.body.classList.remove('cursor-play');
+    });
+  });
 
   closeBtn.addEventListener('click', () => {
     modal.classList.remove('active');
