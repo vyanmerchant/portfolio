@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vyan Merchant — Creative Digital Studio & Video Editor</title>
+<title>Vyan Merchant — Interactive WebGL Experience & Video Editor</title>
 
 <!-- Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -16,14 +16,14 @@
 <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
 
 <style>
-/* ─── RESET & BASE (Active Theory Signature Dark Immersive UI) ─── */
+/* ─── RESET & ACTIVE THEORY DNA ─── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
 
 :root {
   --bg: #030303;
   --fg: #FFFFFF;
-  --accent: #00FFCC; /* Active Theory Electric Cyan-Mint */
-  --accent-glow: rgba(0, 255, 204, 0.25);
+  --accent: #00F0FF; /* Active Theory Cyan Neon */
+  --accent-glow: rgba(0, 240, 255, 0.25);
   --surface: #0A0A0A;
   --border: rgba(255, 255, 255, 0.08);
   --gray: #888888;
@@ -46,7 +46,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ─── ACTIVE THEORY EXPERIMENTAL PHYSICS CURSOR ─── */
+/* ─── CUSTOM PHYSICS CURSOR ─── */
 #custom-cursor {
   position: fixed;
   top: 0; left: 0;
@@ -64,7 +64,7 @@ body {
 }
 .cursor-ring {
   width: 44px; height: 44px;
-  border: 1px solid rgba(0, 255, 204, 0.5);
+  border: 1px solid rgba(0, 240, 255, 0.4);
   border-radius: 50%;
   position: absolute;
   top: 50%; left: 50%;
@@ -84,7 +84,7 @@ body.hover-view .cursor-ring {
   border-color: transparent;
 }
 body.hover-view::after {
-  content: 'INTERACT';
+  content: 'EXPLORE';
   position: fixed;
   font-family: var(--font-mono);
   font-size: 9px;
@@ -145,7 +145,7 @@ nav {
 }
 .nav-links a:hover { color: var(--accent); }
 
-/* ─── CINEMATIC HERO SECTION ─── */
+/* ─── ACTIVE THEORY STYLE IMMERSIVE HERO ─── */
 .hero {
   position: relative;
   height: 100vh;
@@ -156,18 +156,17 @@ nav {
   overflow: hidden;
   border-bottom: 1px solid var(--border);
 }
-.hero-video {
+.hero-bg-canvas {
   position: absolute;
   inset: 0;
   width: 100%; height: 100%;
-  object-fit: cover;
   z-index: 0;
-  filter: brightness(0.3) saturate(0.85);
+  pointer-events: none;
 }
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: radial-gradient(circle at center, rgba(3,3,3,0.1) 0%, rgba(3,3,3,0.9) 100%);
+  background: radial-gradient(circle at center, rgba(3,3,3,0.1) 0%, rgba(3,3,3,0.85) 100%);
   z-index: 1;
 }
 .hero-tag {
@@ -361,7 +360,7 @@ nav {
   color: var(--fg);
 }
 
-/* ─── ACTIVE THEORY HORIZONTAL PINNED GALLERY ─── */
+/* ─── HORIZONTAL PINNED GALLERY (Active Theory Scroll Experience) ─── */
 .horizontal-section {
   padding: 0 !important;
   height: 100vh;
@@ -396,7 +395,7 @@ nav {
   width: 100%; height: 100%;
   object-fit: cover;
   z-index: 0;
-  filter: brightness(0.35) saturate(0.85);
+  filter: brightness(0.4) saturate(0.9);
   transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .project-showcase-card:hover .project-bg-media {
@@ -511,7 +510,7 @@ footer p {
   <div class="cursor-ring"></div>
 </div>
 
-<!-- Active Theory Style WebGL 3D Particle Space -->
+<!-- Global WebGL 3D Particle Space Background -->
 <div id="webgl-container"></div>
 
 <!-- NAVIGATION HUD -->
@@ -527,9 +526,7 @@ footer p {
 <main>
   <!-- CINEMATIC HERO SECTION -->
   <section class="hero">
-    <video autoplay muted loop playsinline class="hero-video">
-      <source src="montage.mp4" type="video/mp4">
-    </video>
+    <canvas class="hero-bg-canvas" id="hero-canvas"></canvas>
     <div class="hero-overlay"></div>
 
     <div class="hero-tag">Gaming Video Editor · DaVinci Resolve · Est. 2021</div>
@@ -602,7 +599,7 @@ footer p {
     </div>
   </section>
 
-  <!-- ACTIVE THEORY INSPIRED HORIZONTAL PINNED GALLERY -->
+  <!-- ACTIVE THEORY HORIZONTAL PINNED GALLERY -->
   <section class="section horizontal-section" id="projects">
     <div class="horizontal-wrapper">
       
@@ -726,7 +723,45 @@ footer p {
     });
   });
 
-  // --- 3. Active Theory Style Three.js 3D Particle Cloud Background ---
+  // --- 3. Active Theory Style Interactive Hero Canvas (Interactive Wave/Grid Mesh) ---
+  const heroCanvas = document.getElementById('hero-canvas');
+  const heroCtx = heroCanvas.getContext('2d');
+
+  function resizeHeroCanvas() {
+    heroCanvas.width = window.innerWidth;
+    heroCanvas.height = window.innerHeight;
+  }
+  resizeHeroCanvas();
+  window.addEventListener('resize', resizeHeroCanvas);
+
+  let heroTime = 0;
+  function drawHeroWave() {
+    heroTime += 0.015;
+    heroCtx.clearRect(0, 0, heroCanvas.width, heroCanvas.height);
+    heroCtx.strokeStyle = 'rgba(0, 240, 255, 0.15)';
+    heroCtx.lineWidth = 1;
+
+    const rows = 12;
+    const cols = 24;
+    const spacingX = heroCanvas.width / cols;
+    const spacingY = heroCanvas.height / rows;
+
+    for (let i = 0; i <= rows; i++) {
+      heroCtx.beginPath();
+      for (let j = 0; j <= cols; j++) {
+        const x = j * spacingX;
+        const wave = Math.sin(j * 0.5 + heroTime + i * 0.3) * 25;
+        const y = i * spacingY + wave;
+        if (j === 0) heroCtx.moveTo(x, y);
+        else heroCtx.lineTo(x, y);
+      }
+      heroCtx.stroke();
+    }
+    requestAnimationFrame(drawHeroWave);
+  }
+  drawHeroWave();
+
+  // --- 4. Global WebGL Three.js 3D Particle Space (Active Theory Ambient Atmosphere) ---
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -735,23 +770,23 @@ footer p {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   document.getElementById('webgl-container').appendChild(renderer.domElement);
 
-  const particleCount = 2500;
+  const particleCount = 3000;
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(particleCount * 3);
 
   for(let i = 0; i < particleCount * 3; i += 3) {
-    positions[i] = (Math.random() - 0.5) * 35;
-    positions[i+1] = (Math.random() - 0.5) * 35;
-    positions[i+2] = (Math.random() - 0.5) * 35;
+    positions[i] = (Math.random() - 0.5) * 40;
+    positions[i+1] = (Math.random() - 0.5) * 40;
+    positions[i+2] = (Math.random() - 0.5) * 40;
   }
 
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
   const material = new THREE.PointsMaterial({
-    size: 0.02,
-    color: 0x00FFCC,
+    size: 0.025,
+    color: 0x00F0FF,
     transparent: true,
-    opacity: 0.6,
+    opacity: 0.7,
     blending: THREE.AdditiveBlending
   });
 
@@ -761,8 +796,8 @@ footer p {
 
   let targetX = 0, targetY = 0;
   window.addEventListener('mousemove', (e) => {
-    targetX = (e.clientX - window.innerWidth / 2) * 0.0006;
-    targetY = (e.clientY - window.innerHeight / 2) * 0.0006;
+    targetX = (e.clientX - window.innerWidth / 2) * 0.0007;
+    targetY = (e.clientY - window.innerHeight / 2) * 0.0007;
   });
 
   function animateWebGL() {
@@ -779,7 +814,7 @@ footer p {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  // --- 4. Horizontal Scroll-Driven Showcase Experience ---
+  // --- 5. Horizontal Scroll-Driven Showcase Experience ---
   const horizontalWrapper = document.querySelector('.horizontal-wrapper');
   if (horizontalWrapper) {
     gsap.to(horizontalWrapper, {
