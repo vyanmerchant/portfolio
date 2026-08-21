@@ -1,104 +1,146 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vyan Merchant — Creative Editor & Visual Director</title>
+  <title>VYAN MERCHANT — Visual Editor & Post-Production Director</title>
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
   <style>
-    /* ─── DESIGN SYSTEM ─── */
+    /* ─── DESIGN SYSTEM & VARS ─── */
     :root {
-      --bg: #09090b;
-      --bg-surface: #121215;
+      --bg: #030712;
+      --bg-card: rgba(15, 23, 42, 0.4);
+      --bg-card-hover: rgba(30, 41, 59, 0.6);
       --border: rgba(255, 255, 255, 0.08);
-      --border-light: rgba(255, 255, 255, 0.15);
+      --border-glow: rgba(56, 189, 248, 0.4);
       
-      --accent: #d4af37;
-      --text-main: #f4f4f5;
-      --text-muted: #a1a1aa;
-      --text-dark: #71717a;
+      --accent-primary: #38bdf8;
+      --accent-secondary: #818cf8;
+      --accent-glow: rgba(56, 189, 248, 0.15);
+      
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dark: #475569;
 
-      --font-display: 'Cinzel', serif;
-      --font-heading: 'Space Grotesk', sans-serif;
-      --font-body: 'Inter', sans-serif;
+      --font-display: 'Syne', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html { scroll-behavior: smooth; }
+    html { scroll-behavior: smooth; color-scheme: dark; }
 
     body {
       background-color: var(--bg);
       color: var(--text-main);
       font-family: var(--font-body);
-      line-height: 1.5;
+      overflow-x: hidden;
+      line-height: 1.6;
       -webkit-font-smoothing: antialiased;
     }
 
-    /* ─── NAVIGATION ─── */
-    header {
+    /* ─── CUSTOM CURSOR & CANVAS SPOTLIGHT ─── */
+    #spotlight-canvas {
       position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
+      inset: 0;
+      pointer-events: none;
+      z-index: 99;
+    }
+
+    /* ─── ACETERNITY GRID & RADIAL BACKGROUND ─── */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-size: 32px 32px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      z-index: -2;
+      mask-image: radial-gradient(ellipse 70% 60% at 50% 0%, #000 60%, transparent 100%);
+    }
+
+    .ambient-glow {
+      position: fixed;
+      top: -10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1200px;
+      height: 700px;
+      background: radial-gradient(circle, rgba(56, 189, 248, 0.08) 0%, rgba(129, 140, 248, 0.03) 50%, transparent 80%);
+      filter: blur(100px);
+      z-index: -1;
+      pointer-events: none;
+    }
+
+    /* ─── FLOATING GLASS NAVBAR ─── */
+    .nav-wrapper {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 1000;
-      padding: 32px 50px;
+      width: min(92%, 800px);
+    }
+
+    nav {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 12px 28px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: linear-gradient(to bottom, rgba(9,9,11,0.9) 0%, rgba(9,9,11,0) 100%);
-      backdrop-filter: blur(8px);
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
 
-    .brand {
+    .nav-logo {
       font-family: var(--font-display);
-      font-size: 18px;
-      letter-spacing: 0.2em;
-      text-transform: uppercase;
+      font-weight: 800;
+      font-size: 16px;
+      letter-spacing: -0.02em;
       color: var(--text-main);
       text-decoration: none;
-      font-weight: 700;
     }
+
+    .nav-logo span { color: var(--accent-primary); }
 
     .nav-links {
       display: flex;
-      gap: 40px;
+      gap: 32px;
       list-style: none;
     }
 
     .nav-links a {
-      font-family: var(--font-heading);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
+      font-size: 13px;
+      font-weight: 500;
       color: var(--text-muted);
       text-decoration: none;
-      transition: color 0.3s ease;
+      transition: color 0.2s ease;
     }
 
-    .nav-links a:hover {
-      color: var(--text-main);
-    }
+    .nav-links a:hover { color: var(--text-main); }
 
-    .contact-cta {
-      font-family: var(--font-heading);
+    .nav-btn {
       font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--text-main);
+      font-weight: 600;
+      color: var(--bg);
+      background: var(--text-main);
+      padding: 8px 18px;
+      border-radius: 9999px;
       text-decoration: none;
-      border-bottom: 1px solid var(--text-main);
-      padding-bottom: 4px;
-      transition: opacity 0.3s ease;
+      transition: all 0.3s ease;
     }
 
-    .contact-cta:hover {
-      opacity: 0.7;
+    .nav-btn:hover {
+      transform: scale(1.03);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
     }
 
     /* ─── HERO SECTION ─── */
@@ -106,396 +148,523 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: flex-end;
-      padding: 0 50px 80px 50px;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 160px 24px 100px;
       position: relative;
     }
 
-    .hero-bg-overlay {
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.03) 0%, transparent 70%);
-      pointer-events: none;
-    }
-
-    .hero-meta {
-      font-family: var(--font-heading);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.25em;
-      color: var(--text-muted);
-      margin-bottom: 24px;
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 8px 18px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent-primary);
+      margin-bottom: 32px;
+      backdrop-filter: blur(10px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
     }
 
     .hero-title {
       font-family: var(--font-display);
-      font-size: clamp(48px, 8vw, 120px);
-      font-weight: 500;
+      font-size: clamp(48px, 8.5vw, 110px);
+      font-weight: 800;
       line-height: 0.95;
-      letter-spacing: -0.02em;
-      text-transform: uppercase;
-      margin-bottom: 40px;
-      max-width: 1200px;
+      letter-spacing: -0.04em;
+      margin-bottom: 28px;
+      background: linear-gradient(180deg, #FFFFFF 30%, rgba(255, 255, 255, 0.4) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      max-width: 1100px;
     }
 
-    .hero-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      border-top: 1px solid var(--border);
-      padding-top: 32px;
+    .hero-title span {
+      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
     }
 
     .hero-sub {
-      font-size: 15px;
+      max-width: 620px;
+      font-size: clamp(16px, 1.8vw, 19px);
       color: var(--text-muted);
-      max-width: 440px;
-      font-weight: 300;
-      line-height: 1.7;
+      margin-bottom: 44px;
+      font-weight: 400;
+      line-height: 1.6;
     }
 
-    .scroll-indicator {
-      font-family: var(--font-heading);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: var(--text-dark);
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
     }
 
-    /* ─── WORK / GALLERY SECTION ─── */
-    .section-work {
-      padding: 120px 50px;
+    .btn-main {
+      padding: 16px 36px;
+      border-radius: 9999px;
+      background: var(--text-main);
+      color: var(--bg);
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      box-shadow: 0 0 25px rgba(255, 255, 255, 0.15);
     }
 
-    .section-header {
+    .btn-main:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 40px rgba(255, 255, 255, 0.3);
+    }
+
+    .btn-ghost {
+      padding: 16px 32px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.3s ease;
+    }
+
+    .btn-ghost:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
+
+    /* ─── SHOWCASE STAGE SECTION ─── */
+    .section {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 120px 24px;
+    }
+
+    .section-head {
+      margin-bottom: 60px;
       display: flex;
       justify-content: space-between;
       align-items: flex-end;
-      margin-bottom: 60px;
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 24px;
+    }
+
+    .section-tag {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 8px;
+      display: block;
     }
 
     .section-title {
       font-family: var(--font-display);
-      font-size: 32px;
-      font-weight: 500;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
+      font-size: clamp(32px, 4vw, 56px);
+      font-weight: 800;
+      letter-spacing: -0.03em;
     }
 
-    .section-count {
-      font-family: var(--font-heading);
-      font-size: 12px;
-      color: var(--text-muted);
-      letter-spacing: 0.1em;
-    }
-
-    .work-grid {
+    .stage-container {
       display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 40px;
+      grid-template-columns: 1fr 1.5fr;
+      gap: 32px;
+      align-items: center;
     }
 
-    .work-card {
-      position: relative;
-      cursor: pointer;
+    .stage-list {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
     }
 
-    .work-card.featured {
-      grid-column: span 8;
-    }
-
-    .work-card.secondary {
-      grid-column: span 4;
-    }
-
-    .work-card.full {
-      grid-column: span 12;
-    }
-
-    .media-wrapper {
-      position: relative;
-      width: 100%;
-      aspect-ratio: 16 / 9;
-      background: var(--bg-surface);
+    .stage-card {
+      padding: 28px;
+      border-radius: 20px;
+      background: var(--bg-card);
       border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      position: relative;
       overflow: hidden;
-      margin-bottom: 20px;
     }
 
-    .media-wrapper iframe,
-    .media-wrapper video {
+    .stage-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 40%);
+      pointer-events: none;
+    }
+
+    .stage-card:hover, .stage-card.active {
+      background: var(--bg-card-hover);
+      border-color: var(--border-glow);
+      transform: translateX(6px);
+    }
+
+    .stage-card h3 {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .stage-card p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .stage-display {
+      position: relative;
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      background: #000;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      box-shadow: 0 30px 60px -12px rgba(0,0,0,0.8), 0 0 40px var(--accent-glow);
+    }
+
+    .stage-display iframe,
+    .stage-display video {
       width: 100%;
       height: 100%;
       border: none;
       object-fit: cover;
-      filter: grayscale(20%);
-      transition: filter 0.5s ease, transform 0.5s ease;
     }
 
-    .work-card:hover .media-wrapper iframe,
-    .work-card:hover .media-wrapper video {
-      filter: grayscale(0%);
-      transform: scale(1.02);
-    }
-
-    .work-details {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-    }
-
-    .work-name {
-      font-family: var(--font-heading);
-      font-size: 18px;
-      font-weight: 500;
-      letter-spacing: -0.01em;
-    }
-
-    .work-meta {
-      font-size: 12px;
-      color: var(--text-muted);
-      font-family: var(--font-heading);
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-    }
-
-    /* ─── ABOUT / CAPABILITIES ─── */
-    .section-about {
-      padding: 120px 50px;
-      border-top: 1px solid var(--border);
+    /* ─── ACETERNITY BENTO GRID ─── */
+    .bento-grid {
       display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 40px;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
     }
 
-    .about-label {
-      grid-column: span 4;
-      font-family: var(--font-heading);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.25em;
-      color: var(--text-muted);
+    .bento-card {
+      position: relative;
+      border-radius: 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 36px;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.3s ease;
+      transform-style: preserve-3d;
+      will-change: transform;
     }
 
-    .about-content {
-      grid-column: span 8;
+    .bento-card::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(56, 189, 248, 0.1), transparent 40%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      pointer-events: none;
     }
 
-    .about-statement {
+    .bento-card:hover::before { opacity: 1; }
+
+    .bento-card:hover {
+      border-color: var(--border-glow);
+    }
+
+    .bento-card.col-2 { grid-column: span 2; }
+    .bento-card.col-3 { grid-column: span 3; }
+
+    .card-stat {
       font-family: var(--font-display);
-      font-size: clamp(28px, 4vw, 48px);
-      font-weight: 500;
-      line-height: 1.2;
-      margin-bottom: 60px;
-      color: var(--text-main);
-    }
-
-    .capabilities-list {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 40px;
-      border-top: 1px solid var(--border);
-      padding-top: 40px;
-    }
-
-    .capability-item h4 {
-      font-family: var(--font-heading);
-      font-size: 14px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, #FFF 0%, var(--text-muted) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
       margin-bottom: 12px;
-      color: var(--text-main);
     }
 
-    .capability-item p {
+    .card-title {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 12px;
+    }
+
+    .card-desc {
       font-size: 14px;
       color: var(--text-muted);
-      font-weight: 300;
       line-height: 1.6;
     }
 
-    /* ─── FOOTER ─── */
-    footer {
-      padding: 120px 50px 60px 50px;
-      border-top: 1px solid var(--border);
+    /* ─── REVEAL ANIMATIONS (ANIMMASTER STYLE) ─── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
     }
 
-    .footer-cta {
-      margin-bottom: 100px;
+    .reveal.active {
+      opacity: 1;
+      transform: translateY(0);
     }
 
-    .footer-heading {
+    /* ─── FOOTER & CONTACT ─── */
+    .contact-box {
+      text-align: center;
+      padding: 100px 32px;
+      background: radial-gradient(circle at 50% 0%, var(--bg-card-hover) 0%, var(--bg-card) 100%);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-title {
       font-family: var(--font-display);
-      font-size: clamp(40px, 7vw, 96px);
-      font-weight: 500;
-      text-transform: uppercase;
-      line-height: 0.95;
-      margin-bottom: 32px;
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 24px;
     }
 
-    .footer-email {
-      font-family: var(--font-heading);
-      font-size: clamp(18px, 3vw, 36px);
-      color: var(--text-muted);
-      text-decoration: none;
-      border-bottom: 1px solid var(--border-light);
-      padding-bottom: 8px;
-      transition: color 0.3s ease, border-color 0.3s ease;
-    }
-
-    .footer-email:hover {
-      color: var(--text-main);
-      border-color: var(--text-main);
-    }
-
-    .footer-bottom {
+    .contact-links {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: var(--font-heading);
-      font-size: 11px;
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      color: var(--text-dark);
+      justify-content: center;
+      gap: 16px;
+      margin-top: 40px;
+      flex-wrap: wrap;
+    }
+
+    footer {
       border-top: 1px solid var(--border);
-      padding-top: 32px;
-    }
-
-    .social-group {
-      display: flex;
-      gap: 24px;
-    }
-
-    .social-group a {
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .social-group a:hover {
-      color: var(--text-main);
+      padding: 40px 24px;
+      text-align: center;
+      font-size: 13px;
+      color: var(--text-dark);
     }
 
     /* ─── RESPONSIVE ─── */
-    @media (max-width: 900px) {
-      header, .hero, .section-work, .section-about, footer { padding-left: 24px; padding-right: 24px; }
-      .work-card.featured, .work-card.secondary { grid-column: span 12; }
-      .section-about { grid-template-columns: 1fr; }
-      .about-label { grid-column: span 1; }
-      .about-content { grid-column: span 1; }
-      .capabilities-list { grid-template-columns: 1fr; }
-      .hero-footer { flex-direction: column; align-items: flex-start; gap: 24px; }
+    @media (max-width: 960px) {
+      .stage-container { grid-template-columns: 1fr; }
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-card.col-2, .bento-card.col-3 { grid-column: span 1; }
+      .nav-links { display: none; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Navigation -->
-  <header>
-    <a href="#" class="brand">Vyan Merchant</a>
-    <ul class="nav-links">
-      <li><a href="#work">Selected Works</a></li>
-      <li><a href="#about">About</a></li>
-    </ul>
-    <a href="mailto:vyanmerchant@gmail.com" class="contact-cta">Get In Touch</a>
-  </header>
+  <!-- Custom Spotlight Canvas Overlay -->
+  <canvas id="spotlight-canvas"></canvas>
+
+  <!-- Background Grids & Ambient Glows -->
+  <div class="bg-grid"></div>
+  <div class="ambient-glow"></div>
+
+  <!-- Floating Navigation -->
+  <div class="nav-wrapper">
+    <nav>
+      <a href="#" class="nav-logo">VYAN<span>.</span></a>
+      <ul class="nav-links">
+        <li><a href="#work">Selected Works</a></li>
+        <li><a href="#capabilities">Capabilities</a></li>
+        <li><a href="#about">About</a></li>
+      </ul>
+      <a href="#contact" class="nav-btn">Start Project</a>
+    </nav>
+  </div>
 
   <!-- Hero Section -->
   <section class="hero">
-    <div class="hero-bg-overlay"></div>
-    <div class="hero-meta">Visual Direction & Editing</div>
-    <h1 class="hero-title">Crafting Motion<br>For Visual Impact</h1>
-    
-    <div class="hero-footer">
-      <p class="hero-sub">
-        Elevating digital media with precise editorial pacing, high-end finishing, and high-impact post-production.
-      </p>
-      <div class="scroll-indicator">[ Scroll to Explore ]</div>
+    <div class="hero-badge reveal">
+      <span>✦</span> Post-Production & Motion Direction
+    </div>
+    <h1 class="hero-title reveal">
+      PRECISION EDITING FOR<br><span>HIGH-IMPACT MEDIA</span>
+    </h1>
+    <p class="hero-sub reveal">
+      Delivering cinema-grade visual pacing, advanced color spaces, and bespoke motion design for creators, agencies, and high-tier brands.
+    </p>
+    <div class="hero-actions reveal">
+      <a href="#work" class="btn-main">View Reel & Work</a>
+      <a href="#contact" class="btn-ghost">Inquire Availability</a>
     </div>
   </section>
 
-  <!-- Work Showcase -->
-  <section class="section-work" id="work">
-    <div class="section-header">
-      <h2 class="section-title">Selected Works</h2>
-      <span class="section-count">01 — 03</span>
+  <!-- Interactive Stage Showcase -->
+  <section class="section" id="work">
+    <div class="section-head reveal">
+      <div>
+        <span class="section-tag">Featured Works</span>
+        <h2 class="section-title">Commercial & Digital Post</h2>
+      </div>
     </div>
 
-    <div class="work-grid">
-      <!-- Project 1 -->
-      <div class="work-card featured">
-        <div class="media-wrapper">
-          <iframe src="https://www.youtube.com/embed/d0qvLlFEEH8?rel=0&modestbranding=1" allowfullscreen></iframe>
+    <div class="stage-container reveal">
+      <div class="stage-list">
+        <div class="stage-card active" onclick="updateStage('youtube', 'd0qvLlFEEH8', this)">
+          <h3>Valorant Visual Post-Production</h3>
+          <p>Precision Frame Syncing / High-Key Color Grade / Custom SFX</p>
         </div>
-        <div class="work-details">
-          <h3 class="work-name">Visual Edit 01</h3>
-          <span class="work-meta">Color / Rhythm / Post-Production</span>
+        <div class="stage-card" onclick="updateStage('youtube', '4ZcBnbLWxvU', this)">
+          <h3>High-Pace Digital Montage</h3>
+          <p>Custom Dynamic Transitions / Kinetic Typography</p>
         </div>
-      </div>
-
-      <!-- Project 2 -->
-      <div class="work-card secondary">
-        <div class="media-wrapper">
-          <iframe src="https://www.youtube.com/embed/4ZcBnbLWxvU?rel=0&modestbranding=1" allowfullscreen></iframe>
-        </div>
-        <div class="work-details">
-          <h3 class="work-name">Visual Edit 02</h3>
-          <span class="work-meta">Sound Design / Cut</span>
+        <div class="stage-card" onclick="updateStage('local', 'montage.mp4', this)">
+          <h3>Motion Design & Style Reel</h3>
+          <p>Experimental Visual Effects / Audio-Driven Motion</p>
         </div>
       </div>
 
-      <!-- Project 3 -->
-      <div class="work-card full">
-        <div class="media-wrapper">
-          <video src="montage.mp4" controls muted loop></video>
-        </div>
-        <div class="work-details">
-          <h3 class="work-name">Editorial Reel</h3>
-          <span class="work-meta">Motion Design / Experimental</span>
-        </div>
+      <div class="stage-display" id="stageDisplay">
+        <iframe src="https://www.youtube.com/embed/d0qvLlFEEH8?autoplay=0&mute=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>
     </div>
   </section>
 
-  <!-- About Section -->
-  <section class="section-about" id="about">
-    <div class="about-label">Background & Capabilities</div>
-    <div class="about-content">
-      <p class="about-statement">
-        Dedicated to mastering narrative flow, precise frame execution, and technical post-production finesse.
+  <!-- Bento Grid Capabilities -->
+  <section class="section" id="capabilities">
+    <div class="section-head reveal">
+      <div>
+        <span class="section-tag">Capabilities</span>
+        <h2 class="section-title">Designed to Scale Commercial Impact</h2>
+      </div>
+    </div>
+
+    <div class="bento-grid">
+      <div class="bento-card col-2 reveal">
+        <div class="card-title">Frame-Accurate Narrative Pacing</div>
+        <p class="card-desc">
+          Over 4 years of continuous editing mastery utilizing DaVinci Resolve Studio. Focused on engineered visual retention, rhythm-driven cuts, and seamless narrative transitions designed for modern digital consumption.
+        </p>
+      </div>
+
+      <div class="bento-card reveal">
+        <div class="card-stat">04+</div>
+        <div class="card-title">Years Experience</div>
+        <p class="card-desc">Specialized post-production focus in DaVinci Resolve Studio.</p>
+      </div>
+
+      <div class="bento-card reveal">
+        <div class="card-title">Bespoke Color Grading</div>
+        <p class="card-desc">Custom node trees, ACES color management, and tailored look-development for high-end digital video.</p>
+      </div>
+
+      <div class="bento-card col-2 reveal">
+        <div class="card-title">Client & Agency Ready</div>
+        <p class="card-desc">Seamless collaboration workflow, fast revision turnarounds, and professional delivery formats structured for immediate high-ticket monetization.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Contact Section -->
+  <section class="section" id="contact">
+    <div class="contact-box reveal">
+      <span class="section-tag">Direct Contact</span>
+      <h2 class="contact-title">READY TO ELEVATE<br>YOUR VISUALS?</h2>
+      <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 32px;">
+        Open for high-tier post-production contracts, commercial edits, and long-term agency partnerships.
       </p>
 
-      <div class="capabilities-list">
-        <div class="capability-item">
-          <h4>Post Production</h4>
-          <p>Frame-accurate pacing, high-retention timeline construction, and rhythm-based sequencing in DaVinci Resolve Studio.</p>
-        </div>
-        <div class="capability-item">
-          <h4>Color & Finishing</h4>
-          <p>Custom color profiles and spaces designed to transform digital footage into cohesive visual stories.</p>
-        </div>
+      <a href="mailto:vyanmerchant@gmail.com" class="btn-main" style="display: inline-flex;">
+        vyanmerchant@gmail.com
+      </a>
+
+      <div class="contact-links">
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vyanmerchant@gmail.com" target="_blank" class="btn-ghost">Direct Email</a>
+        <a href="https://discord.com/users/1111715392461738034" target="_blank" class="btn-ghost">Discord</a>
+        <a href="https://youtube.com" target="_blank" class="btn-ghost">YouTube Portfolio</a>
       </div>
     </div>
   </section>
 
   <!-- Footer -->
   <footer>
-    <div class="footer-cta">
-      <h2 class="footer-heading">Let's Work<br>Together</h2>
-      <a href="mailto:vyanmerchant@gmail.com" class="footer-email">vyanmerchant@gmail.com</a>
-    </div>
-
-    <div class="footer-bottom">
-      <div>© Vyan Merchant</div>
-      <div class="social-group">
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vyanmerchant@gmail.com" target="_blank">Email</a>
-        <a href="https://discord.com/users/1111715392461738034" target="_blank">Discord</a>
-        <a href="https://youtube.com" target="_blank">YouTube</a>
-      </div>
-    </div>
+    <p>© 2026 VYAN MERCHANT. Crafted with premium web standards.</p>
   </footer>
 
+  <script>
+    /* ─── SPOTLIGHT CURSOR CANVAS ─── */
+    const canvas = document.getElementById('spotlight-canvas');
+    const ctx = canvas.getContext('2d');
+    let mouse = { x: -1000, y: -1000 };
+
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    window.addEventListener('mousemove', (e) => {
+      mouse.x = e.clientX;
+      mouse.y = e.clientY;
+
+      // Update card inner radial light tracking
+      document.querySelectorAll('.bento-card, .stage-card').forEach(card => {
+        const rect = card.getBoundingClientRect();
+        card.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
+        card.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
+      });
+    });
+
+    function drawSpotlight() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      if (mouse.x > 0 && mouse.y > 0) {
+        const gradient = ctx.createRadialGradient(mouse.x, mouse.y, 0, mouse.x, mouse.y, 250);
+        gradient.addColorStop(0, 'rgba(56, 189, 248, 0.08)');
+        gradient.addColorStop(1, 'rgba(56, 189, 248, 0)');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(mouse.x, mouse.y, 250, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      requestAnimationFrame(drawSpotlight);
+    }
+    drawSpotlight();
+
+    /* ─── 3D TILT EFFECT FOR BENTO CARDS (ACETERNITY STYLE) ─── */
+    document.querySelectorAll('.bento-card').forEach(card => {
+      card.addEventListener('mousemove', (e) => {
+        const rect = card.getBoundingClientRect();
+        const x = e.clientX - rect.left - rect.width / 2;
+        const y = e.clientY - rect.top - rect.height / 2;
+        
+        card.style.transform = `perspective(1000px) rotateX(${-y / 25}deg) rotateY(${x / 25}deg) translateZ(10px)`;
+      });
+
+      card.addEventListener('mouseleave', () => {
+        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
+      });
+    });
+
+    /* ─── SCROLL REVEAL (ANIMMASTER STYLE) ─── */
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('active');
+        }
+      });
+    }, { threshold: 0.1 });
+
+    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+    /* ─── STAGE VIDEO SWITCHER ─── */
+    function updateStage(type, src, element) {
+      const display = document.getElementById('stageDisplay');
+      document.querySelectorAll('.stage-card').forEach(c => c.classList.remove('active'));
+      element.classList.add('active');
+
+      if (type === 'youtube') {
+        display.innerHTML = `<iframe src="https://www.youtube.com/embed/${src}?autoplay=1&mute=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+      } else {
+        display.innerHTML = `<video src="${src}" controls autoplay muted loop></video>`;
+      }
+    }
+  </script>
 </body>
 </html>
