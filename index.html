@@ -1,525 +1,462 @@
-import React, { useEffect, useRef, useState } from 'react';
-import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
-import { ArrowUpRight, Menu, X, Sparkles, Layers, Cpu, Code2, Globe } from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth bg-neutral-950 text-neutral-100">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Aetheria / Creative Studio 2026</title>
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:ital,wght@1,400;1,600&family=Inter:wght@200;300;400;500;600&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
 
-// ==========================================
-// 1. CUSTOM CURSOR COMPONENT
-// ==========================================
-const CustomCursor = () => {
-  const [cursorVariant, setCursorVariant] = useState('DEFAULT');
-  const [cursorText, setCursorText] = useState('');
-  const mouseX = useMotionValue(-100);
-  const mouseY = useMotionValue(-100);
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            serif: ['Cinzel', 'serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
 
-  const springConfig = { damping: 28, stiffness: 350, mass: 0.5 };
-  const cursorX = useSpring(mouseX, springConfig);
-  const cursorY = useSpring(mouseY, springConfig);
+  <style>
+    /* Hide standard cursor on desktop devices with fine pointing */
+    @media (pointer: fine) {
+      body {
+        cursor: none;
+      }
+      a, button, [data-cursor] {
+        cursor: none;
+      }
+    }
 
-  useEffect(() => {
-    if (window.matchMedia('(pointer: coarse)').matches) return;
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 4px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #0a0a0a;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #262626;
+      border-radius: 2px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #404040;
+    }
+  </style>
+</head>
+<body class="selection:bg-neutral-100 selection:text-neutral-950 overflow-x-hidden">
 
-    const handleMouseMove = (e) => {
-      mouseX.set(e.clientX);
-      mouseY.set(e.clientY);
-    };
+  <!-- ========================================== -->
+  <!-- 1. CUSTOM CURSOR CONTAINER                 -->
+  <!-- ========================================== -->
+  <div id="cursor" class="fixed top-0 left-0 pointer-events-none z-50 rounded-full flex items-center justify-center text-center font-mono text-[10px] tracking-widest font-semibold uppercase text-black transition-[width,height,background-color,border] duration-300 ease-out hidden md:flex mix-blend-difference bg-white w-3 h-3 -translate-x-1/2 -translate-y-1/2">
+    <span id="cursor-label" class="px-2 opacity-0 transition-opacity duration-200"></span>
+  </div>
 
-    const handleMouseOver = (e) => {
+  <!-- ========================================== -->
+  <!-- 2. CANVAS BACKGROUND                       -->
+  <!-- ========================================== -->
+  <canvas id="canvas-bg" class="fixed inset-0 pointer-events-none z-0 opacity-40"></canvas>
+
+  <!-- ========================================== -->
+  <!-- 3. NAVIGATION                              -->
+  <!-- ========================================== -->
+  <header class="fixed top-0 left-0 w-full z-40 px-6 md:px-16 py-6 flex justify-between items-center mix-blend-difference">
+    <a href="#" class="font-mono text-xs uppercase tracking-widest text-neutral-100" data-cursor="pointer">
+      STUDIO / AETHERIA
+    </a>
+
+    <nav class="hidden md:flex items-center gap-8 font-mono text-xs uppercase tracking-widest text-neutral-300">
+      <a href="#work" class="hover:text-neutral-100 transition-colors" data-cursor="pointer">[ Work ]</a>
+      <a href="#about" class="hover:text-neutral-100 transition-colors" data-cursor="pointer">[ Agency ]</a>
+      <a href="#contact" class="hover:text-neutral-100 transition-colors" data-cursor="pointer">[ Contact ]</a>
+    </nav>
+
+    <button id="mobile-menu-btn" class="md:hidden text-neutral-100 p-2 focus:outline-none" data-cursor="pointer">
+      <svg id="menu-icon-open" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <svg id="menu-icon-close" class="w-6 h-6 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12"/></svg>
+    </button>
+  </header>
+
+  <!-- Mobile Overlay -->
+  <div id="mobile-menu" class="fixed inset-0 z-30 bg-neutral-950 hidden flex-col justify-center px-8 font-mono text-lg space-y-6">
+    <a href="#work" class="mobile-link text-neutral-300 hover:text-white">01 // WORK</a>
+    <a href="#about" class="mobile-link text-neutral-300 hover:text-white">02 // AGENCY</a>
+    <a href="#contact" class="mobile-link text-neutral-300 hover:text-white">03 // CONTACT</a>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 4. HERO SECTION                            -->
+  <!-- ========================================== -->
+  <section class="relative w-full min-h-screen flex flex-col justify-between p-6 md:p-16 border-b border-neutral-800/50 pt-24 z-10">
+    <div class="w-full grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono tracking-wider uppercase text-neutral-500">
+      <div>[ CREATIVE DIRECTION ]</div>
+      <div>[ MOTION & CANVAS ]</div>
+      <div class="hidden md:block">[ AVAILABLE 2026 ]</div>
+      <div class="text-right">[ PUNE / GLOBAL ]</div>
+    </div>
+
+    <div class="my-auto py-12 max-w-7xl">
+      <p class="text-xs md:text-sm font-mono tracking-widest uppercase text-neutral-400 mb-4">
+        High-Performance Visual Design & Code
+      </p>
+
+      <h1 class="text-5xl sm:text-7xl lg:text-9xl font-light tracking-tight leading-[0.9] uppercase text-neutral-100">
+        Architecting
+      </h1>
+
+      <h1 class="text-5xl sm:text-7xl lg:text-9xl font-serif italic text-neutral-400 tracking-tight leading-[0.9] mt-1">
+        digital depth.
+      </h1>
+
+      <div class="mt-8 md:mt-12 grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+        <p class="md:col-span-6 text-sm md:text-base text-neutral-400 font-light leading-relaxed">
+          Bridging fine-art editorial layouts with interactive kinetic motion. Building spatial user interfaces, spatial depth, and bespoke digital visual systems.
+        </p>
+
+        <div class="md:col-span-6 md:flex justify-end">
+          <div class="magnetic-wrap inline-block">
+            <a href="#work" data-cursor="pointer" class="magnetic-target inline-flex items-center gap-3 px-8 py-4 rounded-full border border-neutral-700 bg-neutral-900/80 backdrop-blur-md text-xs font-mono uppercase tracking-widest text-neutral-100 hover:bg-neutral-100 hover:text-neutral-950 transition-colors duration-300">
+              View Works <span>→</span>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="w-full flex justify-between items-end text-xs font-mono text-neutral-500">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span>SYSTEM OPERATIONAL</span>
+      </div>
+      <div>[ SCROLL FOR CURATION ]</div>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- 5. SELECTED WORKS SECTION                  -->
+  <!-- ========================================== -->
+  <section id="work" class="w-full py-24 px-6 md:px-16 border-b border-neutral-800/50 z-10 relative">
+    <div class="flex justify-between items-end mb-16 border-b border-neutral-800/60 pb-6">
+      <div>
+        <span class="text-xs font-mono text-neutral-500 uppercase tracking-widest">[ 01 / SELECTED WORKS ]</span>
+        <h2 class="text-3xl md:text-5xl font-light uppercase tracking-tight text-neutral-100 mt-2">Curated Index</h2>
+      </div>
+      <span class="text-xs font-mono text-neutral-500 hidden md:block">[ 2024 — 2026 ]</span>
+    </div>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+      
+      <!-- Project 1 -->
+      <div class="project-card relative w-full group overflow-hidden bg-neutral-900/60 border border-neutral-800/80 rounded-sm" data-cursor="view" data-cursor-label="EXPLORE">
+        <div class="w-full h-[350px] sm:h-[480px] overflow-hidden relative">
+          <img src="https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=1200&auto=format&fit=crop" alt="Minimal Tech Setup" class="w-full h-full object-cover grayscale transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:scale-105" />
+          <div class="absolute inset-0 bg-neutral-950/30 group-hover:bg-transparent transition-colors duration-500"></div>
+        </div>
+        <div class="p-6 bg-neutral-950 flex justify-between items-center border-t border-neutral-800/60">
+          <div>
+            <span class="text-[10px] font-mono text-neutral-500 uppercase tracking-widest block">PROJECT // 01 — VISUAL SYSTEMS</span>
+            <h3 class="text-xl font-light tracking-tight text-neutral-100 uppercase mt-1">Kreo Studio Architecture</h3>
+          </div>
+          <span class="text-xs font-mono text-neutral-400 group-hover:translate-x-1 transition-transform duration-300">[2026]</span>
+        </div>
+      </div>
+
+      <!-- Project 2 -->
+      <div class="project-card relative w-full group overflow-hidden bg-neutral-900/60 border border-neutral-800/80 rounded-sm" data-cursor="view" data-cursor-label="EXPLORE">
+        <div class="w-full h-[350px] sm:h-[480px] overflow-hidden relative">
+          <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1200&auto=format&fit=crop" alt="Aetheria Canvas" class="w-full h-full object-cover grayscale transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:scale-105" />
+          <div class="absolute inset-0 bg-neutral-950/30 group-hover:bg-transparent transition-colors duration-500"></div>
+        </div>
+        <div class="p-6 bg-neutral-950 flex justify-between items-center border-t border-neutral-800/60">
+          <div>
+            <span class="text-[10px] font-mono text-neutral-500 uppercase tracking-widest block">PROJECT // 02 — WEBGL / MOTION</span>
+            <h3 class="text-xl font-light tracking-tight text-neutral-100 uppercase mt-1">Aetheria Canvas Engine</h3>
+          </div>
+          <span class="text-xs font-mono text-neutral-400 group-hover:translate-x-1 transition-transform duration-300">[2025]</span>
+        </div>
+      </div>
+
+      <!-- Project 3 -->
+      <div class="project-card relative w-full group overflow-hidden bg-neutral-900/60 border border-neutral-800/80 rounded-sm" data-cursor="view" data-cursor-label="EXPLORE">
+        <div class="w-full h-[350px] sm:h-[480px] overflow-hidden relative">
+          <img src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop" alt="Neural Matrix" class="w-full h-full object-cover grayscale transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:scale-105" />
+          <div class="absolute inset-0 bg-neutral-950/30 group-hover:bg-transparent transition-colors duration-500"></div>
+        </div>
+        <div class="p-6 bg-neutral-950 flex justify-between items-center border-t border-neutral-800/60">
+          <div>
+            <span class="text-[10px] font-mono text-neutral-500 uppercase tracking-widest block">PROJECT // 03 — INTERACTIVE APP</span>
+            <h3 class="text-xl font-light tracking-tight text-neutral-100 uppercase mt-1">Neural Matrix Interface</h3>
+          </div>
+          <span class="text-xs font-mono text-neutral-400 group-hover:translate-x-1 transition-transform duration-300">[2025]</span>
+        </div>
+      </div>
+
+      <!-- Project 4 -->
+      <div class="project-card relative w-full group overflow-hidden bg-neutral-900/60 border border-neutral-800/80 rounded-sm" data-cursor="view" data-cursor-label="EXPLORE">
+        <div class="w-full h-[350px] sm:h-[480px] overflow-hidden relative">
+          <img src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop" alt="Monolith Agency" class="w-full h-full object-cover grayscale transition-all duration-700 ease-out group-hover:grayscale-0 group-hover:scale-105" />
+          <div class="absolute inset-0 bg-neutral-950/30 group-hover:bg-transparent transition-colors duration-500"></div>
+        </div>
+        <div class="p-6 bg-neutral-950 flex justify-between items-center border-t border-neutral-800/60">
+          <div>
+            <span class="text-[10px] font-mono text-neutral-500 uppercase tracking-widest block">PROJECT // 04 — BRAND IDENTITY</span>
+            <h3 class="text-xl font-light tracking-tight text-neutral-100 uppercase mt-1">Monolith Structural Agency</h3>
+          </div>
+          <span class="text-xs font-mono text-neutral-400 group-hover:translate-x-1 transition-transform duration-300">[2024]</span>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- 6. PHILOSOPHY / CAPABILITIES               -->
+  <!-- ========================================== -->
+  <section id="about" class="w-full py-24 px-6 md:px-16 border-b border-neutral-800/50 z-10 relative">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+      <div class="md:col-span-5">
+        <span class="text-xs font-mono text-neutral-500 uppercase tracking-widest">[ 02 / PHILOSOPHY ]</span>
+        <h2 class="text-3xl md:text-5xl font-light uppercase tracking-tight text-neutral-100 mt-4 leading-tight">
+          Precision in motion, discipline in architecture.
+        </h2>
+      </div>
+
+      <div class="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8 font-mono text-xs">
+        <div class="p-6 border border-neutral-800/80 bg-neutral-900/40 rounded-sm">
+          <div class="text-neutral-400 mb-4 text-base">✦ 01</div>
+          <h3 class="text-sm text-neutral-200 uppercase tracking-wider mb-2">WebGL & Canvas Physics</h3>
+          <p class="text-neutral-400 font-sans leading-relaxed">
+            GPU-accelerated custom shaders, particle vectors, and interactive depth buffers designed for narrative visual engagement.
+          </p>
+        </div>
+
+        <div class="p-6 border border-neutral-800/80 bg-neutral-900/40 rounded-sm">
+          <div class="text-neutral-400 mb-4 text-base">⚡ 02</div>
+          <h3 class="text-sm text-neutral-200 uppercase tracking-wider mb-2">Modern Frontend Engine</h3>
+          <p class="text-neutral-400 font-sans leading-relaxed">
+            Scalable architecture optimized for sub-second load parameters and 60 FPS continuous animation loops.
+          </p>
+        </div>
+
+        <div class="p-6 border border-neutral-800/80 bg-neutral-900/40 rounded-sm">
+          <div class="text-neutral-400 mb-4 text-base">◈ 03</div>
+          <h3 class="text-sm text-neutral-200 uppercase tracking-wider mb-2">Motion Design Systems</h3>
+          <p class="text-neutral-400 font-sans leading-relaxed">
+            Kinetic text reveals, scroll-driven interpolation, and dynamic cursor states calibrated for organic response.
+          </p>
+        </div>
+
+        <div class="p-6 border border-neutral-800/80 bg-neutral-900/40 rounded-sm">
+          <div class="text-neutral-400 mb-4 text-base">❖ 04</div>
+          <h3 class="text-sm text-neutral-200 uppercase tracking-wider mb-2">Production Quality</h3>
+          <p class="text-neutral-400 font-sans leading-relaxed">
+            Bespoke design systems stripped of generic templates, built with editorial typography and responsive rhythm.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========================================== -->
+  <!-- 7. FOOTER / CONTACT                        -->
+  <!-- ========================================== -->
+  <footer id="contact" class="w-full py-24 px-6 md:px-16 bg-neutral-950 text-neutral-100 flex flex-col justify-between min-h-[70vh] z-10 relative">
+    <div class="grid grid-cols-1 md:grid-cols-12 gap-8">
+      <div class="md:col-span-8">
+        <span class="text-xs font-mono text-neutral-500 uppercase tracking-widest">[ 03 / INITIATE CONTACT ]</span>
+        <h2 class="text-4xl sm:text-6xl md:text-8xl font-light uppercase tracking-tight mt-4 leading-none">
+          Let's create something <span class="font-serif italic text-neutral-400">unforgettable.</span>
+        </h2>
+      </div>
+
+      <div class="md:col-span-4 flex flex-col justify-end items-start md:items-end">
+        <div class="magnetic-wrap inline-block">
+          <a href="mailto:contact@aetheria.studio" data-cursor="pointer" class="magnetic-target inline-block px-8 py-6 rounded-full bg-neutral-100 text-neutral-950 font-mono text-xs uppercase tracking-widest hover:bg-neutral-300 transition-colors">
+            Start Conversation
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <div class="pt-16 border-t border-neutral-800/60 flex flex-col md:flex-row justify-between items-center text-xs font-mono text-neutral-500 gap-4">
+      <div>© 2026 AETHERIA CREATIVE STUDIO. ALL RIGHTS RESERVED.</div>
+      <div class="flex gap-6">
+        <a href="#" class="hover:text-neutral-300" data-cursor="pointer">GITHUB</a>
+        <a href="#" class="hover:text-neutral-300" data-cursor="pointer">TWITTER / X</a>
+        <a href="#" class="hover:text-neutral-300" data-cursor="pointer">LINKEDIN</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- ========================================== -->
+  <!-- 8. INTERACTIVE JAVASCRIPT LOGIC            -->
+  <!-- ========================================== -->
+  <script>
+    // --- Custom Cursor Logic ---
+    const cursor = document.getElementById('cursor');
+    const cursorLabel = document.getElementById('cursor-label');
+    let mouseX = -100, mouseY = -100;
+    let cursorX = -100, cursorY = -100;
+
+    window.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    function animateCursor() {
+      // Lerp movement for fluid spring effect
+      cursorX += (mouseX - cursorX) * 0.2;
+      cursorY += (mouseY - cursorY) * 0.2;
+      
+      cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+      requestAnimationFrame(animateCursor);
+    }
+    requestAnimationFrame(animateCursor);
+
+    // Event listener delegation for Cursor States
+    document.addEventListener('mouseover', (e) => {
       const target = e.target.closest('[data-cursor]');
       if (!target) {
-        setCursorVariant('DEFAULT');
-        setCursorText('');
+        cursor.className = "fixed top-0 left-0 pointer-events-none z-50 rounded-full flex items-center justify-center text-center font-mono text-[10px] tracking-widest font-semibold uppercase text-black transition-[width,height,background-color,border] duration-300 ease-out hidden md:flex mix-blend-difference bg-white w-3 h-3 -translate-x-1/2 -translate-y-1/2";
+        cursorLabel.classList.add('opacity-0');
         return;
       }
 
       const mode = target.getAttribute('data-cursor');
       const label = target.getAttribute('data-cursor-label');
 
-      if (mode === 'pointer') setCursorVariant('HOVER');
-      else if (mode === 'view') setCursorVariant('VIEW');
-      else if (mode === 'drag') setCursorVariant('DRAG');
-
-      if (label) setCursorText(label);
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseover', handleMouseOver);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseover', handleMouseOver);
-    };
-  }, [mouseX, mouseY]);
-
-  const variants = {
-    DEFAULT: {
-      width: 12,
-      height: 12,
-      backgroundColor: 'rgba(255, 255, 255, 0.9)',
-      border: '0px solid rgba(255, 255, 255, 0)',
-      mixBlendMode: 'difference',
-    },
-    HOVER: {
-      width: 48,
-      height: 48,
-      backgroundColor: 'rgba(255, 255, 255, 0.15)',
-      border: '1px solid rgba(255, 255, 255, 0.4)',
-      mixBlendMode: 'normal',
-    },
-    VIEW: {
-      width: 80,
-      height: 80,
-      backgroundColor: 'rgba(255, 255, 255, 0.95)',
-      border: '0px solid rgba(0, 0, 0, 0)',
-      mixBlendMode: 'normal',
-    },
-    DRAG: {
-      width: 64,
-      height: 64,
-      backgroundColor: 'rgba(255, 255, 255, 0.85)',
-      border: '0px solid rgba(0, 0, 0, 0)',
-      mixBlendMode: 'difference',
-    },
-  };
-
-  return (
-    <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-50 rounded-full flex items-center justify-center text-center font-mono text-[10px] tracking-widest font-semibold uppercase text-black overflow-hidden hidden md:flex"
-      style={{
-        x: cursorX,
-        y: cursorY,
-        translateX: '-50%',
-        translateY: '-50%',
-      }}
-      animate={cursorVariant}
-      variants={variants}
-      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-    >
-      {cursorText && <span className="px-2 animate-fade-in">{cursorText}</span>}
-    </motion.div>
-  );
-};
-
-// ==========================================
-// 2. MAGNETIC BUTTON COMPONENT
-// ==========================================
-const MagneticButton = ({ children, className = '', pullFactor = 0.35, onClick }) => {
-  const ref = useRef(null);
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-
-  const handleMouseMove = (e) => {
-    if (!ref.current) return;
-    const { clientX, clientY } = e;
-    const { left, top, width, height } = ref.current.getBoundingClientRect();
-
-    const centerX = left + width / 2;
-    const centerY = top + height / 2;
-
-    const distanceX = (clientX - centerX) * pullFactor;
-    const distanceY = (clientY - centerY) * pullFactor;
-
-    setPosition({ x: distanceX, y: distanceY });
-  };
-
-  const handleMouseLeave = () => {
-    setPosition({ x: 0, y: 0 });
-  };
-
-  return (
-    <motion.div
-      ref={ref}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      onClick={onClick}
-      animate={{ x: position.x, y: position.y }}
-      transition={{ type: 'spring', stiffness: 200, damping: 18, mass: 0.1 }}
-      className={`inline-block ${className}`}
-      data-cursor="pointer"
-    >
-      {children}
-    </motion.div>
-  );
-};
-
-// ==========================================
-// 3. BACKGROUND CANVAS COMPONENT
-// ==========================================
-const CanvasBackground = () => {
-  const canvasRef = useRef(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return;
-
-    let animationFrameId;
-    let width = 0;
-    let height = 0;
-    let particles = [];
-
-    class Particle {
-      constructor(w, h) {
-        this.reset(w, h);
+      if (mode === 'pointer') {
+        cursor.className = "fixed top-0 left-0 pointer-events-none z-50 rounded-full flex items-center justify-center text-center font-mono text-[10px] tracking-widest font-semibold uppercase text-black transition-[width,height,background-color,border] duration-300 ease-out hidden md:flex bg-white/20 border border-white/40 w-12 h-12 -translate-x-1/2 -translate-y-1/2";
+      } else if (mode === 'view') {
+        cursor.className = "fixed top-0 left-0 pointer-events-none z-50 rounded-full flex items-center justify-center text-center font-mono text-[10px] tracking-widest font-semibold uppercase text-black transition-[width,height,background-color,border] duration-300 ease-out hidden md:flex bg-white w-20 h-20 -translate-x-1/2 -translate-y-1/2";
       }
 
-      reset(w, h) {
-        this.x = Math.random() * w;
-        this.y = Math.random() * h;
+      if (label) {
+        cursorLabel.textContent = label;
+        cursorLabel.classList.remove('opacity-0');
+      } else {
+        cursorLabel.classList.add('opacity-0');
+      }
+    });
+
+    // --- Magnetic Buttons Physics ---
+    document.querySelectorAll('.magnetic-wrap').forEach(wrap => {
+      const target = wrap.querySelector('.magnetic-target');
+      
+      wrap.addEventListener('mousemove', (e) => {
+        const rect = wrap.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        const deltaX = (e.clientX - centerX) * 0.35;
+        const deltaY = (e.clientY - centerY) * 0.35;
+
+        target.style.transform = `translate3d(${deltaX}px, ${deltaY}px, 0)`;
+      });
+
+      wrap.addEventListener('mouseleave', () => {
+        target.style.transform = 'translate3d(0, 0, 0)';
+        target.style.transition = 'transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)';
+      });
+
+      wrap.addEventListener('mouseenter', () => {
+        target.style.transition = 'none';
+      });
+    });
+
+    // --- Particle Canvas Engine ---
+    const canvas = document.getElementById('canvas-bg');
+    const ctx = canvas.getContext('2d');
+    let width = 0, height = 0, particles = [];
+
+    class Particle {
+      constructor() {
+        this.reset();
+      }
+      reset() {
+        this.x = Math.random() * width;
+        this.y = Math.random() * height;
         this.vx = (Math.random() - 0.5) * 0.3;
         this.vy = (Math.random() - 0.5) * 0.3;
         this.size = Math.random() * 1.5 + 0.5;
         this.alpha = Math.random() * 0.3 + 0.1;
       }
-
-      update(w, h) {
+      update() {
         this.x += this.vx;
         this.y += this.vy;
-
-        if (this.x < 0 || this.x > w) this.vx *= -1;
-        if (this.y < 0 || this.y > h) this.vy *= -1;
+        if (this.x < 0 || this.x > width) this.vx *= -1;
+        if (this.y < 0 || this.y > height) this.vy *= -1;
       }
-
-      draw(context) {
-        context.beginPath();
-        context.arc(this.x, this.y, this.size, 0, Math.PI * 2);
-        context.fillStyle = 'rgba(255, 255, 255, 0.15)';
-        context.globalAlpha = this.alpha;
-        context.fill();
+      draw() {
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        ctx.globalAlpha = this.alpha;
+        ctx.fill();
       }
     }
 
-    const resize = () => {
+    function resizeCanvas() {
       width = window.innerWidth;
       height = window.innerHeight;
       canvas.width = width;
       canvas.height = height;
       const count = Math.floor((width * height) / 15000);
-      particles = Array.from({ length: count }, () => new Particle(width, height));
-    };
+      particles = Array.from({ length: count }, () => new Particle());
+    }
 
-    const render = () => {
+    function renderCanvas() {
       ctx.clearRect(0, 0, width, height);
-      for (let i = 0; i < particles.length; i++) {
-        particles[i].update(width, height);
-        particles[i].draw(ctx);
+      particles.forEach(p => {
+        p.update();
+        p.draw();
+      });
+      requestAnimationFrame(renderCanvas);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+    renderCanvas();
+
+    // --- Mobile Menu Toggle ---
+    const menuBtn = document.getElementById('mobile-menu-btn');
+    const mobileMenu = document.getElementById('mobile-menu');
+    const iconOpen = document.getElementById('menu-icon-open');
+    const iconClose = document.getElementById('menu-icon-close');
+
+    menuBtn.addEventListener('click', () => {
+      const isOpen = !mobileMenu.classList.contains('hidden');
+      if (isOpen) {
+        mobileMenu.classList.add('hidden');
+        mobileMenu.classList.remove('flex');
+        iconOpen.classList.remove('hidden');
+        iconClose.classList.add('hidden');
+      } else {
+        mobileMenu.classList.remove('hidden');
+        mobileMenu.classList.add('flex');
+        iconOpen.classList.add('hidden');
+        iconClose.classList.remove('hidden');
       }
-      animationFrameId = requestAnimationFrame(render);
-    };
+    });
 
-    window.addEventListener('resize', resize);
-    resize();
-    render();
-
-    return () => {
-      window.removeEventListener('resize', resize);
-      cancelAnimationFrame(animationFrameId);
-    };
-  }, []);
-
-  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0 opacity-40" />;
-};
-
-// ==========================================
-// 4. PROJECT CARD WITH PARALLAX
-// ==========================================
-const ProjectCard = ({ title, category, year, image, index }) => {
-  const containerRef = useRef(null);
-
-  const { scrollYProgress } = useScroll({
-    target: containerRef,
-    offset: ['start end', 'end start'],
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], ['-8%', '8%']);
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.1, 1, 1.05]);
-
-  return (
-    <div
-      ref={containerRef}
-      className="relative w-full group overflow-hidden bg-neutral-900/60 border border-neutral-800/80 rounded-sm"
-      data-cursor="view"
-      data-cursor-label="EXPLORE"
-    >
-      <div className="w-full h-[350px] sm:h-[480px] overflow-hidden relative">
-        <motion.img
-          src={image}
-          alt={title}
-          style={{ y, scale }}
-          className="w-full h-full object-cover grayscale transition-all duration-700 ease-out group-hover:grayscale-0"
-        />
-        <div className="absolute inset-0 bg-neutral-950/30 group-hover:bg-transparent transition-colors duration-500" />
-      </div>
-
-      <div className="p-6 bg-neutral-950 flex justify-between items-center border-t border-neutral-800/60">
-        <div>
-          <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest block">
-            PROJECT // 0{index + 1} — {category}
-          </span>
-          <h3 className="text-xl font-light tracking-tight text-neutral-100 uppercase mt-1">
-            {title}
-          </h3>
-        </div>
-        <span className="text-xs font-mono text-neutral-400 group-hover:translate-x-1 transition-transform duration-300">
-          [{year}]
-        </span>
-      </div>
-    </div>
-  );
-};
-
-// ==========================================
-// 5. MAIN APP LAYOUT
-// ==========================================
-export default function PortfolioWebsite() {
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: { staggerChildren: 0.12, delayChildren: 0.2 },
-    },
-  };
-
-  const itemVariants = {
-    hidden: { y: '100%', opacity: 0 },
-    visible: {
-      y: '0%',
-      opacity: 1,
-      transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] },
-    },
-  };
-
-  const projects = [
-    {
-      title: 'Kreo Minimal Desk Setup',
-      category: 'Design & Visual Systems',
-      year: '2026',
-      image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=1200&auto=format&fit=crop',
-    },
-    {
-      title: 'Aetheria Digital Canvas',
-      category: 'Creative Frontend / WebGL',
-      year: '2025',
-      image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1200&auto=format&fit=crop',
-    },
-    {
-      title: 'Neural Matrix Engine',
-      category: 'Interactive Application',
-      year: '2025',
-      image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop',
-    },
-    {
-      title: 'Monolith Architectural Agency',
-      category: 'Brand Direction',
-      year: '2024',
-      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
-    },
-  ];
-
-  return (
-    <div className="relative w-full min-h-screen bg-neutral-950 text-neutral-100 font-sans selection:bg-neutral-100 selection:text-neutral-950 overflow-x-hidden">
-      <CustomCursor />
-      <CanvasBackground />
-
-      {/* Navigation Header */}
-      <header className="fixed top-0 left-0 w-full z-40 px-6 md:px-16 py-6 flex justify-between items-center mix-blend-difference">
-        <a href="#" className="font-mono text-xs uppercase tracking-widest text-neutral-100">
-          STUDIO / CREATIVE
-        </a>
-
-        <nav className="hidden md:flex items-center gap-8 font-mono text-xs uppercase tracking-widest text-neutral-300">
-          <a href="#work" className="hover:text-neutral-100 transition-colors" data-cursor="pointer">
-            [ Work ]
-          </a>
-          <a href="#about" className="hover:text-neutral-100 transition-colors" data-cursor="pointer">
-            [ Agency ]
-          </a>
-          <a href="#contact" className="hover:text-neutral-100 transition-colors" data-cursor="pointer">
-            [ Contact ]
-          </a>
-        </nav>
-
-        <div className="md:hidden">
-          <MagneticButton onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
-            <button className="p-2 text-neutral-100">
-              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
-            </button>
-          </MagneticButton>
-        </div>
-      </header>
-
-      {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <div className="fixed inset-0 z-30 bg-neutral-950 flex flex-col justify-center px-8 font-mono text-lg space-y-6">
-          <a href="#work" onClick={() => setMobileMenuOpen(false)} className="text-neutral-300">
-            01 // WORK
-          </a>
-          <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-neutral-300">
-            02 // AGENCY
-          </a>
-          <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="text-neutral-300">
-            03 // CONTACT
-          </a>
-        </div>
-      )}
-
-      {/* Hero Section */}
-      <section className="relative w-full min-h-screen flex flex-col justify-between p-6 md:p-16 border-b border-neutral-800/50 pt-24">
-        <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono tracking-wider uppercase text-neutral-500 z-10">
-          <div>[ CREATIVE DIRECTION ]</div>
-          <div>[ MOTION & CODE ]</div>
-          <div className="hidden md:block">[ AVAILABLE 2026 ]</div>
-          <div className="text-right">[ PUNE / GLOBAL ]</div>
-        </div>
-
-        <motion.div
-          className="my-auto py-12 z-10 max-w-7xl"
-          variants={containerVariants}
-          initial="hidden"
-          animate="visible"
-        >
-          <div className="overflow-hidden mb-2">
-            <motion.p variants={itemVariants} className="text-xs md:text-sm font-mono tracking-widest uppercase text-neutral-400">
-              High-Performance Frontend & Visual Design
-            </motion.p>
-          </div>
-
-          <div className="overflow-hidden">
-            <motion.h1 variants={itemVariants} className="text-5xl sm:text-7xl lg:text-9xl font-light tracking-tight leading-[0.9] uppercase">
-              Architecting
-            </motion.h1>
-          </div>
-
-          <div className="overflow-hidden">
-            <motion.h1 variants={itemVariants} className="text-5xl sm:text-7xl lg:text-9xl font-serif italic text-neutral-400 tracking-tight leading-[0.9]">
-              digital depth.
-            </motion.h1>
-          </div>
-
-          <div className="mt-8 md:mt-12 grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
-            <motion.p variants={itemVariants} className="md:col-span-6 text-sm md:text-base text-neutral-400 font-light leading-relaxed">
-              Bridging fine art editorial composition with modern WebGL animation engines. Building spatial interfaces, fluid motion systems, and digital visual identity.
-            </motion.p>
-
-            <div className="md:col-span-6 md:flex justify-end gap-4">
-              <MagneticButton>
-                <a
-                  href="#work"
-                  className="inline-flex items-center gap-3 px-8 py-4 rounded-full border border-neutral-700 bg-neutral-900/80 backdrop-blur-md text-xs font-mono uppercase tracking-widest text-neutral-100 hover:bg-neutral-100 hover:text-neutral-950 transition-colors duration-300"
-                >
-                  View Works <ArrowUpRight size={14} />
-                </a>
-              </MagneticButton>
-            </div>
-          </div>
-        </motion.div>
-
-        <div className="w-full flex justify-between items-end text-xs font-mono text-neutral-500 z-10">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>SYSTEM OPERATIONAL</span>
-          </div>
-          <div>[ SCROLL FOR CURATION ]</div>
-        </div>
-      </section>
-
-      {/* Selected Works Section */}
-      <section id="work" className="w-full py-24 px-6 md:px-16 border-b border-neutral-800/50">
-        <div className="flex justify-between items-end mb-16 border-b border-neutral-800/60 pb-6">
-          <div>
-            <span className="text-xs font-mono text-neutral-500 uppercase tracking-widest">[ 01 / SELECTED WORKS ]</span>
-            <h2 className="text-3xl md:text-5xl font-light uppercase tracking-tight text-neutral-100 mt-2">
-              Curated Index
-            </h2>
-          </div>
-          <span className="text-xs font-mono text-neutral-500 hidden md:block">[ 2024 — 2026 ]</span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
-          {projects.map((project, idx) => (
-            <ProjectCard key={idx} index={idx} {...project} />
-          ))}
-        </div>
-      </section>
-
-      {/* Capabilities / Philosophy Section */}
-      <section id="about" className="w-full py-24 px-6 md:px-16 border-b border-neutral-800/50">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
-          <div className="md:col-span-5">
-            <span className="text-xs font-mono text-neutral-500 uppercase tracking-widest">[ 02 / PHILOSOPHY ]</span>
-            <h2 className="text-3xl md:text-5xl font-light uppercase tracking-tight text-neutral-100 mt-4 leading-tight">
-              Precision in motion, discipline in architecture.
-            </h2>
-          </div>
-
-          <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8 font-mono text-xs">
-            <div className="p-6 border border-neutral-800/80 bg-neutral-900/40 rounded-sm">
-              <Cpu className="w-6 h-6 text-neutral-400 mb-4" />
-              <h3 className="text-sm text-neutral-200 uppercase tracking-wider mb-2">01. WebGL & Canvas</h3>
-              <p className="text-neutral-400 font-sans leading-relaxed">
-                GPU-accelerated custom shaders, particle systems, and 3D depth buffers for immersive storytelling.
-              </p>
-            </div>
-
-            <div className="p-6 border border-neutral-800/80 bg-neutral-900/40 rounded-sm">
-              <Code2 className="w-6 h-6 text-neutral-400 mb-4" />
-              <h3 className="text-sm text-neutral-200 uppercase tracking-wider mb-2">02. Modern Frontend</h3>
-              <p className="text-neutral-400 font-sans leading-relaxed">
-                React, Next.js, and TypeScript architectures optimized for sub-second page loads and 60 FPS transitions.
-              </p>
-            </div>
-
-            <div className="p-6 border border-neutral-800/80 bg-neutral-900/40 rounded-sm">
-              <Layers className="w-6 h-6 text-neutral-400 mb-4" />
-              <h3 className="text-sm text-neutral-200 uppercase tracking-wider mb-2">03. Motion Systems</h3>
-              <p className="text-neutral-400 font-sans leading-relaxed">
-                Kinetic typography, scroll-driven interpolation, and micro-interactions tuned for tactical feedback.
-              </p>
-            </div>
-
-            <div className="p-6 border border-neutral-800/80 bg-neutral-900/40 rounded-sm">
-              <Globe className="w-6 h-6 text-neutral-400 mb-4" />
-              <h3 className="text-sm text-neutral-200 uppercase tracking-wider mb-2">04. Global Deployment</h3>
-              <p className="text-neutral-400 font-sans leading-relaxed">
-                Production builds designed for edge delivery, strict WCAG compliance, and zero cumulative layout shifts.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Footer / Contact */}
-      <footer id="contact" className="w-full py-24 px-6 md:px-16 bg-neutral-950 text-neutral-100 flex flex-col justify-between min-h-[70vh]">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-          <div className="md:col-span-8">
-            <span className="text-xs font-mono text-neutral-500 uppercase tracking-widest">[ 03 / INITIATE CONTACT ]</span>
-            <h2 className="text-4xl sm:text-6xl md:text-8xl font-light uppercase tracking-tight mt-4 leading-none">
-              Let's create something <span className="font-serif italic text-neutral-400">unforgettable.</span>
-            </h2>
-          </div>
-
-          <div className="md:col-span-4 flex flex-col justify-end items-start md:items-end">
-            <MagneticButton>
-              <a
-                href="mailto:contact@studio.com"
-                className="px-8 py-6 rounded-full bg-neutral-100 text-neutral-950 font-mono text-xs uppercase tracking-widest hover:bg-neutral-300 transition-colors"
-              >
-                Start Conversation
-              </a>
-            </MagneticButton>
-          </div>
-        </div>
-
-        <div className="pt-16 border-t border-neutral-800/60 flex flex-col md:flex-row justify-between items-center text-xs font-mono text-neutral-500 gap-4">
-          <div>© 2026 CREATIVE STUDIO. ALL RIGHTS RESERVED.</div>
-          <div className="flex gap-6">
-            <a href="#" className="hover:text-neutral-300">GITHUB</a>
-            <a href="#" className="hover:text-neutral-300">TWITTER / X</a>
-            <a href="#" className="hover:text-neutral-300">LINKEDIN</a>
-          </div>
-        </div>
-      </footer>
-    </div>
-  );
-}
+    document.querySelectorAll('.mobile-link').forEach(link => {
+      link.addEventListener('click', () => {
+        mobileMenu.classList.add('hidden');
+        mobileMenu.classList.remove('flex');
+        iconOpen.classList.remove('hidden');
+        iconClose.classList.add('hidden');
+      });
+    });
+  </script>
+</body>
+</html>
