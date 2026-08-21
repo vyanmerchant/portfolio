@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vyan Merchant — Overkill Aceternity & Studio Experience</title>
+<title>Vyan Merchant — Maximum Overkill Animation Masterpiece</title>
 
 <!-- GOOGLE FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -18,16 +18,16 @@
 
 <style>
 /* ==========================================
-   01. DESIGN SYSTEM & TOKENS
+   01. MAXIMUM OVERKILL TOKENS & SYSTEM
    ========================================== */
 :root {
-  --bg: #030303;
-  --surface: #0a0a0a;
-  --surface-border: rgba(255, 255, 255, 0.08);
-  --fg: #f3f0ea;
-  --accent: #ff3c00;
-  --accent-glow: rgba(255, 60, 0, 0.35);
-  --muted: #666666;
+  --bg: #010101;
+  --surface: #070707;
+  --fg: #faf7f2;
+  --accent: #ff2200;
+  --accent-cyan: #00f2ff;
+  --muted: #555555;
+  --border: rgba(250, 247, 242, 0.12);
   
   --font-display: 'Anton', sans-serif;
   --font-sans: 'Syne', sans-serif;
@@ -35,6 +35,7 @@
   --font-mono: 'Space Mono', monospace;
   
   --ease-expo: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -55,7 +56,7 @@ body {
 ::selection { background: var(--accent); color: var(--bg); }
 
 /* ==========================================
-   02. CINEMATIC LOADER
+   02. KINETIC MULTI-LAYER LOADER
    ========================================== */
 #loader {
   position: fixed; inset: 0; z-index: 100000;
@@ -64,69 +65,71 @@ body {
   padding: 4vw; pointer-events: none;
 }
 .loader-header { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 0.75rem; }
-.loader-center { font-family: var(--font-display); font-size: clamp(5rem, 16vw, 18rem); line-height: 0.8; }
-.loader-footer { display: flex; justify-content: space-between; align-items: flex-end; font-family: var(--font-mono); font-size: 0.75rem; border-top: 1px solid var(--surface-border); padding-top: 2rem; }
-.loader-bar-wrap { width: 100vh; max-width: 400px; height: 2px; background: var(--surface-border); position: relative; overflow: hidden; }
+.loader-center { font-family: var(--font-display); font-size: clamp(6rem, 18vw, 22rem); line-height: 0.8; }
+.loader-footer { display: flex; justify-content: space-between; align-items: flex-end; font-family: var(--font-mono); font-size: 0.75rem; border-top: 1px solid var(--border); padding-top: 2rem; }
+.loader-bar-wrap { width: 100vh; max-width: 400px; height: 3px; background: var(--border); position: relative; overflow: hidden; }
 .loader-bar { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: var(--accent); }
 
 /* ==========================================
-   03. CUSTOM DESKTOP CURSOR
+   03. FLUID MORPHING CURSOR
    ========================================== */
 #cursor-dot {
-  position: fixed; top: 0; left: 0; width: 8px; height: 8px;
+  position: fixed; top: 0; left: 0; width: 10px; height: 10px;
   background: var(--accent); border-radius: 50%; pointer-events: none;
   z-index: 99999; transform: translate(-50%, -50%);
 }
 #cursor-ring {
-  position: fixed; top: 0; left: 0; width: 45px; height: 45px;
-  border: 1px solid rgba(243, 240, 234, 0.3); border-radius: 50%; pointer-events: none;
+  position: fixed; top: 0; left: 0; width: 50px; height: 50px;
+  border: 1px solid rgba(250, 247, 242, 0.4); border-radius: 50%; pointer-events: none;
   z-index: 99998; transform: translate(-50%, -50%);
   transition: width 0.4s var(--ease-expo), height 0.4s var(--ease-expo), border-color 0.4s, background 0.4s;
   display: flex; justify-content: center; align-items: center; text-align: center;
 }
 #cursor-ring span { opacity: 0; font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--bg); text-transform: uppercase; transition: opacity 0.3s; }
-.cursor-hover #cursor-ring { width: 80px; height: 80px; background: rgba(243, 240, 234, 0.1); backdrop-filter: blur(8px); border-color: rgba(243, 240, 234, 0.5); }
-.cursor-play #cursor-ring { width: 110px; height: 110px; background: var(--fg); border-color: var(--fg); }
+.cursor-hover #cursor-ring { width: 90px; height: 90px; background: rgba(250, 247, 242, 0.12); backdrop-filter: blur(10px); border-color: rgba(250, 247, 242, 0.6); }
+.cursor-play #cursor-ring { width: 120px; height: 120px; background: var(--fg); border-color: var(--fg); }
 .cursor-play #cursor-ring span { opacity: 1; }
 
 @media (pointer: coarse) { #cursor-dot, #cursor-ring { display: none; } body { cursor: auto; } }
 
 /* ==========================================
-   04. WEBGL BACKGROUND & NOISE
+   04. WEBGL SHADER & GLITCH FILTERS
    ========================================== */
 #webgl-canvas { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
 .noise-overlay {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.055;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.065;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
 }
+svg.svg-filters { position: absolute; width: 0; height: 0; pointer-events: none; }
 
 /* ==========================================
    05. TYPOGRAPHY & UTILS
    ========================================== */
-.t-giant { font-family: var(--font-display); font-size: clamp(5rem, 16vw, 18rem); line-height: 0.82; text-transform: uppercase; }
-.t-h2 { font-family: var(--font-display); font-size: clamp(3rem, 8vw, 9rem); line-height: 0.88; text-transform: uppercase; }
-.t-body { font-size: clamp(1rem, 1.5vw, 1.4rem); line-height: 1.6; color: var(--muted); font-weight: 500; }
+.t-giant { font-family: var(--font-display); font-size: clamp(5.5rem, 17vw, 19rem); line-height: 0.8; text-transform: uppercase; }
+.t-h2 { font-family: var(--font-display); font-size: clamp(3.5rem, 9vw, 10rem); line-height: 0.85; text-transform: uppercase; }
+.t-body { font-size: clamp(1.1rem, 1.6vw, 1.5rem); line-height: 1.6; color: var(--muted); font-weight: 500; }
 .t-mono { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
 .t-serif { font-family: var(--font-serif); font-style: italic; font-weight: 300; }
 
 .grid-layout { display: grid; grid-template-columns: repeat(12, 1fr); gap: 2vw; padding: 0 4vw; }
 .line-reveal { overflow: hidden; display: block; }
 .line-reveal-inner { display: inline-block; transform: translateY(115%); will-change: transform; }
-.text-outline { -webkit-text-stroke: 1.5px var(--fg); color: transparent; }
+.text-outline { -webkit-text-stroke: 1.8px var(--fg); color: transparent; transition: color 0.4s; }
+.text-outline:hover { color: var(--fg); }
 
 /* ==========================================
-   06. HIDE-ON-SCROLL NAVIGATION
+   06. DYNAMIC NAVIGATION
    ========================================== */
 nav {
   position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%);
   width: calc(100% - 4vw); max-width: 1600px;
   padding: 1.25rem 2.5rem; display: flex; justify-content: space-between; align-items: center;
-  z-index: 1000; background: rgba(5, 5, 5, 0.65); backdrop-filter: blur(20px);
-  border: 1px solid var(--surface-border); border-radius: 100px;
+  z-index: 1000; background: rgba(3, 3, 3, 0.7); backdrop-filter: blur(25px);
+  border: 1px solid var(--border); border-radius: 100px;
   transition: transform 0.5s var(--ease-expo), opacity 0.5s;
 }
 nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
-.nav-logo { font-family: var(--font-display); font-size: 1.5rem; letter-spacing: 0.05em; color: var(--fg); text-decoration: none; }
+.nav-logo { font-family: var(--font-display); font-size: 1.6rem; letter-spacing: 0.05em; color: var(--fg); text-decoration: none; }
 .nav-logo span { color: var(--accent); }
 .nav-links { display: flex; gap: 3rem; }
 .nav-links a { color: var(--fg); text-decoration: none; font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.1em; position: relative; padding-bottom: 2px; }
@@ -137,36 +140,79 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
    07. HERO SECTION
    ========================================== */
 .hero { height: 100vh; display: flex; flex-direction: column; justify-content: flex-end; padding: 0 4vw 6vh; position: relative; }
-.hero-meta { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; border-bottom: 1px solid var(--surface-border); padding-bottom: 1.5rem; }
+.hero-meta { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
 .hero-title-group { position: relative; z-index: 2; }
-.hero-subtitle { margin-top: 2rem; max-width: 480px; }
+.hero-subtitle { margin-top: 2rem; max-width: 500px; }
+
+.hero-badge-spin {
+  position: absolute; right: 6vw; top: 32vh; width: 150px; height: 150px;
+  border: 1px solid var(--border); border-radius: 50%; display: flex; justify-content: center; align-items: center;
+}
+.hero-badge-spin svg { width: 100%; height: 100%; animation: spin 14s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
 /* ==========================================
-   08. ACETERNITY 3D CARD TILT & BENTO GRID SECTION
+   08. MANIFESTO SECTION (OBYS TYPOGRAPHY)
    ========================================== */
-.bento-section { padding: 10vw 4vw; background: var(--bg); position: relative; }
-.bento-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 4rem; }
+.manifesto { padding: 18vw 4vw; border-top: 1px solid var(--border); position: relative; background: var(--bg); }
+.manifesto-text { font-size: clamp(2.4rem, 5.5vw, 6rem); line-height: 1.12; font-weight: 700; max-width: 90vw; }
+.word { display: inline-block; overflow: hidden; vertical-align: bottom; }
+.char { display: inline-block; transform: translateY(115%); color: #222222; will-change: transform, color; transition: color 0.3s; }
+.char.active { color: var(--fg); }
+.manifesto-highlight { color: var(--accent) !important; font-style: italic; font-family: var(--font-serif); }
+
+/* ==========================================
+   09. ANIMMASTERLIB INPIRED 3D HORIZONTAL SKEWED GALLERY
+   ========================================== */
+.work-section { position: relative; background: var(--surface); padding-top: 10vw; overflow: hidden; }
+.work-header { padding: 0 4vw 5vw; display: flex; justify-content: space-between; align-items: flex-end; }
+.work-slider-wrap { height: 100vh; width: 100%; overflow: hidden; position: relative; display: flex; align-items: center; perspective: 1400px; }
+.work-track { display: flex; gap: 8vw; padding: 0 8vw; height: 75vh; width: max-content; will-change: transform; transform-style: preserve-3d; }
+
+.work-item { width: 65vw; height: 100%; display: flex; flex-direction: column; position: relative; cursor: none; transform-origin: center; will-change: transform; }
+.work-visual { 
+  flex: 1; width: 100%; overflow: hidden; border-radius: 20px; position: relative; background: #0f0f0f; 
+  border: 1px solid var(--border); filter: url(#distortion-filter);
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%); transition: clip-path 0.6s var(--ease-expo);
+}
+.work-item:hover .work-visual { clip-path: polygon(3% 3%, 97% -3%, 103% 97%, -3% 103%); }
+
+.work-visual img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.35); will-change: transform; filter: grayscale(90%) contrast(1.2); transition: filter 0.6s, transform 0.6s var(--ease-expo); }
+.work-item:hover .work-visual img { filter: grayscale(0%) contrast(1); transform: scale(1.1); }
+
+/* RGB Chroma Glitch Shift on Hover */
+.rgb-layer { position: absolute; inset: 0; background-size: cover; background-position: center; mix-blend-mode: screen; opacity: 0; transition: transform 0.3s, opacity 0.3s; pointer-events: none; }
+.work-item:hover .rgb-layer.red { opacity: 1; transform: translate(-12px, 6px); filter: brightness(0.6) sepia(1) hue-rotate(-50deg) saturate(7); }
+.work-item:hover .rgb-layer.cyan { opacity: 1; transform: translate(12px, -6px); filter: brightness(0.6) sepia(1) hue-rotate(150deg) saturate(7); }
+
+.work-meta { display: flex; justify-content: space-between; align-items: baseline; padding-top: 1.8rem; }
+.work-meta h3 { font-family: var(--font-display); font-size: clamp(2.8vw, 4.5vw, 4.5rem); letter-spacing: 0.02em; text-transform: uppercase; margin: 0; }
+
+/* ==========================================
+   10. ACETERNITY INTERACTIVE 3D TILT BENTO SECTION
+   ========================================== */
+.bento-section { padding: 16vw 4vw; background: var(--bg); position: relative; border-top: 1px solid var(--border); }
+.bento-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 5rem; }
 
 .bento-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-auto-rows: 380px;
+  grid-auto-rows: 400px;
   gap: 2rem;
 }
 
-/* Aceternity 3D Perspective Card Wrapper */
 .bento-card {
-  perspective: 1000px;
+  perspective: 1200px;
   background: var(--surface);
-  border: 1px solid var(--surface-border);
-  border-radius: 20px;
+  border: 1px solid var(--border);
+  border-radius: 24px;
   overflow: hidden;
   position: relative;
   transition: border-color 0.4s, box-shadow 0.4s;
 }
 .bento-card:hover {
-  border-color: rgba(255, 60, 0, 0.4);
-  box-shadow: 0 20px 40px var(--accent-glow);
+  border-color: rgba(255, 34, 0, 0.5);
+  box-shadow: 0 25px 50px rgba(255, 34, 0, 0.25);
 }
 .bento-card.span-2 { grid-column: span 2; }
 
@@ -175,39 +221,27 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
   width: 100%; height: 100%;
   transform-style: preserve-3d;
   transition: transform 0.1s ease-out;
-  padding: 3rem;
+  padding: 3.5rem;
   display: flex; flex-direction: column; justify-content: space-between;
 }
 
-.bento-content {
-  transform: translateZ(40px); /* 3D depth pop-out effect */
-}
-.bento-content h3 { font-family: var(--font-display); font-size: 2.5rem; letter-spacing: 0.02em; text-transform: uppercase; margin-bottom: 0.5rem; }
+.bento-content { transform: translateZ(50px); }
+.bento-content h3 { font-family: var(--font-display); font-size: 2.8rem; letter-spacing: 0.02em; text-transform: uppercase; margin-bottom: 0.5rem; }
 
 .bento-visual {
   position: absolute; inset: 0; z-index: 0; opacity: 0.35;
   transition: opacity 0.4s, transform 0.6s var(--ease-expo);
 }
-.bento-card:hover .bento-visual { opacity: 0.75; transform: scale(1.05); }
+.bento-card:hover .bento-visual { opacity: 0.8; transform: scale(1.06); }
 .bento-visual img { width: 100%; height: 100%; object-fit: cover; }
 .bento-gradient {
   position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(3,3,3,0.95) 10%, rgba(3,3,3,0.4) 60%, transparent 100%);
+  background: linear-gradient(to top, rgba(1,1,1,0.98) 15%, rgba(1,1,1,0.4) 65%, transparent 100%);
   z-index: 1;
 }
 
 /* ==========================================
-   09. MANIFESTO SECTION
-   ========================================== */
-.manifesto { padding: 15vw 4vw; border-top: 1px solid var(--surface-border); background: var(--bg); position: relative; }
-.manifesto-text { font-size: clamp(2.2rem, 5vw, 5.5rem); line-height: 1.15; font-weight: 700; max-width: 90vw; }
-.word { display: inline-block; overflow: hidden; vertical-align: bottom; }
-.char { display: inline-block; transform: translateY(115%); color: #333333; will-change: transform, color; transition: color 0.3s; }
-.char.active { color: var(--fg); }
-.manifesto-highlight { color: var(--accent) !important; font-style: italic; font-family: var(--font-serif); }
-
-/* ==========================================
-   10. MODAL
+   11. CINEMATIC MODAL
    ========================================== */
 .modal {
   position: fixed; inset: 0; background: var(--bg); z-index: 100000;
@@ -215,57 +249,71 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
   clip-path: circle(0% at 50% 50%); transition: clip-path 0.9s var(--ease-expo); pointer-events: none;
 }
 .modal.active { clip-path: circle(150% at 50% 50%); pointer-events: all; }
-.modal-close { position: absolute; top: 3vw; right: 4vw; background: rgba(243,240,234,0.1); border: 1px solid rgba(243,240,234,0.2); color: var(--fg); padding: 0.75rem 1.75rem; border-radius: 100px; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; cursor: none; z-index: 10; }
-.modal-content { width: 90vw; height: 52vw; max-height: 82vh; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid var(--surface-border); box-shadow: 0 40px 80px rgba(0,0,0,0.8); }
+.modal-close { position: absolute; top: 3vw; right: 4vw; background: rgba(250,247,242,0.1); border: 1px solid rgba(250,247,242,0.2); color: var(--fg); padding: 0.75rem 1.75rem; border-radius: 100px; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; cursor: none; z-index: 10; }
+.modal-content { width: 90vw; height: 52vw; max-height: 82vh; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 40px 80px rgba(0,0,0,0.9); }
 .modal-content iframe { width: 100%; height: 100%; border: none; }
 
 /* ==========================================
-   11. FOOTER
+   12. INFINITE MARQUEE & FOOTER
    ========================================== */
-.footer { padding: 12vw 0 4vw; border-top: 1px solid var(--surface-border); background: var(--bg); overflow: hidden; display: flex; flex-direction: column; }
-.marquee-wrap { display: flex; width: max-content; white-space: nowrap; animation: moveLeft 18s linear infinite; margin-bottom: 1.5rem; }
-.marquee-text { font-family: var(--font-display); font-size: clamp(6rem, 14vw, 16rem); line-height: 0.85; text-transform: uppercase; padding-right: 4vw; }
+.footer { padding: 15vw 0 4vw; border-top: 1px solid var(--border); background: var(--bg); overflow: hidden; display: flex; flex-direction: column; }
+.marquee-wrap { display: flex; width: max-content; white-space: nowrap; animation: moveLeft 16s linear infinite; margin-bottom: 1.5rem; }
+.marquee-wrap.reverse { animation: moveRight 16s linear infinite; }
+.marquee-text { font-family: var(--font-display); font-size: clamp(6rem, 14vw, 17rem); line-height: 0.85; text-transform: uppercase; padding-right: 4vw; }
 @keyframes moveLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes moveRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
 
-.footer-main { padding: 8vw 4vw 4vw; text-align: center; }
-.footer-email { font-family: var(--font-serif); font-size: clamp(2.5rem, 6vw, 7rem); font-style: italic; color: var(--fg); text-decoration: none; transition: color 0.3s; display: inline-block; margin-top: 2rem; }
+.footer-main { padding: 10vw 4vw 4vw; text-align: center; }
+.footer-email { font-family: var(--font-serif); font-size: clamp(2.8rem, 6.5vw, 7.5rem); font-style: italic; color: var(--fg); text-decoration: none; transition: color 0.3s; display: inline-block; margin-top: 2rem; }
 .footer-email:hover { color: var(--accent); }
 
-.footer-bottom { padding: 3vw 4vw 0; display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--surface-border); }
+.footer-bottom { padding: 3vw 4vw 0; display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--border); }
 .footer-links { display: flex; gap: 3rem; }
 .footer-links a { color: var(--fg); text-decoration: none; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; }
 
 @media (max-width: 768px) {
   .nav-links { display: none; }
-  .bento-grid { grid-template-columns: 1fr; grid-auto-rows: 320px; }
+  .bento-grid { grid-template-columns: 1fr; grid-auto-rows: 340px; }
   .bento-card.span-2 { grid-column: span 1; }
+  .work-item { width: 85vw; }
   .modal-content { width: 95vw; height: 58vw; }
+  .hero-badge-spin { display: none; }
 }
 </style>
 </head>
 <body>
 
-<!-- LOADER -->
+<!-- SVG FILTERS FOR GLITCH DISPLACEMENT -->
+<svg class="svg-filters">
+  <defs>
+    <filter id="distortion-filter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.012 0.012" numOctaves="1" result="warp" />
+      <feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="0" in="SourceGraphic" in2="warp" id="distort-map" />
+    </filter>
+  </defs>
+</svg>
+
+<!-- MAXIMUM OVERKILL LOADER -->
 <div id="loader">
   <div class="loader-header">
-    <span>VYAN MERCHANT — ACETERNITY EDITION</span>
+    <span>VYAN MERCHANT — ANIMMASTERLIB EDITION</span>
     <span>PUNE, INDIA</span>
   </div>
   <div class="loader-center">
-    <span class="line-reveal"><span class="line-reveal-inner" id="loader-word">STUDIO</span></span>
+    <span class="line-reveal"><span class="line-reveal-inner" id="loader-word">OVERKILL</span></span>
   </div>
   <div class="loader-footer">
     <span id="loader-percent">0%</span>
-    <span>LOADING SPATIAL 3D CARDS</span>
+    <span>COMPILING 3D SHADERS & ANIMATIONS</span>
     <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
   </div>
 </div>
 
-<!-- CURSOR -->
+<!-- CUBERTO MORPHING CURSOR -->
 <div id="cursor-dot"></div>
 <div id="cursor-ring"><span>Play</span></div>
 
-<!-- WEBGL BACKGROUND -->
+<!-- WEBGL BACKGROUND & NOISE -->
 <canvas id="webgl-canvas"></canvas>
 <div class="noise-overlay"></div>
 
@@ -274,46 +322,114 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
   <a href="#" class="nav-logo mag">VM<span>.</span></a>
   <div class="nav-links">
     <a href="#about" class="mag">Profile</a>
-    <a href="#archives" class="mag">Bento Grid</a>
+    <a href="#work" class="mag">3D Gallery</a>
+    <a href="#bento" class="mag">Bento Grid</a>
     <a href="#contact" class="mag">Initiate</a>
   </div>
 </nav>
 
-<!-- HERO -->
+<!-- HERO SECTION -->
 <section class="hero">
+  <div class="hero-badge-spin">
+    <svg viewBox="0 0 100 100">
+      <path id="curve" d="M 50, 50 m -35, 0 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0" fill="transparent"/>
+      <text font-family="Space Mono" font-size="11" fill="#faf7f2" letter-spacing="3"><textPath href="#curve">DAVINCI RESOLVE · KINETIC ·</textPath></text>
+    </svg>
+  </div>
+
   <div class="hero-meta t-mono">
     <span>Gaming Video Editor</span>
-    <span>DaVinci Resolve Specialist</span>
-    <span>Aceternity 3D Architecture</span>
+    <span>DaVinci Resolve Masterclass</span>
+    <span>Uncompromising Motion</span>
   </div>
   <div class="hero-title-group">
     <h1 class="t-giant"><span class="line-reveal"><span class="line-reveal-inner text-outline">VYAN</span></span></h1>
     <h1 class="t-giant"><span class="line-reveal"><span class="line-reveal-inner">MERCHANT</span></span></h1>
   </div>
   <div class="hero-subtitle">
-    <p class="t-body">Crafting high-octane gaming edits with 3D interactive bento grids, depth cards, and uncompromising visual rhythm.</p>
+    <p class="t-body">Engineering uncompromising, high-octane gaming edits with kinetic typography, velocity skew, and deep immersive 3D animation systems.</p>
   </div>
 </section>
 
-<!-- ACETERNITY BENTO GRID & 3D CARD ARCHIVES -->
-<section id="archives" class="bento-section">
-  <div class="bento-header">
+<!-- ANIMMASTERLIB INPIRED 3D HORIZONTAL SKEWED GALLERY -->
+<section id="work" class="work-section">
+  <div class="work-header">
     <h2 class="t-h2">Selected Archives</h2>
-    <span class="t-mono">(Interactive 3D Bento Grid)</span>
+    <span class="t-mono">(3D Velocity Gallery)</span>
+  </div>
+  
+  <div class="work-slider-wrap">
+    <div class="work-track">
+      
+      <!-- PROJECT 01 -->
+      <div class="work-item mag-play" data-video="d0qvLlFEEH8">
+        <div class="work-visual">
+          <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Valorant Montage" class="parallax-img">
+          <div class="rgb-layer red" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg')"></div>
+          <div class="rgb-layer cyan" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg')"></div>
+        </div>
+        <div class="work-meta">
+          <h3>Valorant Montage</h3>
+          <span class="t-mono">01 / Color Grade · Fast Cuts</span>
+        </div>
+      </div>
+
+      <!-- PROJECT 02 -->
+      <div class="work-item mag-play" data-video="4ZcBnbLWxvU">
+        <div class="work-visual">
+          <img src="https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg" alt="Legacy Edit" class="parallax-img">
+          <div class="rgb-layer red" style="background-image: url('https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg')"></div>
+          <div class="rgb-layer cyan" style="background-image: url('https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg')"></div>
+        </div>
+        <div class="work-meta">
+          <h3>Legacy Edit</h3>
+          <span class="t-mono">02 / Gaming Montage · VFX</span>
+        </div>
+      </div>
+
+      <!-- PROJECT 03 -->
+      <div class="work-item mag-play" data-video="d0qvLlFEEH8">
+        <div class="work-visual">
+          <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Practice Reel" class="parallax-img">
+          <div class="rgb-layer red" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg')"></div>
+          <div class="rgb-layer cyan" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg')"></div>
+        </div>
+        <div class="work-meta">
+          <h3>Practice Reel</h3>
+          <span class="t-mono">03 / Motion Design</span>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- MANIFESTO SECTION (OBYS TYPOGRAPHY) -->
+<section id="about" class="manifesto">
+  <p class="manifesto-text" id="split-manifesto">
+    I'm <b>Vyan</b>, a 17-year-old video editor obsessed with making gaming content that actually slaps. Working extensively with DaVinci Resolve, I cut, grade, and sync footage to create montages that lock viewers in from frame one. <span class="manifesto-highlight">Edit. Fast. Hard.</span>
+  </p>
+</section>
+
+<!-- ACETERNITY 3D TILT BENTO SECTION -->
+<section id="bento" class="bento-section">
+  <div class="bento-header">
+    <h2 class="t-h2">Studio Bento Grid</h2>
+    <span class="t-mono">(Interactive 3D Tilt Cards)</span>
   </div>
 
   <div class="bento-grid">
     
     <!-- CARD 1 (Span 2) -->
-    <div class="bento-card span-2 tilt-card play-trigger" data-video="d0qvLlFEEH8">
+    <div class="bento-card span-2 tilt-card mag-play" data-video="d0qvLlFEEH8">
       <div class="bento-card-inner">
         <div class="bento-visual">
           <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Valorant Montage">
           <div class="bento-gradient"></div>
         </div>
         <div class="bento-content">
-          <span class="t-mono">01 / Featured Project</span>
-          <h3>Valorant Montage</h3>
+          <span class="t-mono">01 / Flagship Reel</span>
+          <h3>Valorant Masterclass</h3>
         </div>
         <div class="bento-content" style="display:flex; justify-content:space-between; align-items:flex-end;">
           <span class="t-mono">DaVinci Resolve · Color Grade</span>
@@ -323,7 +439,7 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
     </div>
 
     <!-- CARD 2 -->
-    <div class="bento-card tilt-card play-trigger" data-video="4ZcBnbLWxvU">
+    <div class="bento-card tilt-card mag-play" data-video="4ZcBnbLWxvU">
       <div class="bento-card-inner">
         <div class="bento-visual">
           <img src="https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg" alt="Legacy Edit">
@@ -340,7 +456,7 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
     </div>
 
     <!-- CARD 3 -->
-    <div class="bento-card tilt-card play-trigger" data-video="d0qvLlFEEH8">
+    <div class="bento-card tilt-card mag-play" data-video="d0qvLlFEEH8">
       <div class="bento-card-inner">
         <div class="bento-visual">
           <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Practice Reel">
@@ -360,20 +476,13 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
     <div class="bento-card span-2 tilt-card">
       <div class="bento-card-inner" style="justify-content: center; align-items: center; text-align: center;">
         <div class="bento-content">
-          <span class="t-mono" style="color:var(--accent);">4 Years Experience[cite: 1]</span>
-          <h3 style="font-size:3.5rem; margin-top:1rem;">Endless Hours In Resolve[cite: 1]</h3>
+          <span class="t-mono" style="color:var(--accent);">4 Years Experience</span>
+          <h3 style="font-size:3.5rem; margin-top:1rem;">Endless Hours In Resolve</h3>
         </div>
       </div>
     </div>
 
   </div>
-</section>
-
-<!-- MANIFESTO -->
-<section id="about" class="manifesto">
-  <p class="manifesto-text" id="split-manifesto">
-    I'm <b>Vyan</b>, a 17-year-old video editor obsessed with making gaming content that actually slaps. Working extensively with DaVinci Resolve, I cut, grade, and sync footage to create montages that lock viewers in from frame one[cite: 1]. <span class="manifesto-highlight">Edit. Fast. Hard[cite: 1].</span>
-  </p>
 </section>
 
 <!-- MODAL -->
@@ -385,28 +494,32 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
 <!-- FOOTER -->
 <section id="contact" class="footer">
   <div class="marquee-wrap">
-    <div class="marquee-text">ENGINEERED FOR IMPACT <span style="color:var(--accent)">✦</span> </div>
-    <div class="marquee-text">ENGINEERED FOR IMPACT <span style="color:var(--accent)">✦</span> </div>
+    <div class="marquee-text">ENGINEERED FOR ABSOLUTE RETENTION <span style="color:var(--accent)">✦</span> </div>
+    <div class="marquee-text">ENGINEERED FOR ABSOLUTE RETENTION <span style="color:var(--accent)">✦</span> </div>
+  </div>
+  <div class="marquee-wrap reverse text-outline">
+    <div class="marquee-text">DAVINCI RESOLVE MASTERCLASS <span style="color:var(--accent); -webkit-text-stroke:0;">✦</span> </div>
+    <div class="marquee-text">DAVINCI RESOLVE MASTERCLASS <span style="color:var(--accent); -webkit-text-stroke:0;">✦</span> </div>
   </div>
 
   <div class="footer-main">
-    <span class="t-mono">03 / Initiation</span>
+    <span class="t-mono">04 / Initiation</span>
     <br>
     <a href="mailto:vyanmerchant@gmail.com" class="footer-email mag">vyanmerchant@gmail.com</a>
   </div>
   
   <div class="footer-bottom">
-    <span class="t-mono">© 2026 Vyan Merchant. All rights reserved[cite: 1].</span>
+    <span class="t-mono">© 2026 Vyan Merchant. All rights reserved.</span>
     <div class="footer-links">
-      <a href="https://youtube.com" target="_blank" class="mag">YouTube[cite: 1]</a>
-      <a href="https://discord.com/users/1111715392461738034" target="_blank" class="mag">Discord[cite: 1]</a>
+      <a href="https://youtube.com" target="_blank" class="mag">YouTube</a>
+      <a href="https://discord.com/users/1111715392461738034" target="_blank" class="mag">Discord</a>
     </div>
   </div>
 </section>
 
 <script>
 /* ==========================================
-   ACETERNITY 3D CARD & INTERACTION ENGINE
+   MAXIMUM OVERKILL JAVASCRIPT ARCHITECTURE
    ========================================== */
 gsap.registerPlugin(ScrollTrigger);
 
@@ -430,19 +543,20 @@ function initSmoothScroll() {
   requestAnimationFrame(raf);
 }
 
-// 2. LOADER
+// 2. MULTI-LAYER CINEMATIC LOADER
 function initLoader() {
   const tl = gsap.timeline({
     onComplete: () => {
       initSmoothScroll();
       initGSAPAnimations();
+      initHorizontalSlider();
       initVideoModal();
     }
   });
 
   let loadProgress = { val: 0 };
   tl.to(loadProgress, {
-    val: 100, duration: 1.6, ease: "power2.inOut",
+    val: 100, duration: 1.8, ease: "power2.inOut",
     onUpdate: () => {
       let current = Math.round(loadProgress.val);
       document.getElementById('loader-percent').innerText = current + '%';
@@ -451,10 +565,10 @@ function initLoader() {
   })
   .to('#loader', { yPercent: -100, duration: 1.2, ease: "expo.inOut", delay: 0.2 })
   .to('.hero .line-reveal-inner', { y: '0%', duration: 1.4, stagger: 0.15, ease: "power4.out" }, "-=0.8")
-  .from('.hero-meta, .hero-subtitle, #navbar', { opacity: 0, y: 20, duration: 1, ease: "power2.out", stagger: 0.1 }, "-=1");
+  .from('.hero-meta, .hero-subtitle, #navbar, .hero-badge-spin', { opacity: 0, y: 20, duration: 1, ease: "power2.out", stagger: 0.1 }, "-=1");
 }
 
-// 3. CURSOR
+// 3. CUBERTO MORPHING CURSOR & SVG DISPLACEMENT
 function initCursor() {
   const dot = document.getElementById('cursor-dot');
   const ring = document.getElementById('cursor-ring');
@@ -475,9 +589,18 @@ function initCursor() {
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
   });
 
-  document.querySelectorAll('.play-trigger').forEach(el => {
+  document.querySelectorAll('.mag-play').forEach(el => {
     el.addEventListener('mouseenter', () => document.body.classList.add('cursor-play'));
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-play'));
+
+    el.addEventListener('mousemove', (e) => {
+      const rect = el.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) / rect.width;
+      gsap.to('#distort-map', { attr: { scale: relX * 55 }, duration: 0.3 });
+    });
+    el.addEventListener('mouseleave', () => {
+      gsap.to('#distort-map', { attr: { scale: 0 }, duration: 0.6, ease: 'power2.out' });
+    });
   });
 }
 
@@ -496,7 +619,7 @@ function initNavScroll() {
   });
 }
 
-// 5. BACKGROUND SHADER
+// 5. WEBGL FLUID SHADER BACKGROUND
 function initBackgroundShader() {
   const canvas = document.getElementById('webgl-canvas');
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
@@ -505,22 +628,47 @@ function initBackgroundShader() {
   const scene = new THREE.Scene();
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   
+  const mouse = new THREE.Vector2(0.5, 0.5);
+  window.addEventListener('mousemove', e => {
+    mouse.x = e.clientX / window.innerWidth;
+    mouse.y = 1.0 - (e.clientY / window.innerHeight);
+  });
+
   const material = new THREE.ShaderMaterial({
-    uniforms: { u_time: { value: 0 }, u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) } },
+    uniforms: {
+      u_time: { value: 0 },
+      u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
+      u_mouse: { value: mouse }
+    },
     vertexShader: `void main() { gl_Position = vec4(position, 1.0); }`,
     fragmentShader: `
       uniform float u_time;
       uniform vec2 u_resolution;
+      uniform vec2 u_mouse;
+      
       void main() {
         vec2 st = gl_FragCoord.xy / u_resolution.xy;
         st.x *= u_resolution.x / u_resolution.y;
-        vec2 q = vec2(sin(st.x * 2.5 + u_time * 0.1), cos(st.y * 2.5 + u_time * 0.1));
-        float val = length(q) * 0.35;
-        vec3 color = mix(vec3(0.01, 0.01, 0.01), vec3(0.035, 0.02, 0.01), val);
+        
+        vec2 m = u_mouse;
+        m.x *= u_resolution.x / u_resolution.y;
+        
+        float dist = distance(st, m);
+        float interaction = smoothstep(0.55, 0.0, dist);
+        
+        vec2 q = vec2(0.);
+        q.x = sin(st.x * 3.5 + u_time * 0.15) + cos(st.y * 3.0 + u_time * 0.1);
+        q.y = cos(st.x * 3.0 + u_time * 0.2) + sin(st.y * 3.5 + u_time * 0.15);
+        
+        float val = smoothstep(0.0, 2.2, length(q) * 0.42);
+        vec3 color = mix(vec3(0.008, 0.008, 0.008), vec3(0.035, 0.015, 0.01), val);
+        color += vec3(0.03, 0.005, 0.0) * interaction;
+        
         gl_FragColor = vec4(color, 1.0);
       }
     `
   });
+
   scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
 
   function animate() {
@@ -529,51 +677,14 @@ function initBackgroundShader() {
     requestAnimationFrame(animate);
   }
   animate();
+
   window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     material.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
   });
 }
 
-// 6. ACETERNITY 3D TILT EFFECT FOR CARDS
-function init3DCards() {
-  const cards = document.querySelectorAll('.tilt-card');
-
-  cards.forEach(card => {
-    const inner = card.querySelector('.bento-card-inner');
-
-    card.addEventListener('mousemove', e => {
-      const rect = card.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
-      
-      const xc = rect.width / 2;
-      const yc = rect.height / 2;
-      
-      const dx = (x - xc) / xc;
-      const dy = (y - yc) / yc;
-
-      gsap.to(inner, {
-        rotationY: dx * 12,
-        rotationX: -dy * 12,
-        transformPerspective: 1000,
-        duration: 0.1,
-        ease: "power1.out"
-      });
-    });
-
-    card.addEventListener('mouseleave', () => {
-      gsap.to(inner, {
-        rotationY: 0,
-        rotationX: 0,
-        duration: 0.6,
-        ease: "power3.out"
-      });
-    });
-  });
-}
-
-// 7. MANIFESTO ANIMATIONS
+// 6. KINETIC OBYS TYPOGRAPHY MANIFESTO
 function initGSAPAnimations() {
   const p = document.getElementById('split-manifesto');
   const text = p.innerHTML;
@@ -599,11 +710,103 @@ function initGSAPAnimations() {
     y: '0%', duration: 1, stagger: 0.01, ease: "power3.out",
     scrollTrigger: { trigger: '.manifesto', start: "top 75%", end: "center center", scrub: 1 }
   });
+
+  gsap.utils.toArray('.manifesto .char').forEach(char => {
+    ScrollTrigger.create({
+      trigger: char, start: "top 70%", end: "top 40%",
+      onEnter: () => char.classList.add('active'),
+      onLeaveBack: () => char.classList.remove('active')
+    });
+  });
 }
 
-// 8. MODAL CONTROLLER
+// 7. ANIMMASTERLIB HORIZONTAL PINNED SLIDER + VELOCITY SKEW
+function initHorizontalSlider() {
+  const track = document.querySelector('.work-track');
+  const cards = gsap.utils.toArray('.work-item');
+  const images = gsap.utils.toArray('.parallax-img');
+
+  let sliderTween = gsap.to(track, {
+    x: () => -(track.scrollWidth - document.documentElement.clientWidth) + "px",
+    ease: "none",
+    scrollTrigger: {
+      trigger: ".work-slider-wrap",
+      pin: true,
+      scrub: 1,
+      end: () => "+=" + track.scrollWidth
+    }
+  });
+
+  images.forEach(img => {
+    gsap.to(img, {
+      x: () => img.parentElement.offsetWidth * 0.28,
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".work-slider-wrap",
+        containerAnimation: sliderTween,
+        start: "left right",
+        end: "right left",
+        scrub: true
+      }
+    });
+  });
+
+  let proxy = { skew: 0 },
+      skewSetter = gsap.quickSetter(cards, "rotationY", "deg"),
+      clamp = gsap.utils.clamp(-15, 15);
+
+  ScrollTrigger.create({
+    onUpdate: (self) => {
+      let skew = clamp(self.getVelocity() / -100);
+      if (Math.abs(skew) > Math.abs(proxy.skew)) {
+        proxy.skew = skew;
+        gsap.to(proxy, { skew: 0, duration: 0.8, ease: "power3", overwrite: true, onUpdate: () => skewSetter(proxy.skew) });
+      }
+    }
+  });
+}
+
+// 8. ACETERNITY 3D TILT EFFECT FOR CARDS
+function init3DCards() {
+  const cards = document.querySelectorAll('.tilt-card');
+
+  cards.forEach(card => {
+    const inner = card.querySelector('.bento-card-inner');
+
+    card.addEventListener('mousemove', e => {
+      const rect = card.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      const xc = rect.width / 2;
+      const yc = rect.height / 2;
+      
+      const dx = (x - xc) / xc;
+      const dy = (y - yc) / yc;
+
+      gsap.to(inner, {
+        rotationY: dx * 14,
+        rotationX: -dy * 14,
+        transformPerspective: 1000,
+        duration: 0.1,
+        ease: "power1.out"
+      });
+    });
+
+    card.addEventListener('mouseleave', () => {
+      gsap.to(inner, {
+        rotationY: 0,
+        rotationX: 0,
+        duration: 0.6,
+        ease: "power3.out"
+      });
+    });
+  });
+}
+
+// 9. FULLSCREEN CINEMATIC MODAL
 function initVideoModal() {
-  const triggers = document.querySelectorAll('.play-trigger');
+  const triggers = document.querySelectorAll('.mag-play');
   const modal = document.getElementById('video-modal');
   const modalInner = document.getElementById('modal-inner');
   const closeBtn = document.getElementById('close-modal');
