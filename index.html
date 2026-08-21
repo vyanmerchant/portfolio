@@ -1,415 +1,868 @@
 <!DOCTYPE html>
 <html lang="en" class="lenis lenis-smooth">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ANOMALY // Experimental Digital Monolith</title>
-  
-  <!-- Fonts -->
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500&family=Space+Grotesk:wght@300;500&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vyan Merchant — Cinematic Video Editor</title>
 
-  <!-- Three.js, GSAP, ScrollTrigger, Lenis CDNs -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+<!-- Fonts -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&family=Space+Grotesk:wght@300;500&display=swap" rel="stylesheet">
 
-  <style>
-    :root {
-      --bg: #050505;
-      --fg: #F2F2F2;
-      --accent: #FF3333;
-      --surface: #0E0E0E;
-      --border: rgba(255, 255, 255, 0.1);
-    }
+<!-- Three.js, GSAP, ScrollTrigger, Lenis CDNs -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
 
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      cursor: none !important;
-    }
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6925719089611119" crossorigin="anonymous"></script>
 
-    html, body {
-      background-color: var(--bg);
-      color: var(--fg);
-      font-family: 'Inter', sans-serif;
-      overflow-x: hidden;
-      width: 100vw;
-      -webkit-font-smoothing: antialiased;
-    }
+<style>
+/* ─── RESET & BASE ─── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
 
-    /* Lenis Setup */
-    html.lenis, html.lenis body {
-      height: auto;
-    }
-    .lenis.lenis-smooth {
-      scroll-behavior: auto !important;
-    }
-    .lenis.lenis-smooth [data-lenis-prevent] {
-      overscroll-behavior: contain;
-    }
-    .lenis.lenis-stopped {
-      overflow: hidden;
-    }
+:root {
+  --black: #050505;
+  --white: #f0ede8;
+  --red: #38bdf8;
+  --red-dim: #0284c7;
+  --gray: #1a1a1a;
+  --gray-mid: #2a2a2a;
+  --gray-text: #777;
+  --surface: #0E0E0E;
+  --border: rgba(255, 255, 255, 0.1);
+  --font-display: 'Anton', sans-serif;
+  --font-serif: 'Cormorant Garamond', serif;
+  --font-sans: 'Syne', sans-serif;
+  --font-mono: 'Space Mono', monospace;
+}
 
-    /* Custom Cursor */
-    #custom-cursor {
-      position: fixed;
-      top: 0;
-      left: 0;
-      pointer-events: none;
-      z-index: 99999;
-      mix-blend-mode: difference;
-      transform: translate(-50%, -50%);
-    }
+html.lenis, html.lenis body { height: auto; }
+.lenis.lenis-smooth { scroll-behavior: auto !important; }
+.lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
+.lenis.lenis-stopped { overflow: hidden; }
 
-    .cursor-dot {
-      width: 8px;
-      height: 8px;
-      background-color: #FFFFFF;
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-    }
+body {
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--font-sans);
+  overflow-x: hidden;
+  width: 100vw;
+  -webkit-font-smoothing: antialiased;
+}
 
-    .cursor-ring {
-      width: 40px;
-      height: 40px;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      border-radius: 50%;
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                  height 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                  background-color 0.3s ease;
-    }
+/* ─── CUSTOM CURSOR ─── */
+#custom-cursor {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 99999;
+  mix-blend-mode: difference;
+  transform: translate(-50%, -50%);
+}
+.cursor-dot {
+  width: 8px;
+  height: 8px;
+  background-color: #FFFFFF;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+}
+.cursor-ring {
+  width: 40px; height: 40px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  border-radius: 50%;
+  position: absolute;
+  top: 50%; left: 50%;
+  transform: translate(-50%, -50%);
+  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              height 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+              background-color 0.3s ease;
+}
+body.hover-link .cursor-ring {
+  width: 70px; height: 70px;
+  background-color: rgba(255, 255, 255, 0.1);
+  border-color: transparent;
+}
+body.hover-view .cursor-ring {
+  width: 90px; height: 90px;
+  background-color: var(--red);
+  border-color: transparent;
+}
+body.hover-view::after {
+  content: 'VIEW';
+  position: fixed;
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 2px;
+  color: #000;
+  z-index: 100000;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+}
 
-    body.hover-link .cursor-ring {
-      width: 70px;
-      height: 70px;
-      background-color: rgba(255, 255, 255, 0.1);
-      border-color: transparent;
-    }
+/* ─── WEBGL BACKGROUND ─── */
+#webgl-container {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100vw; height: 100vh;
+  pointer-events: none;
+  z-index: 0;
+}
 
-    body.hover-view .cursor-ring {
-      width: 90px;
-      height: 90px;
-      background-color: var(--accent);
-      border-color: transparent;
-    }
-    body.hover-view::after {
-      content: 'EXPLORE';
-      position: fixed;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 10px;
-      font-weight: 500;
-      letter-spacing: 2px;
-      color: #000;
-      z-index: 100000;
-      pointer-events: none;
-      transform: translate(-50%, -50%);
-    }
+#damascus-bg {
+  position: fixed;
+  inset: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+  opacity: 0.35;
+}
 
-    /* WebGL Canvas */
-    #webgl-container {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      pointer-events: none;
-      z-index: 1;
-    }
+#progress {
+  position: fixed; top: 0; left: 0;
+  height: 2px; width: 0%;
+  background: var(--red);
+  z-index: 1000;
+  transition: width 0.05s linear;
+}
 
-    /* Layout */
-    main {
-      position: relative;
-      z-index: 2;
-    }
+main { position: relative; z-index: 2; }
 
-    section {
-      position: relative;
-      width: 100%;
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding: 8vw 6vw;
-      border-bottom: 1px solid var(--border);
-    }
+/* ─── NAVIGATION ─── */
+nav {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 500;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 28px 48px;
+  background: linear-gradient(to bottom, rgba(5,5,5,0.8), transparent);
+  backdrop-filter: blur(10px);
+}
+.nav-logo {
+  font-family: var(--font-display);
+  font-size: 22px;
+  letter-spacing: 0.05em;
+  color: var(--white);
+  text-decoration: none;
+}
+.nav-logo span { color: var(--red); }
+.nav-links { display: flex; gap: 36px; }
+.nav-links a {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--gray-text);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.nav-links a:hover { color: var(--white); }
 
-    /* Hero */
-    .hero-section {
-      justify-content: space-between;
-    }
-    .hero-meta {
-      display: flex;
-      justify-content: space-between;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
-      letter-spacing: 2px;
-      color: #888;
-    }
-    .kinetic-headline {
-      font-family: 'Syne', sans-serif;
-      font-size: 12vw;
-      line-height: 0.9;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-    .outline {
-      color: transparent;
-      -webkit-text-stroke: 1px var(--fg);
-    }
-    .hero-footer {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-    }
-    .hero-footer p {
-      max-width: 300px;
-      color: #888;
-      font-size: 14px;
-      line-height: 1.5;
-    }
-    .scroll-indicator {
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 12px;
-      letter-spacing: 2px;
-      color: var(--accent);
-    }
+/* ─── HERO ─── */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 700px;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 0 48px 64px;
+  overflow: hidden;
+  border-bottom: 1px solid var(--border);
+}
+.hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  filter: brightness(0.4) saturate(0.8);
+}
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(5,5,5,0.95) 0%, rgba(5,5,5,0.2) 50%, rgba(5,5,5,0.4) 100%);
+  z-index: 1;
+}
+.hero-tag {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.hero-tag::before {
+  content: '';
+  display: inline-block;
+  width: 32px; height: 1px;
+  background: var(--red);
+}
+.hero-name {
+  font-family: var(--font-display);
+  font-size: clamp(80px, 14vw, 180px);
+  line-height: 0.92;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  position: relative;
+  z-index: 2;
+}
+.hero-name .accent { color: var(--red); }
+.hero-bottom {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  margin-top: 32px;
+  position: relative;
+  z-index: 2;
+}
+.hero-sub {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 20px;
+  color: var(--gray-text);
+  line-height: 1.6;
+  max-width: 340px;
+  font-weight: 300;
+}
+.hero-cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 28px;
+  background: transparent;
+  border: 1px solid rgba(240,237,232,0.25);
+  color: var(--white);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+}
+.hero-cta:hover {
+  background: var(--red);
+  border-color: var(--red);
+  color: #000;
+}
 
-    /* Horizontal Section */
-    .horizontal-section {
-      padding: 0 !important;
-      overflow: hidden;
-    }
-    .horizontal-wrapper {
-      display: flex;
-      gap: 10vw;
-      width: fit-content;
-      padding: 0 6vw;
-      align-items: center;
-      height: 100vh;
-    }
-    .project-card {
-      width: 50vw;
-      flex-shrink: 0;
-      background: var(--surface);
-      border: 1px solid var(--border);
-      padding: 4vw;
-      transition: border-color 0.3s ease;
-    }
-    .project-card:hover {
-      border-color: var(--accent);
-    }
+/* ─── MARQUEE ─── */
+.marquee-wrap {
+  background: var(--red);
+  overflow: hidden;
+  padding: 13px 0;
+  border-bottom: 1px solid rgba(8,8,8,0.2);
+}
+.marquee-track {
+  display: flex;
+  width: max-content;
+  animation: marquee 20s linear infinite;
+}
+.marquee-track span {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: #0c1a2e;
+  padding: 0 28px;
+}
+.marquee-track .dot { color: rgba(12,26,46,0.35); padding: 0; }
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
 
-    /* Manifesto */
-    .manifesto-title {
-      font-family: 'Syne', sans-serif;
-      font-size: 3.5vw;
-      line-height: 1.1;
-      margin-top: 2rem;
-      max-width: 1000px;
-    }
-  </style>
+/* ─── SECTIONS ─── */
+.section { padding: 120px 48px; border-bottom: 1px solid var(--border); position: relative; }
+.section-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--red);
+  margin-bottom: 48px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.section-label::after {
+  content: '';
+  flex: 1;
+  max-width: 80px;
+  height: 1px;
+  background: var(--red);
+  opacity: 0.4;
+}
+
+/* ─── ABOUT ─── */
+#about {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: start;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.about-left .big-text {
+  font-family: var(--font-display);
+  font-size: clamp(48px, 6vw, 82px);
+  line-height: 1;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  margin-bottom: 32px;
+}
+.about-left .big-text .accent { color: var(--red); }
+.about-body {
+  font-family: var(--font-serif);
+  font-size: 19px;
+  font-weight: 300;
+  line-height: 1.8;
+  color: var(--gray-text);
+  margin-bottom: 48px;
+}
+.about-body b { color: var(--white); font-weight: 400; font-style: italic; }
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1px;
+  background: var(--gray-mid);
+  border: 1px solid var(--gray-mid);
+  margin-bottom: 48px;
+}
+.stat-item {
+  background: var(--black);
+  padding: 28px 24px;
+  text-align: center;
+}
+.stat-num {
+  font-family: var(--font-display);
+  font-size: 52px;
+  color: var(--white);
+  line-height: 1;
+  display: block;
+}
+.stat-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--gray-text);
+  margin-top: 6px;
+  display: block;
+}
+
+.skill-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 0;
+  border-bottom: 1px solid var(--gray-mid);
+}
+.skill-row:first-of-type { border-top: 1px solid var(--gray-mid); }
+.skill-name {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  font-weight: 300;
+  font-style: italic;
+  color: var(--white);
+}
+
+/* ─── HORIZONTAL CINEMATIC PROJECTS GALLERY (Active Theory Inspired) ─── */
+.horizontal-section {
+  padding: 0 !important;
+  height: 100vh;
+  overflow: hidden;
+}
+.horizontal-wrapper {
+  display: flex;
+  gap: 6vw;
+  width: fit-content;
+  padding: 0 6vw;
+  align-items: center;
+  height: 100vh;
+}
+.project-showcase-card {
+  width: 55vw;
+  height: 65vh;
+  flex-shrink: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  padding: 40px;
+  transition: border-color 0.4s ease;
+}
+.project-showcase-card:hover { border-color: var(--red); }
+.project-bg-media {
+  position: absolute;
+  inset: 0;
+  width: 100%; height: 100%;
+  object-fit: cover;
+  z-index: 0;
+  filter: brightness(0.5);
+  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.project-showcase-card:hover .project-bg-media {
+  transform: scale(1.03);
+}
+.project-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(5,5,5,0.95) 0%, rgba(5,5,5,0.2) 60%);
+  z-index: 1;
+}
+.project-content {
+  position: relative;
+  z-index: 2;
+}
+
+/* ─── CONTACT ─── */
+#contact { max-width: 1200px; margin: 0 auto; }
+.contact-big {
+  font-family: var(--font-display);
+  font-size: clamp(56px, 9vw, 130px);
+  line-height: 0.95;
+  letter-spacing: 0.02em;
+  color: var(--white);
+  margin-bottom: 48px;
+}
+.contact-big .accent { color: var(--red); }
+.contact-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 32px;
+  padding-top: 48px;
+  border-top: 1px solid var(--gray-mid);
+}
+.contact-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.contact-link {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gray-text);
+  text-decoration: none;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.contact-link:hover { color: var(--white); }
+.contact-email {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: clamp(22px, 3vw, 38px);
+  font-weight: 300;
+  color: var(--white);
+  text-decoration: none;
+  transition: color 0.2s;
+}
+.contact-email:hover { color: var(--red); }
+
+/* ─── FOOTER ─── */
+footer {
+  padding: 32px 48px;
+  border-top: 1px solid var(--gray-mid);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  position: relative;
+  z-index: 2;
+}
+footer p {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--gray-text);
+  letter-spacing: 0.12em;
+}
+
+/* ─── REVEAL ANIMATIONS ─── */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+}
+.reveal.visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (max-width: 768px) {
+  nav { padding: 20px 24px; }
+  .hero { padding: 0 24px 48px; }
+  #about { grid-template-columns: 1fr; padding: 60px 24px; }
+  .section { padding: 60px 24px; }
+  .project-showcase-card { width: 85vw; height: 50vh; }
+}
+</style>
 </head>
+
 <body>
 
-  <!-- Custom Cursor -->
-  <div id="custom-cursor">
-    <div class="cursor-dot"></div>
-    <div class="cursor-ring"></div>
+<div id="progress"></div>
+
+<!-- Custom Cursor -->
+<div id="custom-cursor">
+  <div class="cursor-dot"></div>
+  <div class="cursor-ring"></div>
+</div>
+
+<!-- WebGL Background Elements -->
+<div id="webgl-container"></div>
+<canvas id="damascus-bg"></canvas>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="nav-logo">VM<span>.</span></a>
+  <div class="nav-links">
+    <a href="#about" data-cursor="link">About</a>
+    <a href="#projects" data-cursor="link">Work</a>
+    <a href="#contact" data-cursor="link">Contact</a>
+  </div>
+</nav>
+
+<main>
+  <!-- HERO -->
+  <div class="hero">
+    <video autoplay muted loop playsinline class="hero-video">
+      <source src="montage.mp4" type="video/mp4">
+    </video>
+    <div class="hero-overlay"></div>
+
+    <div class="hero-tag">Gaming Video Editor · DaVinci Resolve · Est. 2021</div>
+    <div class="hero-name">VYAN<br>MER<span class="accent">CHANT</span></div>
+    <div class="hero-bottom">
+      <p class="hero-sub">Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages.</p>
+      <a href="#projects" class="hero-cta" data-cursor="link">
+        View My Work
+        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+          <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </a>
+    </div>
   </div>
 
-  <!-- WebGL Background -->
-  <div id="webgl-container"></div>
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track">
+      <span>DaVinci Resolve</span><span class="dot">✦</span>
+      <span>Gaming Montages</span><span class="dot">✦</span>
+      <span>Color Grading</span><span class="dot">✦</span>
+      <span>Fast Edits</span><span class="dot">✦</span>
+      <span>Content Creation</span><span class="dot">✦</span>
+      <span>Valorant</span><span class="dot">✦</span>
+      <span>Motion Design</span><span class="dot">✦</span>
+      <span>4 Years Experience</span><span class="dot">✦</span>
+      <span>DaVinci Resolve</span><span class="dot">✦</span>
+      <span>Gaming Montages</span><span class="dot">✦</span>
+      <span>Color Grading</span><span class="dot">✦</span>
+      <span>Fast Edits</span><span class="dot">✦</span>
+      <span>Content Creation</span><span class="dot">✦</span>
+      <span>Valorant</span><span class="dot">✦</span>
+      <span>Motion Design</span><span class="dot">✦</span>
+      <span>4 Years Experience</span><span class="dot">✦</span>
+    </div>
+  </div>
 
-  <main>
-    <!-- HERO SECTION -->
-    <section class="hero-section">
-      <div class="hero-meta">
-        <span>[ 001 — SYSTEM ACTIVE ]</span>
-        <span>LAT: 18.5204° N // LON: 73.8567° E</span>
-      </div>
-      <div class="hero-title-wrapper">
-        <h1 class="kinetic-headline">
-          <span style="display:block;">DIGITAL</span>
-          <span style="display:block;" class="outline">PARADOX</span>
-        </h1>
-      </div>
-      <div class="hero-footer">
-        <p>Architecting high-performance spatial interfaces and cinematic web systems.</p>
-        <div class="scroll-indicator" data-cursor="link">SCROLL TO INITIALIZE ↓</div>
-      </div>
-    </section>
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="about-left reveal">
+      <div class="section-label">About</div>
+      <div class="big-text">EDIT.<br>FAST.<br><span class="accent">HARD.</span></div>
+      <p class="about-body">
+        I'm <b>Vyan</b>, a 17-year-old video editor obsessed with making gaming content that actually slaps. 
+        I've been editing for <b>4 years</b> using <b>DaVinci Resolve</b> — cutting, grading, and syncing footage 
+        to create montages that keep viewers locked in from the first frame to the last.
+        <br><br>
+        Worked with multiple creators, shipped a video editing internship, and I'm always looking for the next 
+        collab that pushes what gaming edits can be.
+      </p>
 
-    <!-- HORIZONTAL PINNED GALLERY -->
-    <section class="horizontal-section">
-      <div class="horizontal-wrapper">
-        <div class="project-card" data-cursor="view">
-          <span style="font-family: 'Space Grotesk'; font-size: 12px; color: var(--accent); letter-spacing: 2px;">[ PROJECT_01 ]</span>
-          <h2 style="font-family: 'Syne'; font-size: 4vw; margin-top: 1rem;">CHRONOS ENGINE</h2>
-          <p style="margin-top: 1.5rem; color: #888; font-size: 1rem; line-height: 1.6;">Real-time volumetric particle simulation driven by user kinetic velocity vectors.</p>
+      <div class="stats-grid">
+        <div class="stat-item">
+          <span class="stat-num">4</span>
+          <span class="stat-label">Years Editing</span>
         </div>
-        <div class="project-card" data-cursor="view">
-          <span style="font-family: 'Space Grotesk'; font-size: 12px; color: var(--accent); letter-spacing: 2px;">[ PROJECT_02 ]</span>
-          <h2 style="font-family: 'Syne'; font-size: 4vw; margin-top: 1rem;">NEURAL VOID</h2>
-          <p style="margin-top: 1.5rem; color: #888; font-size: 1rem; line-height: 1.6;">Generative shader architecture mapping high-dimensional tensor spaces to web viewports.</p>
-        </div>
-        <div class="project-card" data-cursor="view">
-          <span style="font-family: 'Space Grotesk'; font-size: 12px; color: var(--accent); letter-spacing: 2px;">[ PROJECT_03 ]</span>
-          <h2 style="font-family: 'Syne'; font-size: 4vw; margin-top: 1rem;">SYNTHESIS</h2>
-          <p style="margin-top: 1.5rem; color: #888; font-size: 1rem; line-height: 1.6;">Immersive audio-reactive spatial soundscapes wrapped in custom WebGL environments.</p>
+        <div class="stat-item">
+          <span class="stat-num">∞</span>
+          <span class="stat-label">Hours in Resolve</span>
         </div>
       </div>
-    </section>
+    </div>
 
-    <!-- MANIFESTO SECTION -->
-    <section>
-      <div style="max-width: 1000px;">
-        <span style="font-family: 'Space Grotesk'; color: var(--accent); letter-spacing: 3px; font-size: 12px;">// MANIFESTO</span>
-        <h2 class="manifesto-title">
-          WE DO NOT BUILD WEBSITES. WE CONSTRUCT DIGITAL ENVIRONMENTS THAT DEMAND ATTENTION.
-        </h2>
+    <div class="skills-right reveal" style="transition-delay: 0.15s">
+      <div class="section-label">Skills</div>
+      <div class="skill-row"><span class="skill-name">DaVinci Resolve</span></div>
+      <div class="skill-row"><span class="skill-name">Gaming Montages</span></div>
+      <div class="skill-row"><span class="skill-name">Color Grading</span></div>
+      <div class="skill-row"><span class="skill-name">Motion & SFX</span></div>
+      <div class="skill-row"><span class="skill-name">Content Creation</span></div>
+    </div>
+  </section>
+
+  <!-- HORIZONTAL PINNED GALLERY (Active Theory Inspired Cinematic Showcase) -->
+  <section class="section horizontal-section" id="projects">
+    <div class="horizontal-wrapper">
+      
+      <!-- Project 1 -->
+      <div class="project-showcase-card" data-cursor="view" onclick="window.open('https://www.youtube.com/watch?v=d0qvLlFEEH8', '_blank')">
+        <video autoplay muted loop playsinline class="project-bg-media"><source src="montage.mp4" type="video/mp4"></video>
+        <div class="project-overlay"></div>
+        <div class="project-content">
+          <span style="font-family: 'Space Mono'; font-size: 11px; color: var(--red); letter-spacing: 2px;">[ 01 // FEATURED ]</span>
+          <h2 style="font-family: 'Syne'; font-size: 3.5vw; margin-top: 0.5rem; text-transform: uppercase;">Valorant Montage</h2>
+          <p style="color: var(--gray-text); font-size: 14px; margin-top: 0.5rem;">DaVinci Resolve · Fast Edits · High-Impact Color Grade</p>
+        </div>
       </div>
-    </section>
-  </main>
 
-  <script>
-    // --- 1. Lenis Smooth Scrolling ---
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      direction: 'vertical',
-      gestureDirection: 'vertical',
-      smooth: true,
-      mouseMultiplier: 1,
-      smoothTouch: false,
-      touchMultiplier: 2,
-    });
+      <!-- Project 2 -->
+      <div class="project-showcase-card" data-cursor="view" onclick="window.open('https://www.youtube.com/watch?v=4ZcBnbLWxvU', '_blank')">
+        <video autoplay muted loop playsinline class="project-bg-media"><source src="montage.mp4" type="video/mp4"></video>
+        <div class="project-overlay"></div>
+        <div class="project-content">
+          <span style="font-family: 'Space Mono'; font-size: 11px; color: var(--red); letter-spacing: 2px;">[ 02 // ARCHIVE ]</span>
+          <h2 style="font-family: 'Syne'; font-size: 3.5vw; margin-top: 0.5rem; text-transform: uppercase;">Valorant Montage (Old)</h2>
+          <p style="color: var(--gray-text); font-size: 14px; margin-top: 0.5rem;">Classic Gaming Montage · Precision Timing</p>
+        </div>
+      </div>
 
-    function raf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
+      <!-- Project 3 -->
+      <div class="project-showcase-card" data-cursor="view" onclick="window.open('montage.mp4', '_blank')">
+        <video autoplay muted loop playsinline class="project-bg-media"><source src="montage.mp4" type="video/mp4"></video>
+        <div class="project-overlay"></div>
+        <div class="project-content">
+          <span style="font-family: 'Space Mono'; font-size: 11px; color: var(--red); letter-spacing: 2px;">[ 03 // EXPERIMENTAL ]</span>
+          <h2 style="font-family: 'Syne'; font-size: 3.5vw; margin-top: 0.5rem; text-transform: uppercase;">Practice Edit</h2>
+          <p style="color: var(--gray-text); font-size: 14px; margin-top: 0.5rem;">Advanced Motion Design · Visual Effects</p>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section class="section" id="contact">
+    <div class="section-label reveal">Contact</div>
+    <div class="contact-big reveal" style="transition-delay:0.1s">
+      LET'S<br>BUILD<br><span class="accent">SOMETHING.</span>
+    </div>
+
+    <div class="contact-row reveal" style="transition-delay:0.2s">
+      <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vyanmerchant@gmail.com" target="_blank" class="contact-email" data-cursor="link">
+        vyanmerchant@gmail.com
+      </a>
+      <div class="contact-links">
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vyanmerchant@gmail.com" target="_blank" class="contact-link" data-cursor="link">Email</a>
+        <a href="https://youtube.com" target="_blank" class="contact-link" data-cursor="link">YouTube</a>
+        <a href="https://discord.com/users/1111715392461738034" target="_blank" class="contact-link" data-cursor="link">Discord</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2026 Vyan Merchant</p>
+    <p>Gaming Video Editor · DaVinci Resolve</p>
+  </footer>
+</main>
+
+<script>
+  // --- 1. Lenis Smooth Scrolling ---
+  const lenis = new Lenis({
+    duration: 1.2,
+    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+    direction: 'vertical',
+    smooth: true,
+  });
+
+  function raf(time) {
+    lenis.raf(time);
     requestAnimationFrame(raf);
+  }
+  requestAnimationFrame(raf);
 
-    // GSAP ScrollTrigger Integration
-    gsap.registerPlugin(ScrollTrigger);
-    lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
+  gsap.registerPlugin(ScrollTrigger);
+  lenis.on('scroll', ScrollTrigger.update);
+  gsap.ticker.add((time) => { lenis.raf(time * 1000); });
+  gsap.ticker.lagSmoothing(0);
+
+  // Scroll Progress Bar
+  window.addEventListener('scroll', () => {
+    const st = document.documentElement.scrollTop;
+    const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+    document.getElementById('progress').style.width = (st / h * 100) + '%';
+  });
+
+  // --- 2. Custom Magnetic Cursor ---
+  const cursor = document.getElementById('custom-cursor');
+  let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+  let pos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+
+  window.addEventListener('mousemove', (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  function updateCursor() {
+    pos.x += (mouse.x - pos.x) * 0.15;
+    pos.y += (mouse.y - pos.y) * 0.15;
+    cursor.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
+    requestAnimationFrame(updateCursor);
+  }
+  updateCursor();
+
+  document.querySelectorAll('a, button, [data-cursor]').forEach(el => {
+    el.addEventListener('mouseenter', () => {
+      if (el.dataset.cursor === 'view') {
+        document.body.classList.add('hover-view');
+      } else {
+        document.body.classList.add('hover-link');
+      }
     });
-    gsap.ticker.lagSmoothing(0);
-
-    // --- 2. Custom Physics Cursor ---
-    const cursor = document.getElementById('custom-cursor');
-    let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    let pos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
-    let speed = 0.15;
-
-    window.addEventListener('mousemove', (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
+    el.addEventListener('mouseleave', () => {
+      document.body.classList.remove('hover-link', 'hover-view');
     });
+  });
 
-    function updateCursor() {
-      pos.x += (mouse.x - pos.x) * speed;
-      pos.y += (mouse.y - pos.y) * speed;
-      cursor.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
-      requestAnimationFrame(updateCursor);
-    }
-    updateCursor();
+  // --- 3. WebGL Particle Field Background (Active Theory style) ---
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 
-    document.querySelectorAll('a, button, [data-cursor]').forEach(el => {
-      el.addEventListener('mouseenter', () => {
-        if (el.dataset.cursor === 'view') {
-          document.body.classList.add('hover-view');
-        } else {
-          document.body.classList.add('hover-link');
-        }
-      });
-      el.addEventListener('mouseleave', () => {
-        document.body.classList.remove('hover-link', 'hover-view');
-      });
-    });
+  renderer.setSize(window.innerWidth, window.innerHeight);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  document.getElementById('webgl-container').appendChild(renderer.domElement);
 
-    // --- 3. WebGL Three.js Background ---
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  const particleCount = 1500;
+  const geometry = new THREE.BufferGeometry();
+  const positions = new Float32Array(particleCount * 3);
 
+  for(let i = 0; i < particleCount * 3; i += 3) {
+    positions[i] = (Math.random() - 0.5) * 25;
+    positions[i+1] = (Math.random() - 0.5) * 25;
+    positions[i+2] = (Math.random() - 0.5) * 25;
+  }
+
+  geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+
+  const material = new THREE.PointsMaterial({
+    size: 0.02,
+    color: 0x38bdf8,
+    transparent: true,
+    opacity: 0.5,
+    blending: THREE.AdditiveBlending
+  });
+
+  const particleSystem = new THREE.Points(geometry, material);
+  scene.add(particleSystem);
+  camera.position.z = 5;
+
+  let targetX = 0, targetY = 0;
+  window.addEventListener('mousemove', (e) => {
+    targetX = (e.clientX - window.innerWidth / 2) * 0.0004;
+    targetY = (e.clientY - window.innerHeight / 2) * 0.0004;
+  });
+
+  function animateWebGL() {
+    requestAnimationFrame(animateWebGL);
+    particleSystem.rotation.y += 0.0008 + (targetX - particleSystem.rotation.y) * 0.05;
+    particleSystem.rotation.x += 0.0008 + (targetY - particleSystem.rotation.x) * 0.05;
+    renderer.render(scene, camera);
+  }
+  animateWebGL();
+
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    document.getElementById('webgl-container').appendChild(renderer.domElement);
+  });
 
-    const particleCount = 2000;
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
-
-    for(let i = 0; i < particleCount * 3; i += 3) {
-      positions[i] = (Math.random() - 0.5) * 25;
-      positions[i+1] = (Math.random() - 0.5) * 25;
-      positions[i+2] = (Math.random() - 0.5) * 25;
-    }
-
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-    const material = new THREE.PointsMaterial({
-      size: 0.02,
-      color: 0xFF3333,
-      transparent: true,
-      opacity: 0.6,
-      blending: THREE.AdditiveBlending
+  // --- 4. Horizontal Scroll-Driven Showcase (Active Theory Inspired) ---
+  const horizontalWrapper = document.querySelector('.horizontal-wrapper');
+  if (horizontalWrapper) {
+    gsap.to(horizontalWrapper, {
+      x: () => -(horizontalWrapper.scrollWidth - window.innerWidth),
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".horizontal-section",
+        pin: true,
+        scrub: 1,
+        end: () => "+=" + horizontalWrapper.scrollWidth,
+        invalidateOnRefresh: true,
+      }
     });
+  }
 
-    const particleSystem = new THREE.Points(geometry, material);
-    scene.add(particleSystem);
-    camera.position.z = 5;
+  // --- 5. Damascus Background Procedural Generator ---
+  const canvas = document.getElementById('damascus-bg');
+  const ctx = canvas.getContext('2d');
+  const SCALE = 4;
+  let W, H, t = 0;
 
-    let targetX = 0, targetY = 0;
-    window.addEventListener('mousemove', (e) => {
-      targetX = (e.clientX - window.innerWidth / 2) * 0.0004;
-      targetY = (e.clientY - window.innerHeight / 2) * 0.0004;
-    });
+  function resizeDamascus() {
+    W = Math.floor(window.innerWidth / SCALE);
+    H = Math.floor(window.innerHeight / SCALE);
+    canvas.width = W;
+    canvas.height = H;
+  }
+  resizeDamascus();
+  window.addEventListener('resize', resizeDamascus);
 
-    function animateWebGL() {
-      requestAnimationFrame(animateWebGL);
-      particleSystem.rotation.y += 0.0008 + (targetX - particleSystem.rotation.y) * 0.05;
-      particleSystem.rotation.x += 0.0008 + (targetY - particleSystem.rotation.x) * 0.05;
-      renderer.render(scene, camera);
+  function drawDamascus() {
+    t += 0.002;
+    const img = ctx.createImageData(W, H);
+    const d = img.data;
+
+    for (let y = 0; y < H; y++) {
+      for (let x = 0; x < W; x++) {
+        const nx = x / W, ny = y / H;
+        const warp = Math.sin(ny * 6 + t + Math.sin(nx * 4 + t * 0.5) * 1.2) * 0.15;
+        const wx = nx + warp * 0.4, wy = ny + warp * 0.3;
+        const band1 = Math.sin(wx * 12 + wy * 8 + t * 0.3) * 0.5 + 0.5;
+        const v = band1;
+        const base = 4 + v * 10;
+
+        const i = (y * W + x) * 4;
+        d[i]   = base;
+        d[i+1] = base + 4;
+        d[i+2] = base + 12;
+        d[i+3] = 255;
+      }
     }
-    animateWebGL();
+    ctx.putImageData(img, 0, 0);
+    requestAnimationFrame(drawDamascus);
+  }
+  drawDamascus();
 
-    window.addEventListener('resize', () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
+  // Intersection Observer for Revealing Content
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
     });
+  }, { threshold: 0.05 });
+  document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+</script>
 
-    // --- 4. Horizontal Scroll-Driven Showcase ---
-    const horizontalWrapper = document.querySelector('.horizontal-wrapper');
-    if (horizontalWrapper) {
-      gsap.to(horizontalWrapper, {
-        x: () => -(horizontalWrapper.scrollWidth - window.innerWidth),
-        ease: "none",
-        scrollTrigger: {
-          trigger: ".horizontal-section",
-          pin: true,
-          scrub: 1,
-          end: () => "+=" + horizontalWrapper.scrollWidth,
-          invalidateOnRefresh: true,
-        }
-      });
-    }
-  </script>
 </body>
 </html>
