@@ -1,1033 +1,675 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vyan Merchant — Video Editor</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vyan Merchant — Premium Gaming Video Editor</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Anton&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-<script async
-  src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6925719089611119"
-  crossorigin="anonymous"></script>
-<style>
-/* ─── RESET & BASE ─── */
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,800;1,400&family=Space+Grotesk:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
 
-:root {
-  --black: #080808;
-  --white: #f0ede8;
-  --red: #7dd3fc;
-  --red-dim: #38bdf8;
-  --gray: #1a1a1a;
-  --gray-mid: #2a2a2a;
-  --gray-text: #777;
-  --font-display: 'Anton', sans-serif;
-  --font-serif: 'Cormorant Garamond', serif;
-  --font-sans: 'Syne', sans-serif;
-  --font-mono: 'Space Mono', monospace;
-}
+  <style>
+    /* ─── DESIGN SYSTEM & VARS ─── */
+    :root {
+      --bg: #030712;
+      --bg-card: rgba(17, 24, 39, 0.4);
+      --bg-card-hover: rgba(31, 41, 55, 0.6);
+      --border: rgba(255, 255, 255, 0.08);
+      --border-glow: rgba(56, 189, 248, 0.3);
+      
+      --accent: #38bdf8;
+      --accent-glow: rgba(56, 189, 248, 0.25);
+      --accent-secondary: #818cf8;
+      
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --text-dim: #6b7280;
 
-html { scroll-behavior: smooth; }
+      --font-display: 'Syne', sans-serif;
+      --font-heading: 'Space Grotesk', sans-serif;
+      --font-body: 'Plus Jakarta Sans', sans-serif;
+    }
 
-body {
-  background: var(--black);
-  color: var(--white);
-  font-family: var(--font-sans);
-  overflow-x: hidden;
- 
-}
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html { scroll-behavior: smooth; color-scheme: dark; }
 
+    body {
+      background-color: var(--bg);
+      color: var(--text-main);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      line-height: 1.6;
+    }
 
-/* ─── DAMASCUS BACKGROUND ─── */
-#damascus-bg {
-  position: fixed;
-  inset: 0;
-  width: 100%; height: 100%;
-  z-index: -1;
-  opacity: 1;
-}
-#progress {
-  position: fixed; top: 0; left: 0;
-  height: 2px; width: 0%;
-  background: var(--red);
-  z-index: 1000;
-  transition: width 0.05s linear;
-}
+    /* ─── BACKGROUND EFFECTS (Aceternity Grid + Ambient Glows) ─── */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-size: 40px 40px;
+      background-image: 
+        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      z-index: -2;
+      mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, #000 70%, transparent 100%);
+    }
 
-/* ─── NAVIGATION ─── */
-nav {
-  position: fixed; top: 0; left: 0; right: 0;
-  z-index: 500;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 28px 48px;
-  mix-blend-mode: normal;
-}
-.nav-logo {
-  font-family: var(--font-display);
-  font-size: 22px;
-  letter-spacing: 0.05em;
-  color: var(--white);
-  text-decoration: none;
-}
-.nav-logo span { color: var(--red); }
-.nav-links { display: flex; gap: 36px; }
-.nav-links a {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  color: var(--gray-text);
-  text-decoration: none;
-  transition: color 0.2s;
-}
-.nav-links a:hover { color: var(--white); }
+    .ambient-glow {
+      position: fixed;
+      top: -10%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 1000px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(56,189,248,0.12) 0%, rgba(129,140,248,0.05) 50%, transparent 80%);
+      filter: blur(80px);
+      z-index: -1;
+      pointer-events: none;
+    }
 
-/* ─── HERO ─── */
-.hero {
-  position: relative;
-  height: 100vh;
-  min-height: 700px;
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
-  padding: 0 48px 64px;
-  overflow: hidden;
-}
+    /* ─── FLOATING NAVBAR ─── */
+    .nav-container {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 1000;
+      width: min(90%, 650px);
+    }
 
-.hero-video {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-  object-fit: cover;
-  z-index: 0;
-  filter: brightness(0.45) saturate(0.8);
-}
-.hero-overlay {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to top, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.3) 50%, rgba(8,8,8,0.5) 100%);
-  z-index: 1;
-}
+    nav {
+      background: rgba(15, 23, 42, 0.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 9999px;
+      padding: 10px 24px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+    }
 
-.hero-tag {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: 16px;
-  position: relative;
-  z-index: 2;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.hero-tag::before {
-  content: '';
-  display: inline-block;
-  width: 32px; height: 1px;
-  background: var(--red);
-}
+    .nav-logo {
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--text-main);
+      text-decoration: none;
+      letter-spacing: -0.02em;
+    }
 
-.hero-name {
-  font-family: var(--font-display);
-  font-size: clamp(80px, 14vw, 180px);
-  line-height: 0.92;
-  letter-spacing: 0.02em;
-  color: var(--white);
-  position: relative;
-  z-index: 2;
-  animation: heroSlide 1s cubic-bezier(0.16,1,0.3,1) both;
-}
-@keyframes heroSlide {
-  from { opacity: 0; transform: translateY(60px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.hero-name .accent { color: var(--red); }
+    .nav-logo span { color: var(--accent); }
 
-.hero-bottom {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  margin-top: 32px;
-  position: relative;
-  z-index: 2;
-}
-.hero-sub {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 20px;
-  color: var(--gray-text);
-  line-height: 1.6;
-  max-width: 340px;
-  font-weight: 300;
-}
-.hero-cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 12px;
-  padding: 14px 28px;
-  background: transparent;
-  border: 1px solid rgba(240,237,232,0.25);
-  color: var(--white);
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: background 0.2s, border-color 0.2s, transform 0.2s;
-}
-.hero-cta:hover {
-  background: var(--red);
-  border-color: var(--red);
-  transform: translateY(-2px);
-}
-.hero-cta svg { transition: transform 0.2s; }
-.hero-cta:hover svg { transform: translateX(4px); }
+    .nav-links {
+      display: flex;
+      gap: 24px;
+      list-style: none;
+    }
 
-/* ─── MARQUEE ─── */
-.marquee-wrap {
-  background: var(--red);
-  overflow: hidden;
-  padding: 13px 0;
-  border-top: 1px solid var(--red);
-  border-bottom: 1px solid rgba(8,8,8,0.2);
-}
-.marquee-track {
-  display: flex;
-  width: max-content;
-  animation: marquee 20s linear infinite;
-}
-.marquee-track span {
-  font-family: var(--font-sans);
-  font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: #0c1a2e;
-  padding: 0 28px;
-}
-.marquee-track .dot {
-  color: rgba(12,26,46,0.35);
-  padding: 0;
-}
-@keyframes marquee {
-  0% {
-    transform: translateX(0);
-  }
-  100% {
-    transform: translateX(-50%);
-  }
-}
-/* ─── SECTIONS ─── */
-.section { padding: 120px 48px; }
-.section-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.22em;
-  text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: 48px;
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-.section-label::after {
-  content: '';
-  flex: 1;
-  max-width: 80px;
-  height: 1px;
-  background: var(--red);
-  opacity: 0.4;
-}
+    .nav-links a {
+      font-family: var(--font-heading);
+      font-size: 13px;
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
 
-/* ─── ABOUT ─── */
-#about {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px;
-  align-items: start;
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.about-left .big-text {
-  font-family: var(--font-display);
-  font-size: clamp(48px, 6vw, 82px);
-  line-height: 1;
-  letter-spacing: 0.02em;
-  color: var(--white);
-  margin-bottom: 32px;
-}
-.about-left .big-text .accent { color: var(--red); }
-.about-body {
-  font-family: var(--font-serif);
-  font-size: 19px;
-  font-weight: 300;
-  line-height: 1.8;
-  color: var(--gray-text);
-  margin-bottom: 48px;
-}
-.about-body b { color: var(--white); font-weight: 400; font-style: italic; }
+    .nav-links a:hover {
+      color: var(--text-main);
+      text-shadow: 0 0 8px var(--accent-glow);
+    }
 
-/* STATS */
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1px;
-  background: var(--gray-mid);
-  border: 1px solid var(--gray-mid);
-  margin-bottom: 48px;
-}
-.stat-item {
-  background: var(--black);
-  padding: 28px 24px;
-  text-align: center;
-  position: relative;
-  overflow: hidden;
-}
-.stat-num {
-  font-family: var(--font-display);
-  font-size: 52px;
-  color: var(--white);
-  line-height: 1;
-  display: block;
-}
-.stat-label {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  color: var(--gray-text);
-  margin-top: 6px;
-  display: block;
-}
+    .nav-status {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.1);
+      padding: 4px 10px;
+      border-radius: 9999px;
+      border: 1px solid rgba(56, 189, 248, 0.2);
+    }
 
-/* SKILLS */
-.skills-right .section-label { margin-top: 0; }
-.skill-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 18px 0;
-  border-bottom: 1px solid var(--gray-mid);
-}
-.skill-row:first-of-type { border-top: 1px solid var(--gray-mid); }
-.skill-name {
-  font-family: var(--font-serif);
-  font-size: 20px;
-  font-weight: 300;
-  font-style: italic;
-  color: var(--white);
-}
+    .status-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--accent);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--accent);
+      animation: pulse 2s infinite;
+    }
 
-/* ─── DIVIDER ─── */
-.divider {
-  height: 1px;
-  background: var(--gray-mid);
-  margin: 0 48px;
-}
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
 
-/* ─── PROJECTS ─── */
-#projects {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-#projects .section-label { margin-bottom: 60px; }
+    /* ─── HERO SECTION ─── */
+    .hero {
+      position: relative;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 140px 24px 80px;
+    }
 
-.work-layout {
-  display: grid;
-  grid-template-columns: 1fr 1.3fr;
-  gap: 40px;
-  align-items: start;
-}
-/* Left: project list */
-.work-list { border-top: 1px solid var(--gray-mid); }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      font-size: 12px;
+      font-family: var(--font-heading);
+      color: var(--text-muted);
+      margin-bottom: 24px;
+      backdrop-filter: blur(8px);
+    }
 
-.work-item {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 28px 0;
-  border-bottom: 1px solid var(--gray-mid);
-  position: relative;
-  transition: padding-left 0.3s cubic-bezier(0.16,1,0.3,1);
-}
-.work-item::before {
-  content: '';
-  position: absolute;
-  left: 0; top: 0; bottom: 0;
-  width: 0;
-  background: var(--red);
-  opacity: 0.12;
-  transition: width 0.3s cubic-bezier(0.16,1,0.3,1);
-}
-.work-item:hover::before { width: 100%; }
-.work-item.active::before { width: 100%; opacity: 0.08; }
-.work-item:hover { padding-left: 16px; }
-.work-item.active { padding-left: 16px; }
+    .hero-title {
+      font-family: var(--font-display);
+      font-size: clamp(48px, 9vw, 110px);
+      font-weight: 800;
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+      margin-bottom: 24px;
+      background: linear-gradient(180deg, #FFFFFF 30%, rgba(255, 255, 255, 0.5) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-.work-item-left { display: flex; align-items: center; gap: 20px; }
-.work-num {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--gray-text);
-  letter-spacing: 0.1em;
-  min-width: 24px;
-}
-.work-item.active .work-num { color: var(--red); }
-.work-title {
-  font-family: var(--font-display);
-  font-size: clamp(22px, 2.8vw, 34px);
-  letter-spacing: 0.02em;
-  color: var(--gray-text);
-  transition: color 0.2s;
-  line-height: 1;
-}
-.work-item:hover .work-title,
-.work-item.active .work-title { color: var(--white); }
+    .hero-title span {
+      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
 
-.work-meta {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--gray-text);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  opacity: 0;
-  transition: opacity 0.2s;
-}
-.work-item:hover .work-meta,
-.work-item.active .work-meta { opacity: 1; }
+    .hero-sub {
+      max-width: 580px;
+      font-size: clamp(16px, 2vw, 18px);
+      color: var(--text-muted);
+      margin-bottom: 40px;
+      font-weight: 400;
+    }
 
-.work-arrow {
-  font-family: var(--font-mono);
-  font-size: 16px;
-  color: var(--red);
-  opacity: 0;
-  transform: translateX(-8px);
-  transition: opacity 0.2s, transform 0.3s;
-  text-decoration: none;
-}
-.work-item:hover .work-arrow,
-.work-item.active .work-arrow {
-  opacity: 1;
-  transform: translateX(0);
-}
+    .hero-actions {
+      display: flex;
+      gap: 16px;
+      align-items: center;
+    }
 
-/* Right: preview panel */
-.work-preview {
-  position: sticky;
-  top: 100px;
-}
-.work-preview-inner {
-  position: relative;
-  width: 100%;
-  height: 420px;
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 32px;
+      border-radius: 9999px;
+      background: var(--text-main);
+      color: var(--bg);
+      font-family: var(--font-heading);
+      font-weight: 700;
+      font-size: 14px;
+      text-decoration: none;
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+    }
 
-}
-.work-preview-inner iframe {
-  position: absolute;
-  inset: 0;
-  width: 100%; height: 100%;
-  border: none;
-  opacity: 0;
-  transition: opacity 0.4s ease;
-  pointer-events: none;
-}
-.work-preview-inner iframe.active {
-  opacity: 1;
-  pointer-events: none;
-}
-.work-preview-placeholder {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 12px;
-  transition: opacity 0.3s;
-}
-.work-preview-placeholder.hidden { opacity: 0; }
-.work-preview-placeholder span {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.2em;
-  text-transform: uppercase;
-  color: var(--gray-text);
-}
-.preview-line {
-  width: 32px; height: 1px;
-  background: var(--gray-mid);
-}
-.work-preview-caption {
-  margin-top: 16px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.work-preview-caption-title {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 15px;
-  font-weight: 300;
-  color: var(--gray-text);
-  transition: color 0.3s;
-}
-.work-preview-caption-title.visible { color: var(--white); }
-.work-open {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--red);
-  text-decoration: none;
-  opacity: 0;
-  transition: opacity 0.3s;
-}
-.work-open.visible { opacity: 1; }
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+    }
 
-@media (max-width: 768px) {
-  .work-layout { grid-template-columns: 1fr; }
-.work-preview {
-  display: block;
-  position: relative;
-  margin-top: 20px;
-}
-  .work-preview-inner {
-  height: 220px;
-}
-}
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 28px;
+      border-radius: 9999px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--text-main);
+      font-family: var(--font-heading);
+      font-weight: 600;
+      font-size: 14px;
+      text-decoration: none;
+      backdrop-filter: blur(10px);
+      transition: all 0.3s ease;
+    }
 
-/* ─── CONTACT ─── */
-#contact {
-  max-width: 1200px;
-  margin: 0 auto;
-}
-.contact-big {
-  font-family: var(--font-display);
-  font-size: clamp(56px, 9vw, 130px);
-  line-height: 0.95;
-  letter-spacing: 0.02em;
-  color: var(--white);
-  margin-bottom: 48px;
-}
-.contact-big .accent { color: var(--red); }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+    }
 
-.contact-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  flex-wrap: wrap;
-  gap: 32px;
-  padding-top: 48px;
-  border-top: 1px solid var(--gray-mid);
-}
-.contact-links { display: flex; gap: 24px; flex-wrap: wrap; }
-.contact-link {
-  font-family: var(--font-mono);
-  font-size: 11px;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  color: var(--gray-text);
-  text-decoration: none;
-  transition: color 0.2s;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-.contact-link:hover { color: var(--white); }
-  .contact-link[href*="discord"]:hover {
-  color: #5865F2;
-}
-.contact-link svg { opacity: 0.4; transition: opacity 0.2s; }
-.contact-link:hover svg { opacity: 1; }
+    /* ─── INFINITE MARQUEE ─── */
+    .marquee-container {
+      width: 100%;
+      overflow: hidden;
+      border-y: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.3);
+      padding: 18px 0;
+      backdrop-filter: blur(8px);
+    }
 
-.contact-email {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-size: clamp(22px, 3vw, 38px);
-  font-weight: 300;
-  color: var(--white);
-  text-decoration: none;
-  transition: color 0.2s;
-  display: inline-block;
-}
-.contact-email:hover { color: var(--red); }
+    .marquee-track {
+      display: flex;
+      gap: 40px;
+      width: max-content;
+      animation: marquee 25s linear infinite;
+    }
 
-/* ─── FOOTER ─── */
-footer {
-  padding: 32px 48px;
-  border-top: 1px solid var(--gray-mid);
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 12px;
-}
-footer p {
-  font-family: var(--font-mono);
-  font-size: 10px;
-  color: var(--gray-text);
-  letter-spacing: 0.12em;
-}
+    .marquee-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-heading);
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
 
-/* ─── REVEAL ANIMATION ─── */
-.reveal {
-  opacity: 0;
-  transform: translateY(40px);
-  transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
-}
-.reveal.visible {
-  opacity: 1;
-  transform: none;
-}
+    .marquee-item span { color: var(--accent); }
 
-/* ─── MOBILE ─── */
-@media (max-width: 768px) {
-  nav { padding: 20px 24px; }
-  .hero { padding: 0 24px 48px; }
-  #about { grid-template-columns: 1fr; padding: 60px 24px; }
-  .section { padding: 60px 24px; }
-  .projects-row-2 { grid-template-columns: 1fr; }
-  footer { padding: 24px; }
-  .divider { margin: 0 24px; }
-  .contact-big { font-size: clamp(48px, 12vw, 80px); }
-  .nav-links { display: none; }
-}
-</style>
+    @keyframes marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-50%); }
+    }
+
+    /* ─── BENTO GRID LAYOUT ─── */
+    .section {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 120px 24px;
+    }
+
+    .section-header {
+      margin-bottom: 48px;
+    }
+
+    .section-tag {
+      font-family: var(--font-heading);
+      font-size: 12px;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      margin-bottom: 8px;
+      display: block;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(32px, 5vw, 52px);
+      font-weight: 700;
+      letter-spacing: -0.02em;
+    }
+
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+    }
+
+    .bento-card {
+      position: relative;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 32px;
+      backdrop-filter: blur(12px);
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .bento-card:hover {
+      border-color: var(--border-glow);
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5), 0 0 30px var(--accent-glow);
+    }
+
+    .bento-card.col-2 { grid-column: span 2; }
+    .bento-card.col-3 { grid-column: span 3; }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 14px;
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.2);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      margin-bottom: 20px;
+    }
+
+    .card-title {
+      font-family: var(--font-heading);
+      font-size: 20px;
+      font-weight: 700;
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .stat-number {
+      font-family: var(--font-display);
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1;
+      background: linear-gradient(135deg, #FFF 0%, var(--text-muted) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 8px;
+    }
+
+    /* ─── WORK / SHOWCASE SECTION ─── */
+    .work-showcase {
+      display: grid;
+      grid-template-columns: 1fr 1.2fr;
+      gap: 32px;
+      align-items: start;
+    }
+
+    .work-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .work-item {
+      padding: 24px;
+      border-radius: 16px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: all 0.3s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .work-item:hover, .work-item.active {
+      background: var(--bg-card-hover);
+      border-color: var(--accent);
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .work-info h4 {
+      font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .work-info p {
+      font-size: 13px;
+      color: var(--text-muted);
+    }
+
+    .work-preview-box {
+      position: sticky;
+      top: 120px;
+      border-radius: 24px;
+      border: 1px solid var(--border);
+      overflow: hidden;
+      background: #000;
+      aspect-ratio: 16 / 9;
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+    }
+
+    .work-preview-box iframe,
+    .work-preview-box video {
+      width: 100%;
+      height: 100%;
+      border: none;
+      object-fit: cover;
+    }
+
+    /* ─── FOOTER & CONTACT ─── */
+    .contact-card {
+      text-align: center;
+      padding: 80px 32px;
+      background: linear-gradient(180deg, var(--bg-card) 0%, rgba(15,23,42,0.8) 100%);
+      border: 1px solid var(--border);
+      border-radius: 32px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .contact-title {
+      font-family: var(--font-display);
+      font-size: clamp(36px, 6vw, 72px);
+      font-weight: 800;
+      line-height: 1;
+      margin-bottom: 24px;
+    }
+
+    .social-links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      margin-top: 32px;
+      flex-wrap: wrap;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 32px 24px;
+      text-align: center;
+      color: var(--text-dim);
+      font-size: 13px;
+      font-family: var(--font-heading);
+    }
+
+    /* ─── RESPONSIVE ─── */
+    @media (max-width: 900px) {
+      .bento-grid { grid-template-columns: 1fr; }
+      .bento-card.col-2, .bento-card.col-3 { grid-column: span 1; }
+      .work-showcase { grid-template-columns: 1fr; }
+      .nav-status { display: none; }
+    }
+  </style>
 </head>
-
 <body>
 
-<div id="progress"></div>
-<canvas id="damascus-bg"></canvas>
+  <!-- Background Layer -->
+  <div class="bg-grid"></div>
+  <div class="ambient-glow"></div>
 
-
-<!-- NAV -->
-<nav>
-  <a href="#" class="nav-logo">VM<span>.</span></a>
-  <div class="nav-links">
-    <a href="#about">About</a>
-    <a href="#projects">Work</a>
-    <a href="#contact">Contact</a>
+  <!-- Floating Navigation -->
+  <div class="nav-container">
+    <nav>
+      <a href="#" class="nav-logo">VYAN<span>.</span></a>
+      <ul class="nav-links">
+        <li><a href="#about">About</a></li>
+        <li><a href="#work">Work</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+      <div class="nav-status">
+        <div class="status-dot"></div>
+        <span>Available for Hire</span>
+      </div>
+    </nav>
   </div>
-</nav>
 
-<!-- HERO -->
-<div class="hero">
-  <video autoplay muted loop playsinline class="hero-video">
-    <source src="montage.mp4" type="video/mp4">
-  </video>
-  <div class="hero-overlay"></div>
-
-  <div class="hero-tag">Gaming Video Editor · DaVinci Resolve · Est. 2021</div>
-  <div class="hero-name">VYAN<br>MER<span class="accent">CHANT</span></div>
-  <div class="hero-bottom">
-    <p class="hero-sub">Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages.</p>
-    <a href="#projects" class="hero-cta">
-      View My Work
-      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-        <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-      </svg>
-    </a>
-  </div>
-</div>
-
-<!-- MARQUEE -->
-<div class="marquee-wrap">
-  <div class="marquee-track">
-    <span>DaVinci Resolve</span><span class="dot">✦</span>
-    <span>Gaming Montages</span><span class="dot">✦</span>
-    <span>Color Grading</span><span class="dot">✦</span>
-    <span>Fast Edits</span><span class="dot">✦</span>
-    <span>Content Creation</span><span class="dot">✦</span>
-    <span>Valorant</span><span class="dot">✦</span>
-    <span>Motion Design</span><span class="dot">✦</span>
-    <span>4 Years Experience</span><span class="dot">✦</span>
-    <!-- duplicate for seamless loop -->
-    <span>DaVinci Resolve</span><span class="dot">✦</span>
-    <span>Gaming Montages</span><span class="dot">✦</span>
-    <span>Color Grading</span><span class="dot">✦</span>
-    <span>Fast Edits</span><span class="dot">✦</span>
-    <span>Content Creation</span><span class="dot">✦</span>
-    <span>Valorant</span><span class="dot">✦</span>
-    <span>Motion Design</span><span class="dot">✦</span>
-    <span>4 Years Experience</span><span class="dot">✦</span>
-  </div>
-</div>
-
-<!-- ABOUT -->
-<section class="section" id="about">
-  <!-- Left -->
-  <div class="about-left reveal">
-    <div class="section-label">About</div>
-    <div class="big-text">EDIT.<br>FAST.<br><span class="accent">HARD.</span></div>
-    <p class="about-body">
-      I'm <b>Vyan</b>, a 17-year-old video editor obsessed with making gaming content that actually slaps. 
-      I've been editing for <b>4 years</b> using <b>DaVinci Resolve</b> — cutting, grading, and syncing footage 
-      to create montages that keep viewers locked in from the first frame to the last.
-      <br><br>
-      Worked with multiple creators, shipped a video editing internship, and I'm always looking for the next 
-      collab that pushes what gaming edits can be.
+  <!-- Hero Section -->
+  <section class="hero">
+    <div class="hero-badge">
+      <span>✦</span> Gaming Video Editor & Motion Designer
+    </div>
+    <h1 class="hero-title">
+      CRAFTING HIGH IMPACT<br><span>GAMING VISUALS</span>
+    </h1>
+    <p class="hero-sub">
+      Transforming raw gameplay into high-octane visual experiences. Specialized in fast-paced edits, precise pacing, and custom color grading.
     </p>
+    <div class="hero-actions">
+      <a href="#work" class="btn-primary">
+        Explore Work
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+      </a>
+      <a href="#contact" class="btn-secondary">Get in Touch</a>
+    </div>
+  </section>
 
-    <div class="stats-grid">
-      <div class="stat-item">
-        <span class="stat-num">4</span>
-        <span class="stat-label">Years Editing</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-num">∞</span>
-        <span class="stat-label">Hours in Resolve</span>
-      </div>
+  <!-- Marquee Banner -->
+  <div class="marquee-container">
+    <div class="marquee-track">
+      <div class="marquee-item">DaVinci Resolve Studio <span>✦</span></div>
+      <div class="marquee-item">Valorant Montages <span>✦</span></div>
+      <div class="marquee-item">Color Grading <span>✦</span></div>
+      <div class="marquee-item">Sound Design & SFX <span>✦</span></div>
+      <div class="marquee-item">4+ Years Experience <span>✦</span></div>
+      <div class="marquee-item">Motion Graphics <span>✦</span></div>
+      <!-- Duplicate for looping -->
+      <div class="marquee-item">DaVinci Resolve Studio <span>✦</span></div>
+      <div class="marquee-item">Valorant Montages <span>✦</span></div>
+      <div class="marquee-item">Color Grading <span>✦</span></div>
+      <div class="marquee-item">Sound Design & SFX <span>✦</span></div>
+      <div class="marquee-item">4+ Years Experience <span>✦</span></div>
+      <div class="marquee-item">Motion Graphics <span>✦</span></div>
     </div>
   </div>
 
-  <!-- Right -->
-  <div class="skills-right reveal" style="transition-delay: 0.15s">
-    <div class="section-label">Skills</div>
-
-    <div class="skill-row">
-      <span class="skill-name">DaVinci Resolve</span>
+  <!-- About / Bento Section -->
+  <section class="section" id="about">
+    <div class="section-header">
+      <span class="section-tag">Overview</span>
+      <h2 class="section-title">Built for Performance & Style</h2>
     </div>
-    <div class="skill-row">
-      <span class="skill-name">Gaming Montages</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-name">Color Grading</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-name">Motion & SFX</span>
-    </div>
-    <div class="skill-row">
-      <span class="skill-name">Content Creation</span>
-    </div>
-  </div>
-</section>
 
-<div class="divider"></div>
+    <div class="bento-grid">
+      <div class="bento-card col-2">
+        <div class="card-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l5 5-5 5M4 4v7a4 4 0 004 4h12"/></svg>
+        </div>
+        <h3 class="card-title">Narrative & Rhythm-Driven Editing</h3>
+        <p class="card-desc">
+          I'm Vyan, a 17-year-old video editor with 4+ years of hands-on experience in DaVinci Resolve. My focus is on frame-accurate beat syncing, narrative pacing, and seamless visual impact that maximizes retention.
+        </p>
+      </div>
 
-<!-- PROJECTS -->
-<section class="section" id="projects">
-  <div class="section-label reveal">Work</div>
+      <div class="bento-card">
+        <div class="stat-number">4+</div>
+        <h3 class="card-title">Years Crafting</h3>
+        <p class="card-desc">Dedicated solely to mastering timeline speed & software perfection.</p>
+      </div>
 
-  <div class="work-layout reveal" style="transition-delay:0.1s">
-    <!-- Left: list -->
-    <div class="work-list">
+      <div class="bento-card">
+        <div class="card-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        </div>
+        <h3 class="card-title">Color Grading</h3>
+        <p class="card-desc">Custom LUTs and color spaces built to turn flat clips into cinematic masterpieces.</p>
+      </div>
 
-      <div class="work-item active" data-id="val" data-url="https://www.youtube.com/watch?v=d0qvLlFEEH8">
-        <div class="work-item-left">
-          <span class="work-num">01</span>
-          <div>
-            <div class="work-title">Valorant Montage</div>
-            <div class="work-meta">DaVinci Resolve · Fast Edits · Color Grade</div>
+      <div class="bento-card col-2">
+        <div class="card-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        <h3 class="card-title">Creator & Industry Ready</h3>
+        <p class="card-desc">From fast-paced YouTube content to esports edits—shipped internships and worked directly with creators to elevate their brand aesthetics.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Work Showcase -->
+  <section class="section" id="work">
+    <div class="section-header">
+      <span class="section-tag">Portfolio</span>
+      <h2 class="section-title">Selected Edits</h2>
+    </div>
+
+    <div class="work-showcase">
+      <div class="work-list">
+        <div class="work-item active" onclick="switchVideo('youtube', 'd0qvLlFEEH8', this)">
+          <div class="work-info">
+            <h4>Valorant Montage 2026</h4>
+            <p>DaVinci Resolve · Precision Sync · Color Grade</p>
           </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
         </div>
-        <a href="https://www.youtube.com/watch?v=d0qvLlFEEH8" target="_blank" class="work-arrow">↗</a>
-      </div>
 
-      <div class="work-item" data-id="proj2" data-url="https://www.youtube.com/watch?v=4ZcBnbLWxvU">
-        <div class="work-item-left">
-          <span class="work-num">02</span>
-          <div>
-            <div class="work-title">Valorant Montage(old)</div>
-            <div class="work-meta">Gaming Montage · DaVinci Resolve</div>
+        <div class="work-item" onclick="switchVideo('youtube', '4ZcBnbLWxvU', this)">
+          <div class="work-info">
+            <h4>Valorant Montage (Classic)</h4>
+            <p>Gaming Montage · FX Sound Design</p>
           </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
         </div>
-        <a href="https://www.youtube.com/watch?v=4ZcBnbLWxvU" target="_blank" class="work-arrow"></a>
-      </div>
 
-      <div class="work-item" data-id="proj3" data-url="montage.mp4">
-        <div class="work-item-left">
-          <span class="work-num">03</span>
-          <div>
-            <div class="work-title">practice edit</div>
-            <div class="work-meta">Creative Edit · Motion Design</div>
+        <div class="work-item" onclick="switchVideo('local', 'montage.mp4', this)">
+          <div class="work-info">
+            <h4>Practice & Style Reel</h4>
+            <p>Motion Design · Visual Experiments</p>
           </div>
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
         </div>
-        <a href="#" target="_blank" class="work-arrow">↗</a>
       </div>
 
-    </div>
-
-    <!-- Right: preview -->
-    <div class="work-preview">
-      <div class="work-preview-inner">
-        <div class="work-preview-placeholder" id="work-placeholder">
-          <div class="preview-line"></div>
-          <span>Hover to preview</span>
-          <div class="preview-line"></div>
-        </div>
-        <!-- iframes injected by JS -->
-      </div>
-      <div class="work-preview-caption">
-        <span class="work-preview-caption-title" id="preview-caption">—</span>
-        <a class="work-open" id="preview-link" href="#" target="_blank">Open ↗</a>
+      <div class="work-preview-box" id="previewContainer">
+        <iframe src="https://www.youtube.com/embed/d0qvLlFEEH8?autoplay=0&mute=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
       </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<div class="divider"></div>
-
-<!-- CONTACT -->
-<section class="section" id="contact">
-  <div class="section-label reveal">Contact</div>
-
-  <div class="contact-big reveal" style="transition-delay:0.1s">
-    LET'S<br>BUILD<br><span class="accent">SOMETHING.</span>
-  </div>
-
-  <div class="contact-row reveal" style="transition-delay:0.2s">
-    
-    <!-- MAIN EMAIL -->
-    <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vyanmerchant@gmail.com" target="_blank" class="contact-email">
-  vyanmerchant@gmail.com
-    </a>
-    <div class="contact-links">
+  <!-- Contact Section -->
+  <section class="section" id="contact">
+    <div class="contact-card">
+      <span class="section-tag">Get In Touch</span>
+      <h2 class="contact-title">LET'S CREATE SOMETHING<br>ICONIC.</h2>
+      <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 32px;">
+        Open for video editing commissions, long-term creator partnerships, and gaming projects.
+      </p>
       
-      <!-- EMAIL LINK -->
-     <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vyanmerchant@gmail.com" target="_blank" class="contact-link">
-    
-         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
-          <polyline points="22,6 12,13 2,6"/>
-        </svg>
-        Email
+      <a href="mailto:vyanmerchant@gmail.com" class="btn-primary" style="display: inline-flex;">
+        vyanmerchant@gmail.com
       </a>
 
-      <!-- YOUTUBE -->
-      <a href="https://youtube.com" target="_blank" class="contact-link">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M22.54 6.42a2.78 2.78 0 0 0-1.95-1.96C18.88 4 12 4 12 4s-6.88 0-8.59.46A2.78 2.78 0 0 0 1.46 6.42 29 29 0 0 0 1 12a29 29 0 0 0 .46 5.58 2.78 2.78 0 0 0 1.95 1.95C5.12 20 12 20 12 20s6.88 0 8.59-.47a2.78 2.78 0 0 0 1.95-1.95A29 29 0 0 0 23 12a29 29 0 0 0-.46-5.58z"/>
-          <polygon points="9.75 15.02 15.5 12 9.75 8.98 9.75 15.02"/>
-        </svg>
-        YouTube
-      </a>
-
-      <!-- DISCORD -->
-<a href="https://discord.com/users/1111715392461738034" target="_blank" class="contact-link">
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-    <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515..."/>
-  </svg>
-  💬 Discord
-</a>
-
+      <div class="social-links">
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vyanmerchant@gmail.com" target="_blank" class="btn-secondary">Email</a>
+        <a href="https://youtube.com" target="_blank" class="btn-secondary">YouTube</a>
+        <a href="https://discord.com/users/1111715392461738034" target="_blank" class="btn-secondary">Discord</a>
+      </div>
     </div>
-  </div>
-</section>
+  </section>
 
-<!-- FOOTER -->
-<footer>
-  <p>© 2026 Vyan Merchant</p>
-  <p>Gaming Video Editor · DaVinci Resolve</p>
-</footer>
+  <!-- Footer -->
+  <footer>
+    <p>© 2026 Vyan Merchant. Crafting top-tier gaming edits.</p>
+  </footer>
 
-<script>
+  <script>
+    // Video Player Switcher
+    function switchVideo(type, source, element) {
+      const container = document.getElementById('previewContainer');
+      
+      // Update UI active state
+      document.querySelectorAll('.work-item').forEach(item => item.classList.remove('active'));
+      element.classList.add('active');
 
-
-/* SCROLL PROGRESS */
-window.addEventListener('scroll', () => {
-  const st = document.documentElement.scrollTop;
-  const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-  document.getElementById('progress').style.width = (st / h * 100) + '%';
-});
-
-/* REVEAL */
-const observer = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      e.target.classList.add('visible');
-      e.target.querySelectorAll('.skill-row').forEach(row => row.classList.add('in-view'));
-      observer.unobserve(e.target);
-    }
-  });
-}, { threshold: 0.05, rootMargin: '0px 0px -40px 0px' });
-
-document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-
-// Fallback: show all hidden sections after 1.5s in case observer doesn't fire
-setTimeout(() => {
-  document.querySelectorAll('.reveal:not(.visible)').forEach(el => el.classList.add('visible'));
-}, 1500);
-
-/* WORK SECTION — hover to play */
-(function() {
-  const projects = {
-    val:   { id: 'd0qvLlFEEH8', title: 'Valorant Montage', url: 'https://www.youtube.com/watch?v=d0qvLlFEEH8' },
-    proj2: { id: '4ZcBnbLWxvU', title: 'Valorant Montage(old)', url: 'https://www.youtube.com/watch?v=4ZcBnbLWxvU' },
-    proj3: { video: 'montage.mp4', title: 'Project 3', url: 'montage.mp4' },
-  };
-
-  const previewWrap = document.querySelector('.work-preview-inner');
-  const placeholder = document.getElementById('work-placeholder');
-  const caption     = document.getElementById('preview-caption');
-  const openLink    = document.getElementById('preview-link');
-  const iframes     = {};
-  let currentId     = null;
-  let hoverTimer    = null;
-
- Object.entries(projects).forEach(([key, p]) => {
-
-  // YouTube
-  if (p.id) {
-    const f = document.createElement('iframe');
-    f.src = `https://www.youtube.com/embed/${p.id}?autoplay=0&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${p.id}`;
-    f.allow = 'autoplay; encrypted-media';
-    f.setAttribute('allowfullscreen', '');
-    previewWrap.appendChild(f);
-    iframes[key] = f;
-  }
-
-  // Local video (montage.mp4)
-  if (p.video) {
-    const v = document.createElement('video');
-    v.src = p.video;
-    v.muted = true;
-    v.loop = true;
-    v.playsInline = true;
-
-    v.style.position = "absolute";
-    v.style.inset = "0";
-    v.style.width = "100%";
-    v.style.height = "100%";
-    v.style.objectFit = "cover";
-    v.style.opacity = "0";
-    v.style.transition = "opacity 0.4s ease";
-
-    previewWrap.appendChild(v);
-    iframes[key] = v;
-  }
-
-});
-
-  function activate(key) {
-    if (currentId === key) return;
-    currentId = key;
-
-    const p = projects[key];
-
-   Object.entries(iframes).forEach(([k, el]) => {
-  if (k === key) {
-    el.style.opacity = "1";
-
-    if (el.tagName === "VIDEO") {
-      el.currentTime = 0;
-      el.play();
-    }
-
-    if (el.tagName === "IFRAME") {
-      const base = el.src.split('?')[0];
-      el.src = `${base}?autoplay=1&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${projects[key].id}`;
-    }
-
-  } else {
-    el.style.opacity = "0";
-
-    if (el.tagName === "VIDEO") {
-      el.pause();
-    }
-
-    if (el.tagName === "IFRAME") {
-      const base = el.src.split('?')[0];
-      const pid = projects[k]?.id;
-      if (pid) {
-        el.src = `${base}?autoplay=0&mute=1&controls=0&modestbranding=1&rel=0&loop=1&playlist=${pid}`;
+      if (type === 'youtube') {
+        container.innerHTML = `<iframe src="https://www.youtube.com/embed/${source}?autoplay=1&mute=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+      } else if (type === 'local') {
+        container.innerHTML = `<video src="${source}" controls autoplay muted loop></video>`;
       }
     }
-  }
-});
-
-    // Update caption
-    placeholder.classList.toggle('hidden', !!p.id);
-    caption.textContent = p.title;
-    caption.classList.toggle('visible', true);
-    openLink.href = p.url;
-    openLink.classList.toggle('visible', p.url !== '#');
-
-    // Active state on list items
-    document.querySelectorAll('.work-item').forEach(el => {
-      el.classList.toggle('active', el.dataset.id === key);
-    });
-  }
-
- document.querySelectorAll('.work-item').forEach(item => {
-
-  // Desktop hover
-  item.addEventListener('mouseenter', () => {
-    clearTimeout(hoverTimer);
-    hoverTimer = setTimeout(() => activate(item.dataset.id), 120);
-  });
-
-  // Mobile tap
-  item.addEventListener('click', () => {
-    activate(item.dataset.id);
-  });
-
-});;
-
-  // Activate first on load
-  activate('val');
-})();
-(function() {
-  const canvas = document.getElementById('damascus-bg');
-  const ctx = canvas.getContext('2d');
-  const SCALE = 3;
-  let W, H, t = 0;
-
-  function resize() {
-    W = Math.floor(window.innerWidth / SCALE);
-    H = Math.floor(window.innerHeight / SCALE);
-    canvas.width = W;
-    canvas.height = H;
-  }
-  resize();
-  window.addEventListener('resize', resize);
-
-  function draw() {
-    t += 0.003;
-    const img = ctx.createImageData(W, H);
-    const d = img.data;
-
-    for (let y = 0; y < H; y++) {
-      for (let x = 0; x < W; x++) {
-        const nx = x / W;
-        const ny = y / H;
-
-        const warp = Math.sin(ny * 8 + t + Math.sin(nx * 5 + t * 0.6) * 1.4) * 0.18
-                   + Math.cos(nx * 6 - t * 0.5 + Math.sin(ny * 4 + t * 0.8) * 1.2) * 0.12;
-
-        const wx = nx + warp * 0.5;
-        const wy = ny + warp * 0.3;
-
-        const band1 = Math.sin(wx * 14 + wy * 9  + t * 0.4) * 0.5 + 0.5;
-        const band2 = Math.sin(wx * 7  - wy * 11 + t * 0.25 + 1.8) * 0.5 + 0.5;
-
-        const v = band1 * 0.55 + band2 * 0.45;
-        const base = 6 + v * 16;
-        const shimmer = Math.pow(Math.max(0, Math.sin(wx * 30 + wy * 12 + t * 1.8)), 14) * 18;
-
-        const r = base + shimmer * 0.9;
-        const g = base + shimmer * 0.85;
-        const b = base + shimmer * 0.7;
-
-        const i = (y * W + x) * 4;
-        d[i]   = r;
-        d[i+1] = g;
-        d[i+2] = b;
-        d[i+3] = 255;
-      }
-    }
-    ctx.putImageData(img, 0, 0);
-    requestAnimationFrame(draw);
-  }
-  draw();
-})();
-</script>
-
+  </script>
 </body>
 </html>
