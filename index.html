@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vyan Merchant — Ultimate Cinematic Masterpiece</title>
+<title>Vyan Merchant — Overkill Cinematic Masterpiece</title>
 
-<!-- GOOGLE FONTS -->
+<!-- FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -18,17 +18,17 @@
 
 <style>
 /* ==========================================
-   01. ARCHITECTURAL TOKENS & RESET
+   01. ARCHITECTURAL TOKENS
    ========================================== */
 :root {
-  --bg: #030305;
-  --surface: #0a0a0e;
-  --surface-light: #13131a;
-  --fg: #f5f2ec;
-  --accent: #ff2a00;
-  --accent-blue: #00f0ff;
-  --muted: #666670;
-  --border: rgba(245, 242, 236, 0.08);
+  --bg: #020204;
+  --surface: #07070a;
+  --surface-light: #111116;
+  --fg: #f4f1ea;
+  --accent: #ff2800;
+  --accent-cyan: #00f5ff;
+  --muted: #555560;
+  --border: rgba(244, 241, 234, 0.08);
   
   --font-display: 'Anton', sans-serif;
   --font-sans: 'Syne', sans-serif;
@@ -57,7 +57,7 @@ body {
 ::selection { background: var(--accent); color: var(--bg); }
 
 /* ==========================================
-   02. CINEMATIC MULTI-LAYER LOADER
+   02. CINEMATIC OVERKILL LOADER
    ========================================== */
 #loader {
   position: fixed; inset: 0; z-index: 100000;
@@ -72,7 +72,7 @@ body {
 .loader-bar { position: absolute; top: 0; left: 0; width: 0%; height: 100%; background: var(--accent); }
 
 /* ==========================================
-   03. CUBERTO-STYLE MORPHING CURSOR
+   03. CUBERTO MORPHING CURSOR
    ========================================== */
 #cursor-dot {
   position: fixed; top: 0; left: 0; width: 8px; height: 8px;
@@ -81,20 +81,20 @@ body {
 }
 #cursor-ring {
   position: fixed; top: 0; left: 0; width: 45px; height: 45px;
-  border: 1px solid rgba(245, 242, 236, 0.35); border-radius: 50%; pointer-events: none;
+  border: 1px solid rgba(244, 241, 234, 0.35); border-radius: 50%; pointer-events: none;
   z-index: 99998; transform: translate(-50%, -50%);
   transition: width 0.4s var(--ease-expo), height 0.4s var(--ease-expo), border-color 0.4s, background 0.4s;
   display: flex; justify-content: center; align-items: center; text-align: center;
 }
 #cursor-ring span { opacity: 0; font-family: var(--font-mono); font-size: 9px; font-weight: 700; color: var(--bg); text-transform: uppercase; transition: opacity 0.3s; }
-.cursor-hover #cursor-ring { width: 85px; height: 85px; background: rgba(245, 242, 236, 0.1); backdrop-filter: blur(10px); border-color: rgba(245, 242, 236, 0.6); }
+.cursor-hover #cursor-ring { width: 85px; height: 85px; background: rgba(244, 241, 234, 0.1); backdrop-filter: blur(10px); border-color: rgba(244, 241, 234, 0.6); }
 .cursor-play #cursor-ring { width: 120px; height: 120px; background: var(--fg); border-color: var(--fg); }
 .cursor-play #cursor-ring span { opacity: 1; }
 
 @media (pointer: coarse) { #cursor-dot, #cursor-ring { display: none; } body { cursor: auto; } }
 
 /* ==========================================
-   04. WEBGL BACKGROUND & SVG DISPLACEMENT
+   04. WEBGL SHADER BACKGROUND
    ========================================== */
 #webgl-canvas { position: fixed; inset: 0; z-index: -2; pointer-events: none; }
 .noise-overlay {
@@ -106,7 +106,7 @@ svg.svg-filters { position: absolute; width: 0; height: 0; pointer-events: none;
 /* ==========================================
    05. TYPOGRAPHY & UTILS
    ========================================== */
-.t-giant { font-family: var(--font-display); font-size: clamp(5.5rem, 16vw, 18rem); line-height: 0.82; text-transform: uppercase; }
+.t-giant { font-family: var(--font-display); font-size: clamp(5.5rem, 16vw, 19rem); line-height: 0.8; text-transform: uppercase; }
 .t-h2 { font-family: var(--font-display); font-size: clamp(3rem, 8vw, 9.5rem); line-height: 0.88; text-transform: uppercase; }
 .t-body { font-size: clamp(1.05rem, 1.5vw, 1.45rem); line-height: 1.6; color: var(--muted); font-weight: 500; }
 .t-mono { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--muted); }
@@ -125,7 +125,7 @@ nav {
   position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%);
   width: calc(100% - 4vw); max-width: 1600px;
   padding: 1.25rem 2.5rem; display: flex; justify-content: space-between; align-items: center;
-  z-index: 1000; background: rgba(5, 5, 8, 0.7); backdrop-filter: blur(25px);
+  z-index: 1000; background: rgba(3, 3, 5, 0.75); backdrop-filter: blur(25px);
   border: 1px solid var(--border); border-radius: 100px;
   transition: transform 0.5s var(--ease-expo), opacity 0.5s;
 }
@@ -158,7 +158,7 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
 .manifesto { padding: 18vw 4vw; border-top: 1px solid var(--border); position: relative; background: var(--bg); }
 .manifesto-text { font-size: clamp(2.4rem, 5.5vw, 6rem); line-height: 1.12; font-weight: 700; max-width: 90vw; }
 .word { display: inline-block; overflow: hidden; vertical-align: bottom; }
-.char { display: inline-block; transform: translateY(115%); color: #222228; will-change: transform, color; transition: color 0.3s; }
+.char { display: inline-block; transform: translateY(115%); color: #22222a; will-change: transform, color; transition: color 0.3s; }
 .char.active { color: var(--fg); }
 .manifesto-highlight { color: var(--accent) !important; font-style: italic; font-family: var(--font-serif); }
 
@@ -182,8 +182,8 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
 .work-item:hover .work-visual img { filter: grayscale(0%) contrast(1); transform: scale(1.1); }
 
 .rgb-layer { position: absolute; inset: 0; background-size: cover; background-position: center; mix-blend-mode: screen; opacity: 0; transition: transform 0.3s, opacity 0.3s; pointer-events: none; }
-.work-item:hover .rgb-layer.red { opacity: 1; transform: translate(-12px, 6px); filter: brightness(0.6) sepia(1) hue-rotate(-50deg) saturate(7); }
-.work-item:hover .rgb-layer.cyan { opacity: 1; transform: translate(12px, -6px); filter: brightness(0.6) sepia(1) hue-rotate(150deg) saturate(7); }
+.work-item:hover .rgb-layer.red { opacity: 1; transform: translate(-14px, 7px); filter: brightness(0.6) sepia(1) hue-rotate(-50deg) saturate(8); }
+.work-item:hover .rgb-layer.cyan { opacity: 1; transform: translate(14px, -7px); filter: brightness(0.6) sepia(1) hue-rotate(150deg) saturate(8); }
 
 .work-meta { display: flex; justify-content: space-between; align-items: baseline; padding-top: 1.8rem; }
 .work-meta h3 { font-family: var(--font-display); font-size: clamp(2.8rem, 4.5vw, 4.5rem); letter-spacing: 0.02em; text-transform: uppercase; margin: 0; }
@@ -211,8 +211,8 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
   transition: border-color 0.4s, box-shadow 0.4s;
 }
 .bento-card:hover {
-  border-color: rgba(255, 42, 0, 0.6);
-  box-shadow: 0 30px 60px rgba(255, 42, 0, 0.25);
+  border-color: rgba(255, 40, 0, 0.7);
+  box-shadow: 0 35px 70px rgba(255, 40, 0, 0.3);
 }
 .bento-card.span-2 { grid-column: span 2; }
 
@@ -225,18 +225,18 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
   display: flex; flex-direction: column; justify-content: space-between;
 }
 
-.bento-content { transform: translateZ(50px); }
+.bento-content { transform: translateZ(60px); }
 .bento-content h3 { font-family: var(--font-display); font-size: 3rem; letter-spacing: 0.02em; text-transform: uppercase; margin-bottom: 0.5rem; }
 
 .bento-visual {
   position: absolute; inset: 0; z-index: 0; opacity: 0.35;
   transition: opacity 0.4s, transform 0.6s var(--ease-expo);
 }
-.bento-card:hover .bento-visual { opacity: 0.85; transform: scale(1.06); }
+.bento-card:hover .bento-visual { opacity: 0.9; transform: scale(1.07); }
 .bento-visual img { width: 100%; height: 100%; object-fit: cover; }
 .bento-gradient {
   position: absolute; inset: 0;
-  background: linear-gradient(to top, rgba(3,3,5,0.98) 15%, rgba(3,3,5,0.4) 65%, transparent 100%);
+  background: linear-gradient(to top, rgba(2,2,4,0.98) 15%, rgba(2,2,4,0.4) 65%, transparent 100%);
   z-index: 1;
 }
 
@@ -249,8 +249,8 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
   clip-path: circle(0% at 50% 50%); transition: clip-path 0.9s var(--ease-expo); pointer-events: none;
 }
 .modal.active { clip-path: circle(150% at 50% 50%); pointer-events: all; }
-.modal-close { position: absolute; top: 3vw; right: 4vw; background: rgba(245,242,236,0.1); border: 1px solid rgba(245,242,236,0.2); color: var(--fg); padding: 0.75rem 1.75rem; border-radius: 100px; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; cursor: none; z-index: 10; }
-.modal-content { width: 90vw; height: 52vw; max-height: 82vh; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 40px 90px rgba(0,0,0,0.95); }
+.modal-close { position: absolute; top: 3vw; right: 4vw; background: rgba(244,241,234,0.1); border: 1px solid rgba(244,241,234,0.2); color: var(--fg); padding: 0.75rem 1.75rem; border-radius: 100px; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; cursor: none; z-index: 10; }
+.modal-content { width: 90vw; height: 52vw; max-height: 82vh; background: #000; border-radius: 20px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 40px 100px rgba(0,0,0,0.95); }
 .modal-content iframe { width: 100%; height: 100%; border: none; }
 
 /* ==========================================
@@ -259,7 +259,7 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
 .footer { padding: 15vw 0 4vw; border-top: 1px solid var(--border); background: var(--bg); overflow: hidden; display: flex; flex-direction: column; }
 .marquee-wrap { display: flex; width: max-content; white-space: nowrap; animation: moveLeft 16s linear infinite; margin-bottom: 1.5rem; }
 .marquee-wrap.reverse { animation: moveRight 16s linear infinite; }
-.marquee-text { font-family: var(--font-display); font-size: clamp(6rem, 14vm, 17rem); font-size: clamp(6rem, 14vw, 17rem); line-height: 0.85; text-transform: uppercase; padding-right: 4vw; }
+.marquee-text { font-family: var(--font-display); font-size: clamp(6rem, 14vw, 17rem); line-height: 0.85; text-transform: uppercase; padding-right: 4vw; }
 @keyframes moveLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 @keyframes moveRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
 
@@ -287,7 +287,7 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
 <svg class="svg-filters">
   <defs>
     <filter id="distortion-filter">
-      <feTurbulence type="fractalNoise" baseFrequency="0.014 0.014" numOctaves="1" result="warp" />
+      <feTurbulence type="fractalNoise" baseFrequency="0.015 0.015" numOctaves="1" result="warp" />
       <feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="0" in="SourceGraphic" in2="warp" id="distort-map" />
     </filter>
   </defs>
@@ -296,7 +296,7 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
 <!-- LOADER -->
 <div id="loader">
   <div class="loader-header">
-    <span>VYAN MERCHANT — MASTERPIECE EDITION</span>
+    <span>VYAN MERCHANT — 2026 OVERKILL EDITION</span>
     <span>PUNE, INDIA</span>
   </div>
   <div class="loader-center">
@@ -304,7 +304,7 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
   </div>
   <div class="loader-footer">
     <span id="loader-percent">0%</span>
-    <span>COMPILING 3D ENVIRONMENTS & SHADERS</span>
+    <span>INITIALIZING SHADER PIPELINE</span>
     <div class="loader-bar-wrap"><div class="loader-bar" id="loader-bar"></div></div>
   </div>
 </div>
@@ -333,13 +333,13 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
   <div class="hero-badge-spin">
     <svg viewBox="0 0 100 100">
       <path id="curve" d="M 50, 50 m -35, 0 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0" fill="transparent"/>
-      <text font-family="Space Mono" font-size="11" fill="#f5f2ec" letter-spacing="3"><textPath href="#curve">DAVINCI RESOLVE · KINETIC ·</textPath></text>
+      <text font-family="Space Mono" font-size="11" fill="#f4f1ea" letter-spacing="3"><textPath href="#curve">DAVINCI RESOLVE · KINETIC ·</textPath></text>
     </svg>
   </div>
 
   <div class="hero-meta t-mono">
-    <span>Gaming Video Editor</span>
-    <span>DaVinci Resolve Specialist</span>
+    <span>Gaming Video Editor[cite: 1]</span>
+    <span>DaVinci Resolve Specialist[cite: 1]</span>
     <span>Uncompromising Motion</span>
   </div>
   <div class="hero-title-group">
@@ -347,11 +347,11 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
     <h1 class="t-giant"><span class="line-reveal"><span class="line-reveal-inner">MERCHANT</span></span></h1>
   </div>
   <div class="hero-subtitle">
-    <p class="t-body">Engineering uncompromising, high-octane gaming edits with kinetic typography, velocity skew, and immersive spatial 3D architecture.</p>
+    <p class="t-body">Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages[cite: 1] engineered for absolute viewer retention.</p>
   </div>
 </section>
 
-<!-- ANIMMASTERLIB 3D HORIZONTAL SKEWED GALLERY -->
+<!-- ANIMMASTERLIB HORIZONTAL SKEWED 3D GALLERY -->
 <section id="work" class="work-section">
   <div class="work-header">
     <h2 class="t-h2">Selected Archives</h2>
@@ -369,8 +369,8 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
           <div class="rgb-layer cyan" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg')"></div>
         </div>
         <div class="work-meta">
-          <h3>Valorant Montage</h3>
-          <span class="t-mono">01 / Color Grade · Fast Cuts</span>
+          <h3>Valorant Montage[cite: 1]</h3>
+          <span class="t-mono">01 / Color Grade · Fast Cuts[cite: 1]</span>
         </div>
       </div>
 
@@ -383,7 +383,7 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
         </div>
         <div class="work-meta">
           <h3>Legacy Edit</h3>
-          <span class="t-mono">02 / Gaming Montage · VFX</span>
+          <span class="t-mono">02 / Gaming Montage · VFX[cite: 1]</span>
         </div>
       </div>
 
@@ -396,7 +396,7 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
         </div>
         <div class="work-meta">
           <h3>Practice Reel</h3>
-          <span class="t-mono">03 / Motion Design</span>
+          <span class="t-mono">03 / Motion Design[cite: 1]</span>
         </div>
       </div>
 
@@ -407,7 +407,7 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
 <!-- MANIFESTO SECTION (OBYS TYPOGRAPHY) -->
 <section id="about" class="manifesto">
   <p class="manifesto-text" id="split-manifesto">
-    I'm <b>Vyan</b>, a 17-year-old video editor obsessed with making gaming content that actually slaps. Working extensively with DaVinci Resolve, I cut, grade, and sync footage to create montages that lock viewers in from frame one. <span class="manifesto-highlight">Edit. Fast. Hard.</span>
+    I'm <b>Vyan</b>[cite: 1], a 17-year-old video editor[cite: 1] obsessed with making gaming content that actually slaps[cite: 1]. Working extensively with DaVinci Resolve[cite: 1], I cut, grade, and sync footage to create montages that lock viewers in from frame one[cite: 1]. <span class="manifesto-highlight">Edit. Fast. Hard[cite: 1].</span>
   </p>
 </section>
 
@@ -432,7 +432,7 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
           <h3>Valorant Masterclass</h3>
         </div>
         <div class="bento-content" style="display:flex; justify-content:space-between; align-items:flex-end;">
-          <span class="t-mono">DaVinci Resolve · Color Grade</span>
+          <span class="t-mono">DaVinci Resolve · Color Grade[cite: 1]</span>
           <span class="t-mono" style="color:var(--accent);">Play Edit →</span>
         </div>
       </div>
@@ -476,8 +476,8 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
     <div class="bento-card span-2 tilt-card">
       <div class="bento-card-inner" style="justify-content: center; align-items: center; text-align: center;">
         <div class="bento-content">
-          <span class="t-mono" style="color:var(--accent);">4 Years Experience</span>
-          <h3 style="font-size:3.5rem; margin-top:1rem;">Endless Hours In Resolve</h3>
+          <span class="t-mono" style="color:var(--accent);">4 Years Experience[cite: 1]</span>
+          <h3 style="font-size:3.5rem; margin-top:1rem;">Endless Hours In Resolve[cite: 1]</h3>
         </div>
       </div>
     </div>
@@ -509,17 +509,17 @@ nav.nav-hidden { transform: translate(-50%, -190%); opacity: 0; }
   </div>
   
   <div class="footer-bottom">
-    <span class="t-mono">© 2026 Vyan Merchant. All rights reserved.</span>
+    <span class="t-mono">© 2026 Vyan Merchant. All rights reserved[cite: 1].</span>
     <div class="footer-links">
-      <a href="https://youtube.com" target="_blank" class="mag">YouTube</a>
-      <a href="https://discord.com/users/1111715392461738034" target="_blank" class="mag">Discord</a>
+      <a href="https://youtube.com" target="_blank" class="mag">YouTube[cite: 1]</a>
+      <a href="https://discord.com/users/1111715392461738034" target="_blank" class="mag">Discord[cite: 1]</a>
     </div>
   </div>
 </section>
 
 <script>
 /* ==========================================
-   PRODUCTION MASTERPIECE ENGINE
+   PRODUCTION ENGINE ARCHITECTURE
    ========================================== */
 gsap.registerPlugin(ScrollTrigger);
 
@@ -596,7 +596,7 @@ function initCursor() {
     el.addEventListener('mousemove', (e) => {
       const rect = el.getBoundingClientRect();
       const relX = (e.clientX - rect.left) / rect.width;
-      gsap.to('#distort-map', { attr: { scale: relX * 60 }, duration: 0.25 });
+      gsap.to('#distort-map', { attr: { scale: relX * 65 }, duration: 0.25 });
     });
     el.addEventListener('mouseleave', () => {
       gsap.to('#distort-map', { attr: { scale: 0 }, duration: 0.5, ease: 'power2.out' });
@@ -657,12 +657,12 @@ function initBackgroundShader() {
         float interaction = smoothstep(0.6, 0.0, dist);
         
         vec2 q = vec2(0.);
-        q.x = sin(st.x * 3.5 + u_time * 0.15) + cos(st.y * 3.0 + u_time * 0.1);
-        q.y = cos(st.x * 3.0 + u_time * 0.2) + sin(st.y * 3.5 + u_time * 0.15);
+        q.x = sin(st.x * 4.0 + u_time * 0.15) + cos(st.y * 3.0 + u_time * 0.1);
+        q.y = cos(st.x * 3.0 + u_time * 0.2) + sin(st.y * 4.0 + u_time * 0.15);
         
-        float val = smoothstep(0.0, 2.2, length(q) * 0.42);
-        vec3 color = mix(vec3(0.005, 0.005, 0.008), vec3(0.035, 0.012, 0.008), val);
-        color += vec3(0.035, 0.005, 0.0) * interaction;
+        float val = smoothstep(0.0, 2.2, length(q) * 0.4);
+        vec3 color = mix(vec3(0.004, 0.004, 0.008), vec3(0.04, 0.012, 0.006), val);
+        color += vec3(0.04, 0.005, 0.0) * interaction;
         
         gl_FragColor = vec4(color, 1.0);
       }
@@ -753,11 +753,11 @@ function initHorizontalSlider() {
 
   let proxy = { skew: 0 },
       skewSetter = gsap.quickSetter(cards, "rotationY", "deg"),
-      clamp = gsap.utils.clamp(-16, 16);
+      clamp = gsap.utils.clamp(-18, 18);
 
   ScrollTrigger.create({
     onUpdate: (self) => {
-      let skew = clamp(self.getVelocity() / -90);
+      let skew = clamp(self.getVelocity() / -80);
       if (Math.abs(skew) > Math.abs(proxy.skew)) {
         proxy.skew = skew;
         gsap.to(proxy, { skew: 0, duration: 0.7, ease: "power3", overwrite: true, onUpdate: () => skewSetter(proxy.skew) });
@@ -785,8 +785,8 @@ function init3DCards() {
       const dy = (y - yc) / yc;
 
       gsap.to(inner, {
-        rotationY: dx * 16,
-        rotationX: -dy * 16,
+        rotationY: dx * 18,
+        rotationX: -dy * 18,
         transformPerspective: 1000,
         duration: 0.1,
         ease: "power1.out"
