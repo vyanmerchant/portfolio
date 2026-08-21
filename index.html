@@ -3,664 +3,499 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vyan Merchant — Premium Gaming Video Editor</title>
+  <title>Vyan Merchant — Creative Editor & Visual Director</title>
 
+  <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300;0,400;0,600;0,800;1,400&family=Space+Grotesk:wght@400;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700&family=Inter:wght@300;400;500;600&family=Space+Grotesk:wght@400;500;600&display=swap" rel="stylesheet">
 
   <style>
-    /* ─── DESIGN SYSTEM & VARS ─── */
+    /* ─── DESIGN SYSTEM ─── */
     :root {
-      --bg: #030712;
-      --bg-card: rgba(17, 24, 39, 0.4);
-      --bg-card-hover: rgba(31, 41, 55, 0.6);
+      --bg: #09090b;
+      --bg-surface: #121215;
       --border: rgba(255, 255, 255, 0.08);
-      --border-glow: rgba(56, 189, 248, 0.3);
+      --border-light: rgba(255, 255, 255, 0.15);
       
-      --accent: #38bdf8;
-      --accent-glow: rgba(56, 189, 248, 0.25);
-      --accent-secondary: #818cf8;
-      
-      --text-main: #f9fafb;
-      --text-muted: #9ca3af;
-      --text-dim: #6b7280;
+      --accent: #d4af37;
+      --text-main: #f4f4f5;
+      --text-muted: #a1a1aa;
+      --text-dark: #71717a;
 
-      --font-display: 'Syne', sans-serif;
+      --font-display: 'Cinzel', serif;
       --font-heading: 'Space Grotesk', sans-serif;
-      --font-body: 'Plus Jakarta Sans', sans-serif;
+      --font-body: 'Inter', sans-serif;
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    html { scroll-behavior: smooth; color-scheme: dark; }
+    html { scroll-behavior: smooth; }
 
     body {
       background-color: var(--bg);
       color: var(--text-main);
       font-family: var(--font-body);
-      overflow-x: hidden;
-      line-height: 1.6;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
     }
 
-    /* ─── BACKGROUND EFFECTS (Aceternity Grid + Ambient Glows) ─── */
-    .bg-grid {
+    /* ─── NAVIGATION ─── */
+    header {
       position: fixed;
-      inset: 0;
-      background-size: 40px 40px;
-      background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-      z-index: -2;
-      mask-image: radial-gradient(ellipse 60% 50% at 50% 0%, #000 70%, transparent 100%);
-    }
-
-    .ambient-glow {
-      position: fixed;
-      top: -10%;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 1000px;
-      height: 600px;
-      background: radial-gradient(circle, rgba(56,189,248,0.12) 0%, rgba(129,140,248,0.05) 50%, transparent 80%);
-      filter: blur(80px);
-      z-index: -1;
-      pointer-events: none;
-    }
-
-    /* ─── FLOATING NAVBAR ─── */
-    .nav-container {
-      position: fixed;
-      top: 24px;
-      left: 50%;
-      transform: translateX(-50%);
+      top: 0;
+      left: 0;
+      width: 100%;
       z-index: 1000;
-      width: min(90%, 650px);
-    }
-
-    nav {
-      background: rgba(15, 23, 42, 0.65);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--border);
-      border-radius: 9999px;
-      padding: 10px 24px;
+      padding: 32px 50px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5), 0 0 0 1px rgba(255,255,255,0.05);
+      background: linear-gradient(to bottom, rgba(9,9,11,0.9) 0%, rgba(9,9,11,0) 100%);
+      backdrop-filter: blur(8px);
     }
 
-    .nav-logo {
-      font-family: var(--font-heading);
-      font-weight: 700;
+    .brand {
+      font-family: var(--font-display);
       font-size: 18px;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
       color: var(--text-main);
       text-decoration: none;
-      letter-spacing: -0.02em;
+      font-weight: 700;
     }
-
-    .nav-logo span { color: var(--accent); }
 
     .nav-links {
       display: flex;
-      gap: 24px;
+      gap: 40px;
       list-style: none;
     }
 
     .nav-links a {
       font-family: var(--font-heading);
-      font-size: 13px;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
       color: var(--text-muted);
       text-decoration: none;
-      transition: all 0.2s ease;
+      transition: color 0.3s ease;
     }
 
     .nav-links a:hover {
       color: var(--text-main);
-      text-shadow: 0 0 8px var(--accent-glow);
     }
 
-    .nav-status {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 11px;
-      color: var(--accent);
-      background: rgba(56, 189, 248, 0.1);
-      padding: 4px 10px;
-      border-radius: 9999px;
-      border: 1px solid rgba(56, 189, 248, 0.2);
+    .contact-cta {
+      font-family: var(--font-heading);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-main);
+      text-decoration: none;
+      border-bottom: 1px solid var(--text-main);
+      padding-bottom: 4px;
+      transition: opacity 0.3s ease;
     }
 
-    .status-dot {
-      width: 6px;
-      height: 6px;
-      background: var(--accent);
-      border-radius: 50%;
-      box-shadow: 0 0 8px var(--accent);
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.4; transform: scale(0.8); }
+    .contact-cta:hover {
+      opacity: 0.7;
     }
 
     /* ─── HERO SECTION ─── */
     .hero {
-      position: relative;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      text-align: center;
-      padding: 140px 24px 80px;
+      justify-content: flex-end;
+      padding: 0 50px 80px 50px;
+      position: relative;
     }
 
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 6px 16px;
-      border-radius: 9999px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      font-size: 12px;
+    .hero-bg-overlay {
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at 50% 30%, rgba(255,255,255,0.03) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    .hero-meta {
       font-family: var(--font-heading);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
       color: var(--text-muted);
       margin-bottom: 24px;
-      backdrop-filter: blur(8px);
     }
 
     .hero-title {
       font-family: var(--font-display);
-      font-size: clamp(48px, 9vw, 110px);
-      font-weight: 800;
+      font-size: clamp(48px, 8vw, 120px);
+      font-weight: 500;
       line-height: 0.95;
-      letter-spacing: -0.04em;
-      margin-bottom: 24px;
-      background: linear-gradient(180deg, #FFFFFF 30%, rgba(255, 255, 255, 0.5) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+      margin-bottom: 40px;
+      max-width: 1200px;
     }
 
-    .hero-title span {
-      background: linear-gradient(135deg, var(--accent) 0%, var(--accent-secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
+    .hero-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      border-top: 1px solid var(--border);
+      padding-top: 32px;
     }
 
     .hero-sub {
-      max-width: 580px;
-      font-size: clamp(16px, 2vw, 18px);
+      font-size: 15px;
       color: var(--text-muted);
-      margin-bottom: 40px;
-      font-weight: 400;
+      max-width: 440px;
+      font-weight: 300;
+      line-height: 1.7;
     }
 
-    .hero-actions {
-      display: flex;
-      gap: 16px;
-      align-items: center;
-    }
-
-    .btn-primary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 32px;
-      border-radius: 9999px;
-      background: var(--text-main);
-      color: var(--bg);
+    .scroll-indicator {
       font-family: var(--font-heading);
-      font-weight: 700;
-      font-size: 14px;
-      text-decoration: none;
-      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-    }
-
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
-    }
-
-    .btn-secondary {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 28px;
-      border-radius: 9999px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      color: var(--text-main);
-      font-family: var(--font-heading);
-      font-weight: 600;
-      font-size: 14px;
-      text-decoration: none;
-      backdrop-filter: blur(10px);
-      transition: all 0.3s ease;
-    }
-
-    .btn-secondary:hover {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: rgba(255, 255, 255, 0.2);
-    }
-
-    /* ─── INFINITE MARQUEE ─── */
-    .marquee-container {
-      width: 100%;
-      overflow: hidden;
-      border-top: 1px solid var(--border);
-      border-bottom: 1px solid var(--border);
-      background: rgba(15, 23, 42, 0.3);
-      padding: 18px 0;
-      backdrop-filter: blur(8px);
-    }
-
-    .marquee-track {
-      display: flex;
-      gap: 40px;
-      width: max-content;
-      animation: marquee 25s linear infinite;
-    }
-
-    .marquee-item {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-family: var(--font-heading);
-      font-size: 13px;
-      font-weight: 600;
-      color: var(--text-muted);
+      font-size: 11px;
       text-transform: uppercase;
-      letter-spacing: 0.1em;
+      letter-spacing: 0.2em;
+      color: var(--text-dark);
     }
 
-    .marquee-item span { color: var(--accent); }
-
-    @keyframes marquee {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
-    }
-
-    /* ─── BENTO GRID LAYOUT ─── */
-    .section {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 120px 24px;
+    /* ─── WORK / GALLERY SECTION ─── */
+    .section-work {
+      padding: 120px 50px;
     }
 
     .section-header {
-      margin-bottom: 48px;
-    }
-
-    .section-tag {
-      font-family: var(--font-heading);
-      font-size: 12px;
-      color: var(--accent);
-      text-transform: uppercase;
-      letter-spacing: 0.15em;
-      margin-bottom: 8px;
-      display: block;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 60px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 24px;
     }
 
     .section-title {
       font-family: var(--font-display);
-      font-size: clamp(32px, 5vw, 52px);
-      font-weight: 700;
-      letter-spacing: -0.02em;
+      font-size: 32px;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
     }
 
-    .bento-grid {
+    .section-count {
+      font-family: var(--font-heading);
+      font-size: 12px;
+      color: var(--text-muted);
+      letter-spacing: 0.1em;
+    }
+
+    .work-grid {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 20px;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 40px;
     }
 
-    .bento-card {
+    .work-card {
       position: relative;
-      background: var(--bg-card);
+      cursor: pointer;
+    }
+
+    .work-card.featured {
+      grid-column: span 8;
+    }
+
+    .work-card.secondary {
+      grid-column: span 4;
+    }
+
+    .work-card.full {
+      grid-column: span 12;
+    }
+
+    .media-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: var(--bg-surface);
       border: 1px solid var(--border);
-      border-radius: 24px;
-      padding: 32px;
-      backdrop-filter: blur(12px);
       overflow: hidden;
-      transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-    }
-
-    .bento-card:hover {
-      border-color: var(--border-glow);
-      transform: translateY(-4px);
-      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.5), 0 0 30px var(--accent-glow);
-    }
-
-    .bento-card.col-2 { grid-column: span 2; }
-    .bento-card.col-3 { grid-column: span 3; }
-
-    .card-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: 14px;
-      background: rgba(56, 189, 248, 0.1);
-      border: 1px solid rgba(56, 189, 248, 0.2);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent);
       margin-bottom: 20px;
     }
 
-    .card-title {
-      font-family: var(--font-heading);
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 12px;
-      color: var(--text-main);
-    }
-
-    .card-desc {
-      color: var(--text-muted);
-      font-size: 14px;
-      line-height: 1.6;
-    }
-
-    .stat-number {
-      font-family: var(--font-display);
-      font-size: 64px;
-      font-weight: 800;
-      line-height: 1;
-      background: linear-gradient(135deg, #FFF 0%, var(--text-muted) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 8px;
-    }
-
-    /* ─── WORK / SHOWCASE SECTION ─── */
-    .work-showcase {
-      display: grid;
-      grid-template-columns: 1fr 1.2fr;
-      gap: 32px;
-      align-items: start;
-    }
-
-    .work-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .work-item {
-      padding: 24px;
-      border-radius: 16px;
-      background: var(--bg-card);
-      border: 1px solid var(--border);
-      cursor: pointer;
-      transition: all 0.3s ease;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .work-item:hover, .work-item.active {
-      background: var(--bg-card-hover);
-      border-color: var(--accent);
-      box-shadow: 0 0 20px var(--accent-glow);
-    }
-
-    .work-info h4 {
-      font-family: var(--font-heading);
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 4px;
-    }
-
-    .work-info p {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .work-preview-box {
-      position: sticky;
-      top: 120px;
-      border-radius: 24px;
-      border: 1px solid var(--border);
-      overflow: hidden;
-      background: #000;
-      aspect-ratio: 16 / 9;
-      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
-    }
-
-    .work-preview-box iframe,
-    .work-preview-box video {
+    .media-wrapper iframe,
+    .media-wrapper video {
       width: 100%;
       height: 100%;
       border: none;
       object-fit: cover;
+      filter: grayscale(20%);
+      transition: filter 0.5s ease, transform 0.5s ease;
     }
 
-    /* ─── FOOTER & CONTACT ─── */
-    .contact-card {
-      text-align: center;
-      padding: 80px 32px;
-      background: linear-gradient(180deg, var(--bg-card) 0%, rgba(15,23,42,0.8) 100%);
-      border: 1px solid var(--border);
-      border-radius: 32px;
-      position: relative;
-      overflow: hidden;
+    .work-card:hover .media-wrapper iframe,
+    .work-card:hover .media-wrapper video {
+      filter: grayscale(0%);
+      transform: scale(1.02);
     }
 
-    .contact-title {
-      font-family: var(--font-display);
-      font-size: clamp(36px, 6vw, 72px);
-      font-weight: 800;
-      line-height: 1;
-      margin-bottom: 24px;
-    }
-
-    .social-links {
+    .work-details {
       display: flex;
-      justify-content: center;
-      gap: 16px;
-      margin-top: 32px;
-      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: baseline;
     }
 
-    footer {
-      border-top: 1px solid var(--border);
-      padding: 32px 24px;
-      text-align: center;
-      color: var(--text-dim);
-      font-size: 13px;
+    .work-name {
       font-family: var(--font-heading);
+      font-size: 18px;
+      font-weight: 500;
+      letter-spacing: -0.01em;
+    }
+
+    .work-meta {
+      font-size: 12px;
+      color: var(--text-muted);
+      font-family: var(--font-heading);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    /* ─── ABOUT / CAPABILITIES ─── */
+    .section-about {
+      padding: 120px 50px;
+      border-top: 1px solid var(--border);
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 40px;
+    }
+
+    .about-label {
+      grid-column: span 4;
+      font-family: var(--font-heading);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.25em;
+      color: var(--text-muted);
+    }
+
+    .about-content {
+      grid-column: span 8;
+    }
+
+    .about-statement {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 4vw, 48px);
+      font-weight: 500;
+      line-height: 1.2;
+      margin-bottom: 60px;
+      color: var(--text-main);
+    }
+
+    .capabilities-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 40px;
+      border-top: 1px solid var(--border);
+      padding-top: 40px;
+    }
+
+    .capability-item h4 {
+      font-family: var(--font-heading);
+      font-size: 14px;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-bottom: 12px;
+      color: var(--text-main);
+    }
+
+    .capability-item p {
+      font-size: 14px;
+      color: var(--text-muted);
+      font-weight: 300;
+      line-height: 1.6;
+    }
+
+    /* ─── FOOTER ─── */
+    footer {
+      padding: 120px 50px 60px 50px;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer-cta {
+      margin-bottom: 100px;
+    }
+
+    .footer-heading {
+      font-family: var(--font-display);
+      font-size: clamp(40px, 7vw, 96px);
+      font-weight: 500;
+      text-transform: uppercase;
+      line-height: 0.95;
+      margin-bottom: 32px;
+    }
+
+    .footer-email {
+      font-family: var(--font-heading);
+      font-size: clamp(18px, 3vw, 36px);
+      color: var(--text-muted);
+      text-decoration: none;
+      border-bottom: 1px solid var(--border-light);
+      padding-bottom: 8px;
+      transition: color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .footer-email:hover {
+      color: var(--text-main);
+      border-color: var(--text-main);
+    }
+
+    .footer-bottom {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-heading);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.15em;
+      color: var(--text-dark);
+      border-top: 1px solid var(--border);
+      padding-top: 32px;
+    }
+
+    .social-group {
+      display: flex;
+      gap: 24px;
+    }
+
+    .social-group a {
+      color: var(--text-muted);
+      text-decoration: none;
+      transition: color 0.3s ease;
+    }
+
+    .social-group a:hover {
+      color: var(--text-main);
     }
 
     /* ─── RESPONSIVE ─── */
     @media (max-width: 900px) {
-      .bento-grid { grid-template-columns: 1fr; }
-      .bento-card.col-2, .bento-card.col-3 { grid-column: span 1; }
-      .work-showcase { grid-template-columns: 1fr; }
-      .nav-status { display: none; }
+      header, .hero, .section-work, .section-about, footer { padding-left: 24px; padding-right: 24px; }
+      .work-card.featured, .work-card.secondary { grid-column: span 12; }
+      .section-about { grid-template-columns: 1fr; }
+      .about-label { grid-column: span 1; }
+      .about-content { grid-column: span 1; }
+      .capabilities-list { grid-template-columns: 1fr; }
+      .hero-footer { flex-direction: column; align-items: flex-start; gap: 24px; }
     }
   </style>
 </head>
 <body>
 
-  <div class="bg-grid"></div>
-  <div class="ambient-glow"></div>
+  <!-- Navigation -->
+  <header>
+    <a href="#" class="brand">Vyan Merchant</a>
+    <ul class="nav-links">
+      <li><a href="#work">Selected Works</a></li>
+      <li><a href="#about">About</a></li>
+    </ul>
+    <a href="mailto:vyanmerchant@gmail.com" class="contact-cta">Get In Touch</a>
+  </header>
 
-  <div class="nav-container">
-    <nav>
-      <a href="#" class="nav-logo">VYAN<span>.</span></a>
-      <ul class="nav-links">
-        <li><a href="#about">About</a></li>
-        <li><a href="#work">Work</a></li>
-        <li><a href="#contact">Contact</a></li>
-      </ul>
-      <div class="nav-status">
-        <div class="status-dot"></div>
-        <span>Available for Hire</span>
-      </div>
-    </nav>
-  </div>
-
+  <!-- Hero Section -->
   <section class="hero">
-    <div class="hero-badge">
-      <span>✦</span> Gaming Video Editor & Motion Designer
-    </div>
-    <h1 class="hero-title">
-      CRAFTING HIGH IMPACT<br><span>GAMING VISUALS</span>
-    </h1>
-    <p class="hero-sub">
-      Transforming raw gameplay into high-octane visual experiences. Specialized in fast-paced edits, precise pacing, and custom color grading.
-    </p>
-    <div class="hero-actions">
-      <a href="#work" class="btn-primary">
-        Explore Work
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
-      </a>
-      <a href="#contact" class="btn-secondary">Get in Touch</a>
-    </div>
-  </section>
-
-  <div class="marquee-container">
-    <div class="marquee-track">
-      <div class="marquee-item">DaVinci Resolve Studio <span>✦</span></div>
-      <div class="marquee-item">Valorant Montages <span>✦</span></div>
-      <div class="marquee-item">Color Grading <span>✦</span></div>
-      <div class="marquee-item">Sound Design & SFX <span>✦</span></div>
-      <div class="marquee-item">4+ Years Experience <span>✦</span></div>
-      <div class="marquee-item">Motion Graphics <span>✦</span></div>
-      <div class="marquee-item">DaVinci Resolve Studio <span>✦</span></div>
-      <div class="marquee-item">Valorant Montages <span>✦</span></div>
-      <div class="marquee-item">Color Grading <span>✦</span></div>
-      <div class="marquee-item">Sound Design & SFX <span>✦</span></div>
-      <div class="marquee-item">4+ Years Experience <span>✦</span></div>
-      <div class="marquee-item">Motion Graphics <span>✦</span></div>
-    </div>
-  </div>
-
-  <section class="section" id="about">
-    <div class="section-header">
-      <span class="section-tag">Overview</span>
-      <h2 class="section-title">Built for Performance & Style</h2>
-    </div>
-
-    <div class="bento-grid">
-      <div class="bento-card col-2">
-        <div class="card-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 10l5 5-5 5M4 4v7a4 4 0 004 4h12"/></svg>
-        </div>
-        <h3 class="card-title">Narrative & Rhythm-Driven Editing</h3>
-        <p class="card-desc">
-          I'm Vyan, a 17-year-old video editor with 4+ years of hands-on experience in DaVinci Resolve. My focus is on frame-accurate beat syncing, narrative pacing, and seamless visual impact that maximizes retention.
-        </p>
-      </div>
-
-      <div class="bento-card">
-        <div class="stat-number">4+</div>
-        <h3 class="card-title">Years Crafting</h3>
-        <p class="card-desc">Dedicated solely to mastering timeline speed & software perfection.</p>
-      </div>
-
-      <div class="bento-card">
-        <div class="card-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-        </div>
-        <h3 class="card-title">Color Grading</h3>
-        <p class="card-desc">Custom LUTs and color spaces built to turn flat clips into cinematic masterpieces.</p>
-      </div>
-
-      <div class="bento-card col-2">
-        <div class="card-icon">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        </div>
-        <h3 class="card-title">Creator & Industry Ready</h3>
-        <p class="card-desc">From fast-paced YouTube content to esports edits—shipped internships and worked directly with creators to elevate their brand aesthetics.</p>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="work">
-    <div class="section-header">
-      <span class="section-tag">Portfolio</span>
-      <h2 class="section-title">Selected Edits</h2>
-    </div>
-
-    <div class="work-showcase">
-      <div class="work-list">
-        <div class="work-item active" onclick="switchVideo('youtube', 'd0qvLlFEEH8', this)">
-          <div class="work-info">
-            <h4>Valorant Montage 2026</h4>
-            <p>DaVinci Resolve · Precision Sync · Color Grade</p>
-          </div>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-        </div>
-
-        <div class="work-item" onclick="switchVideo('youtube', '4ZcBnbLWxvU', this)">
-          <div class="work-info">
-            <h4>Valorant Montage (Classic)</h4>
-            <p>Gaming Montage · FX Sound Design</p>
-          </div>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-        </div>
-
-        <div class="work-item" onclick="switchVideo('local', 'montage.mp4', this)">
-          <div class="work-info">
-            <h4>Practice & Style Reel</h4>
-            <p>Motion Design · Visual Experiments</p>
-          </div>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M7 17L17 7M17 7H7M17 7V17"/></svg>
-        </div>
-      </div>
-
-      <div class="work-preview-box" id="previewContainer">
-        <iframe src="https://www.youtube.com/embed/d0qvLlFEEH8?autoplay=0&mute=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="contact">
-    <div class="contact-card">
-      <span class="section-tag">Get In Touch</span>
-      <h2 class="contact-title">LET'S CREATE SOMETHING<br>ICONIC.</h2>
-      <p style="color: var(--text-muted); max-width: 500px; margin: 0 auto 32px;">
-        Open for video editing commissions, long-term creator partnerships, and gaming projects.
+    <div class="hero-bg-overlay"></div>
+    <div class="hero-meta">Visual Direction & Editing</div>
+    <h1 class="hero-title">Crafting Motion<br>For Visual Impact</h1>
+    
+    <div class="hero-footer">
+      <p class="hero-sub">
+        Elevating digital media with precise editorial pacing, high-end finishing, and high-impact post-production.
       </p>
-      
-      <a href="mailto:vyanmerchant@gmail.com" class="btn-primary" style="display: inline-flex;">
-        vyanmerchant@gmail.com
-      </a>
+      <div class="scroll-indicator">[ Scroll to Explore ]</div>
+    </div>
+  </section>
 
-      <div class="social-links">
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vyanmerchant@gmail.com" target="_blank" class="btn-secondary">Email</a>
-        <a href="https://youtube.com" target="_blank" class="btn-secondary">YouTube</a>
-        <a href="https://discord.com/users/1111715392461738034" target="_blank" class="btn-secondary">Discord</a>
+  <!-- Work Showcase -->
+  <section class="section-work" id="work">
+    <div class="section-header">
+      <h2 class="section-title">Selected Works</h2>
+      <span class="section-count">01 — 03</span>
+    </div>
+
+    <div class="work-grid">
+      <!-- Project 1 -->
+      <div class="work-card featured">
+        <div class="media-wrapper">
+          <iframe src="https://www.youtube.com/embed/d0qvLlFEEH8?rel=0&modestbranding=1" allowfullscreen></iframe>
+        </div>
+        <div class="work-details">
+          <h3 class="work-name">Visual Edit 01</h3>
+          <span class="work-meta">Color / Rhythm / Post-Production</span>
+        </div>
+      </div>
+
+      <!-- Project 2 -->
+      <div class="work-card secondary">
+        <div class="media-wrapper">
+          <iframe src="https://www.youtube.com/embed/4ZcBnbLWxvU?rel=0&modestbranding=1" allowfullscreen></iframe>
+        </div>
+        <div class="work-details">
+          <h3 class="work-name">Visual Edit 02</h3>
+          <span class="work-meta">Sound Design / Cut</span>
+        </div>
+      </div>
+
+      <!-- Project 3 -->
+      <div class="work-card full">
+        <div class="media-wrapper">
+          <video src="montage.mp4" controls muted loop></video>
+        </div>
+        <div class="work-details">
+          <h3 class="work-name">Editorial Reel</h3>
+          <span class="work-meta">Motion Design / Experimental</span>
+        </div>
       </div>
     </div>
   </section>
 
+  <!-- About Section -->
+  <section class="section-about" id="about">
+    <div class="about-label">Background & Capabilities</div>
+    <div class="about-content">
+      <p class="about-statement">
+        Dedicated to mastering narrative flow, precise frame execution, and technical post-production finesse.
+      </p>
+
+      <div class="capabilities-list">
+        <div class="capability-item">
+          <h4>Post Production</h4>
+          <p>Frame-accurate pacing, high-retention timeline construction, and rhythm-based sequencing in DaVinci Resolve Studio.</p>
+        </div>
+        <div class="capability-item">
+          <h4>Color & Finishing</h4>
+          <p>Custom color profiles and spaces designed to transform digital footage into cohesive visual stories.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
   <footer>
-    <p>© 2026 Vyan Merchant. Crafting top-tier gaming edits.</p>
+    <div class="footer-cta">
+      <h2 class="footer-heading">Let's Work<br>Together</h2>
+      <a href="mailto:vyanmerchant@gmail.com" class="footer-email">vyanmerchant@gmail.com</a>
+    </div>
+
+    <div class="footer-bottom">
+      <div>© Vyan Merchant</div>
+      <div class="social-group">
+        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vyanmerchant@gmail.com" target="_blank">Email</a>
+        <a href="https://discord.com/users/1111715392461738034" target="_blank">Discord</a>
+        <a href="https://youtube.com" target="_blank">YouTube</a>
+      </div>
+    </div>
   </footer>
 
-  <script>
-    // Video Player Switcher
-    function switchVideo(type, source, element) {
-      const container = document.getElementById('previewContainer');
-      
-      // Update UI active state
-      document.querySelectorAll('.work-item').forEach(item => item.classList.remove('active'));
-      element.classList.add('active');
-
-      if (type === 'youtube') {
-        container.innerHTML = `<iframe src="https://www.youtube.com/embed/${source}?autoplay=1&mute=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-      } else if (type === 'local') {
-        container.innerHTML = `<video src="${source}" controls autoplay muted loop></video>`;
-      }
-    }
-  </script>
 </body>
 </html>
