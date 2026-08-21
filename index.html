@@ -15,22 +15,18 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6925719089611119" crossorigin="anonymous"></script>
-
 <style>
-/* ─── RESET & BASE ─── */
+/* ─── RESET & BASE (Active Theory Inspired Dark UI) ─── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; cursor: none !important; }
 
 :root {
-  --black: #050505;
-  --white: #f0ede8;
-  --red: #38bdf8;
-  --red-dim: #0284c7;
-  --gray: #1a1a1a;
-  --gray-mid: #2a2a2a;
-  --gray-text: #777;
-  --surface: #0E0E0E;
-  --border: rgba(255, 255, 255, 0.1);
+  --black: #000000;
+  --white: #FFFFFF;
+  --accent: #49c5b6; /* Active Theory Cyan-Green Vibe Accent */
+  --accent-glow: rgba(73, 197, 182, 0.2);
+  --surface: #0A0A0A;
+  --border: rgba(255, 255, 255, 0.08);
+  --gray-text: #888888;
   --font-display: 'Anton', sans-serif;
   --font-serif: 'Cormorant Garamond', serif;
   --font-sans: 'Syne', sans-serif;
@@ -51,52 +47,51 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* ─── CUSTOM CURSOR ─── */
+/* ─── ACTIVE THEORY STYLE CUSTOM PHYSICS CURSOR ─── */
 #custom-cursor {
   position: fixed;
   top: 0;
   left: 0;
   pointer-events: none;
   z-index: 99999;
-  mix-blend-mode: difference;
   transform: translate(-50%, -50%);
 }
 .cursor-dot {
-  width: 8px;
-  height: 8px;
-  background-color: #FFFFFF;
+  width: 6px;
+  height: 6px;
+  background-color: var(--accent);
   border-radius: 50%;
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
 }
 .cursor-ring {
-  width: 40px; height: 40px;
-  border: 1px solid rgba(255, 255, 255, 0.4);
+  width: 36px; height: 36px;
+  border: 1px solid rgba(73, 197, 182, 0.4);
   border-radius: 50%;
   position: absolute;
   top: 50%; left: 50%;
   transform: translate(-50%, -50%);
-  transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-              height 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-              background-color 0.3s ease;
+  transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              height 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
+              background-color 0.3s ease, border-color 0.3s ease;
 }
 body.hover-link .cursor-ring {
-  width: 70px; height: 70px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border-color: transparent;
+  width: 64px; height: 64px;
+  background-color: var(--accent-glow);
+  border-color: var(--accent);
 }
 body.hover-view .cursor-ring {
-  width: 90px; height: 90px;
-  background-color: var(--red);
+  width: 80px; height: 80px;
+  background-color: var(--accent);
   border-color: transparent;
 }
 body.hover-view::after {
-  content: 'VIEW';
+  content: 'PLAY';
   position: fixed;
-  font-family: 'Space Grotesk', sans-serif;
+  font-family: 'Space Mono', monospace;
   font-size: 10px;
-  font-weight: 500;
+  font-weight: 700;
   letter-spacing: 2px;
   color: #000;
   z-index: 100000;
@@ -104,7 +99,7 @@ body.hover-view::after {
   transform: translate(-50%, -50%);
 }
 
-/* ─── WEBGL BACKGROUND ─── */
+/* ─── WEBGL LAYERS ─── */
 #webgl-container {
   position: fixed;
   top: 0; left: 0;
@@ -113,64 +108,54 @@ body.hover-view::after {
   z-index: 0;
 }
 
-#damascus-bg {
-  position: fixed;
-  inset: 0;
-  width: 100%; height: 100%;
-  z-index: -1;
-  opacity: 0.35;
-}
-
 #progress {
   position: fixed; top: 0; left: 0;
   height: 2px; width: 0%;
-  background: var(--red);
+  background: var(--accent);
   z-index: 1000;
   transition: width 0.05s linear;
 }
 
 main { position: relative; z-index: 2; }
 
-/* ─── NAVIGATION ─── */
+/* ─── HUD NAVIGATION ─── */
 nav {
   position: fixed; top: 0; left: 0; right: 0;
   z-index: 500;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 28px 48px;
-  background: linear-gradient(to bottom, rgba(5,5,5,0.8), transparent);
-  backdrop-filter: blur(10px);
+  padding: 32px 56px;
+  background: linear-gradient(to bottom, rgba(0,0,0,0.9), transparent);
 }
 .nav-logo {
   font-family: var(--font-display);
-  font-size: 22px;
+  font-size: 24px;
   letter-spacing: 0.05em;
   color: var(--white);
   text-decoration: none;
 }
-.nav-logo span { color: var(--red); }
-.nav-links { display: flex; gap: 36px; }
+.nav-logo span { color: var(--accent); }
+.nav-links { display: flex; gap: 40px; }
 .nav-links a {
   font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--gray-text);
   text-decoration: none;
   transition: color 0.2s;
 }
-.nav-links a:hover { color: var(--white); }
+.nav-links a:hover { color: var(--accent); }
 
-/* ─── HERO ─── */
+/* ─── CINEMATIC HERO ─── */
 .hero {
   position: relative;
   height: 100vh;
-  min-height: 700px;
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 0 48px 64px;
+  padding: 0 56px 64px;
   overflow: hidden;
   border-bottom: 1px solid var(--border);
 }
@@ -180,12 +165,12 @@ nav {
   width: 100%; height: 100%;
   object-fit: cover;
   z-index: 0;
-  filter: brightness(0.4) saturate(0.8);
+  filter: brightness(0.35) saturate(0.9);
 }
 .hero-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(5,5,5,0.95) 0%, rgba(5,5,5,0.2) 50%, rgba(5,5,5,0.4) 100%);
+  background: radial-gradient(circle at center, rgba(0,0,0,0.2) 0%, rgba(0,0,0,0.85) 100%);
   z-index: 1;
 }
 .hero-tag {
@@ -193,7 +178,7 @@ nav {
   font-size: 11px;
   letter-spacing: 0.2em;
   text-transform: uppercase;
-  color: var(--red);
+  color: var(--accent);
   margin-bottom: 16px;
   position: relative;
   z-index: 2;
@@ -205,18 +190,18 @@ nav {
   content: '';
   display: inline-block;
   width: 32px; height: 1px;
-  background: var(--red);
+  background: var(--accent);
 }
 .hero-name {
   font-family: var(--font-display);
-  font-size: clamp(80px, 14vw, 180px);
-  line-height: 0.92;
+  font-size: clamp(80px, 15vw, 190px);
+  line-height: 0.9;
   letter-spacing: 0.02em;
   color: var(--white);
   position: relative;
   z-index: 2;
 }
-.hero-name .accent { color: var(--red); }
+.hero-name .accent { color: var(--accent); }
 .hero-bottom {
   display: flex;
   justify-content: space-between;
@@ -228,39 +213,40 @@ nav {
 .hero-sub {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: 20px;
+  font-size: 21px;
   color: var(--gray-text);
   line-height: 1.6;
-  max-width: 340px;
+  max-width: 360px;
   font-weight: 300;
 }
 .hero-cta {
   display: inline-flex;
   align-items: center;
   gap: 12px;
-  padding: 14px 28px;
+  padding: 16px 32px;
   background: transparent;
-  border: 1px solid rgba(240,237,232,0.25);
+  border: 1px solid rgba(255,255,255,0.2);
   color: var(--white);
   font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.14em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   text-decoration: none;
-  transition: background 0.2s, border-color 0.2s, transform 0.2s;
+  transition: all 0.3s cubic-bezier(0.16,1,0.3,1);
 }
 .hero-cta:hover {
-  background: var(--red);
-  border-color: var(--red);
+  background: var(--accent);
+  border-color: var(--accent);
   color: #000;
+  transform: translateY(-2px);
 }
 
-/* ─── MARQUEE ─── */
+/* ─── KINETIC MARQUEE ─── */
 .marquee-wrap {
-  background: var(--red);
+  background: var(--accent);
   overflow: hidden;
-  padding: 13px 0;
-  border-bottom: 1px solid rgba(8,8,8,0.2);
+  padding: 14px 0;
+  border-bottom: 1px solid #000;
 }
 .marquee-track {
   display: flex;
@@ -270,65 +256,65 @@ nav {
 .marquee-track span {
   font-family: var(--font-sans);
   font-size: 13px;
-  font-weight: 700;
-  letter-spacing: 0.12em;
+  font-weight: 800;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
-  color: #0c1a2e;
-  padding: 0 28px;
+  color: #000;
+  padding: 0 32px;
 }
-.marquee-track .dot { color: rgba(12,26,46,0.35); padding: 0; }
+.marquee-track .dot { color: rgba(0,0,0,0.4); padding: 0; }
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
 }
 
-/* ─── SECTIONS ─── */
-.section { padding: 120px 48px; border-bottom: 1px solid var(--border); position: relative; }
+/* ─── SECTIONS & LAYOUT ─── */
+.section { padding: 140px 56px; border-bottom: 1px solid var(--border); position: relative; }
 .section-label {
   font-family: var(--font-mono);
   font-size: 10px;
-  letter-spacing: 0.22em;
+  letter-spacing: 0.25em;
   text-transform: uppercase;
-  color: var(--red);
-  margin-bottom: 48px;
+  color: var(--accent);
+  margin-bottom: 56px;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
 }
 .section-label::after {
   content: '';
   flex: 1;
-  max-width: 80px;
+  max-width: 100px;
   height: 1px;
-  background: var(--red);
-  opacity: 0.4;
+  background: var(--accent);
+  opacity: 0.3;
 }
 
 /* ─── ABOUT ─── */
 #about {
   display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 80px;
+  grid-template-columns: 1.1fr 0.9fr;
+  gap: 100px;
   align-items: start;
-  max-width: 1200px;
+  max-width: 1300px;
   margin: 0 auto;
 }
 .about-left .big-text {
   font-family: var(--font-display);
-  font-size: clamp(48px, 6vw, 82px);
-  line-height: 1;
+  font-size: clamp(52px, 6.5vw, 88px);
+  line-height: 0.95;
   letter-spacing: 0.02em;
   color: var(--white);
-  margin-bottom: 32px;
+  margin-bottom: 36px;
 }
-.about-left .big-text .accent { color: var(--red); }
+.about-left .big-text .accent { color: var(--accent); }
 .about-body {
   font-family: var(--font-serif);
-  font-size: 19px;
+  font-size: 20px;
   font-weight: 300;
   line-height: 1.8;
   color: var(--gray-text);
-  margin-bottom: 48px;
+  margin-bottom: 56px;
 }
 .about-body b { color: var(--white); font-weight: 400; font-style: italic; }
 
@@ -336,18 +322,17 @@ nav {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 1px;
-  background: var(--gray-mid);
-  border: 1px solid var(--gray-mid);
-  margin-bottom: 48px;
+  background: var(--border);
+  border: 1px solid var(--border);
 }
 .stat-item {
   background: var(--black);
-  padding: 28px 24px;
+  padding: 32px 28px;
   text-align: center;
 }
 .stat-num {
   font-family: var(--font-display);
-  font-size: 52px;
+  font-size: 56px;
   color: var(--white);
   line-height: 1;
   display: block;
@@ -358,7 +343,7 @@ nav {
   letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--gray-text);
-  margin-top: 6px;
+  margin-top: 8px;
   display: block;
 }
 
@@ -366,19 +351,19 @@ nav {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 18px 0;
-  border-bottom: 1px solid var(--gray-mid);
+  padding: 22px 0;
+  border-bottom: 1px solid var(--border);
 }
-.skill-row:first-of-type { border-top: 1px solid var(--gray-mid); }
+.skill-row:first-of-type { border-top: 1px solid var(--border); }
 .skill-name {
   font-family: var(--font-serif);
-  font-size: 20px;
+  font-size: 22px;
   font-weight: 300;
   font-style: italic;
   color: var(--white);
 }
 
-/* ─── HORIZONTAL CINEMATIC PROJECTS GALLERY (Active Theory Inspired) ─── */
+/* ─── ACTIVE THEORY INSPIRED HORIZONTAL PINNED GALLERY ─── */
 .horizontal-section {
   padding: 0 !important;
   height: 100vh;
@@ -386,15 +371,15 @@ nav {
 }
 .horizontal-wrapper {
   display: flex;
-  gap: 6vw;
+  gap: 8vw;
   width: fit-content;
-  padding: 0 6vw;
+  padding: 0 8vw;
   align-items: center;
   height: 100vh;
 }
 .project-showcase-card {
-  width: 55vw;
-  height: 65vh;
+  width: 60vw;
+  height: 70vh;
   flex-shrink: 0;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -403,26 +388,26 @@ nav {
   display: flex;
   flex-direction: column;
   justify-content: flex-end;
-  padding: 40px;
-  transition: border-color 0.4s ease;
+  padding: 48px;
+  transition: border-color 0.4s cubic-bezier(0.16,1,0.3,1);
 }
-.project-showcase-card:hover { border-color: var(--red); }
+.project-showcase-card:hover { border-color: var(--accent); }
 .project-bg-media {
   position: absolute;
   inset: 0;
   width: 100%; height: 100%;
   object-fit: cover;
   z-index: 0;
-  filter: brightness(0.5);
-  transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  filter: brightness(0.4) saturate(0.8);
+  transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
 }
 .project-showcase-card:hover .project-bg-media {
-  transform: scale(1.03);
+  transform: scale(1.04);
 }
 .project-overlay {
   position: absolute;
   inset: 0;
-  background: linear-gradient(to top, rgba(5,5,5,0.95) 0%, rgba(5,5,5,0.2) 60%);
+  background: linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.1) 60%);
   z-index: 1;
 }
 .project-content {
@@ -430,31 +415,31 @@ nav {
   z-index: 2;
 }
 
-/* ─── CONTACT ─── */
-#contact { max-width: 1200px; margin: 0 auto; }
+/* ─── CONTACT SECTION ─── */
+#contact { max-width: 1300px; margin: 0 auto; }
 .contact-big {
   font-family: var(--font-display);
-  font-size: clamp(56px, 9vw, 130px);
-  line-height: 0.95;
+  font-size: clamp(60px, 10vw, 140px);
+  line-height: 0.92;
   letter-spacing: 0.02em;
   color: var(--white);
-  margin-bottom: 48px;
+  margin-bottom: 56px;
 }
-.contact-big .accent { color: var(--red); }
+.contact-big .accent { color: var(--accent); }
 .contact-row {
   display: flex;
   justify-content: space-between;
   align-items: flex-end;
   flex-wrap: wrap;
   gap: 32px;
-  padding-top: 48px;
-  border-top: 1px solid var(--gray-mid);
+  padding-top: 56px;
+  border-top: 1px solid var(--border);
 }
-.contact-links { display: flex; gap: 24px; flex-wrap: wrap; }
+.contact-links { display: flex; gap: 32px; flex-wrap: wrap; }
 .contact-link {
   font-family: var(--font-mono);
   font-size: 11px;
-  letter-spacing: 0.12em;
+  letter-spacing: 0.15em;
   text-transform: uppercase;
   color: var(--gray-text);
   text-decoration: none;
@@ -463,27 +448,27 @@ nav {
   align-items: center;
   gap: 8px;
 }
-.contact-link:hover { color: var(--white); }
+.contact-link:hover { color: var(--accent); }
 .contact-email {
   font-family: var(--font-serif);
   font-style: italic;
-  font-size: clamp(22px, 3vw, 38px);
+  font-size: clamp(24px, 3.5vw, 42px);
   font-weight: 300;
   color: var(--white);
   text-decoration: none;
   transition: color 0.2s;
 }
-.contact-email:hover { color: var(--red); }
+.contact-email:hover { color: var(--accent); }
 
 /* ─── FOOTER ─── */
 footer {
-  padding: 32px 48px;
-  border-top: 1px solid var(--gray-mid);
+  padding: 40px 56px;
+  border-top: 1px solid var(--border);
   display: flex;
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 12px;
+  gap: 16px;
   position: relative;
   z-index: 2;
 }
@@ -491,14 +476,14 @@ footer p {
   font-family: var(--font-mono);
   font-size: 10px;
   color: var(--gray-text);
-  letter-spacing: 0.12em;
+  letter-spacing: 0.15em;
 }
 
 /* ─── REVEAL ANIMATIONS ─── */
 .reveal {
   opacity: 0;
   transform: translateY(40px);
-  transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1);
+  transition: opacity 1s cubic-bezier(0.16,1,0.3,1), transform 1s cubic-bezier(0.16,1,0.3,1);
 }
 .reveal.visible {
   opacity: 1;
@@ -506,11 +491,12 @@ footer p {
 }
 
 @media (max-width: 768px) {
-  nav { padding: 20px 24px; }
+  nav { padding: 24px; }
   .hero { padding: 0 24px 48px; }
-  #about { grid-template-columns: 1fr; padding: 60px 24px; }
-  .section { padding: 60px 24px; }
-  .project-showcase-card { width: 85vw; height: 50vh; }
+  #about { grid-template-columns: 1fr; padding: 80px 24px; gap: 60px; }
+  .section { padding: 80px 24px; }
+  .project-showcase-card { width: 85vw; height: 55vh; padding: 28px; }
+  footer { padding: 24px; }
 }
 </style>
 </head>
@@ -519,17 +505,16 @@ footer p {
 
 <div id="progress"></div>
 
-<!-- Custom Cursor -->
+<!-- Custom Physics Cursor -->
 <div id="custom-cursor">
   <div class="cursor-dot"></div>
   <div class="cursor-ring"></div>
 </div>
 
-<!-- WebGL Background Elements -->
+<!-- WebGL Particle Simulation Canvas -->
 <div id="webgl-container"></div>
-<canvas id="damascus-bg"></canvas>
 
-<!-- NAV -->
+<!-- NAVIGATION HUD -->
 <nav>
   <a href="#" class="nav-logo">VM<span>.</span></a>
   <div class="nav-links">
@@ -540,8 +525,8 @@ footer p {
 </nav>
 
 <main>
-  <!-- HERO -->
-  <div class="hero">
+  <!-- CINEMATIC HERO -->
+  <section class="hero">
     <video autoplay muted loop playsinline class="hero-video">
       <source src="montage.mp4" type="video/mp4">
     </video>
@@ -552,15 +537,15 @@ footer p {
     <div class="hero-bottom">
       <p class="hero-sub">Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages.</p>
       <a href="#projects" class="hero-cta" data-cursor="link">
-        View My Work
+        Explore Work
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
           <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
       </a>
     </div>
-  </div>
+  </section>
 
-  <!-- MARQUEE -->
+  <!-- KINETIC MARQUEE -->
   <div class="marquee-wrap">
     <div class="marquee-track">
       <span>DaVinci Resolve</span><span class="dot">✦</span>
@@ -585,7 +570,7 @@ footer p {
   <!-- ABOUT -->
   <section class="section" id="about">
     <div class="about-left reveal">
-      <div class="section-label">About</div>
+      <div class="section-label">About System</div>
       <div class="big-text">EDIT.<br>FAST.<br><span class="accent">HARD.</span></div>
       <p class="about-body">
         I'm <b>Vyan</b>, a 17-year-old video editor obsessed with making gaming content that actually slaps. 
@@ -609,7 +594,7 @@ footer p {
     </div>
 
     <div class="skills-right reveal" style="transition-delay: 0.15s">
-      <div class="section-label">Skills</div>
+      <div class="section-label">Technical Stack</div>
       <div class="skill-row"><span class="skill-name">DaVinci Resolve</span></div>
       <div class="skill-row"><span class="skill-name">Gaming Montages</span></div>
       <div class="skill-row"><span class="skill-name">Color Grading</span></div>
@@ -618,7 +603,7 @@ footer p {
     </div>
   </section>
 
-  <!-- HORIZONTAL PINNED GALLERY (Active Theory Inspired Cinematic Showcase) -->
+  <!-- ACTIVE THEORY INSPIRED HORIZONTAL PINNED GALLERY -->
   <section class="section horizontal-section" id="projects">
     <div class="horizontal-wrapper">
       
@@ -627,7 +612,7 @@ footer p {
         <video autoplay muted loop playsinline class="project-bg-media"><source src="montage.mp4" type="video/mp4"></video>
         <div class="project-overlay"></div>
         <div class="project-content">
-          <span style="font-family: 'Space Mono'; font-size: 11px; color: var(--red); letter-spacing: 2px;">[ 01 // FEATURED ]</span>
+          <span style="font-family: 'Space Mono'; font-size: 11px; color: var(--accent); letter-spacing: 2px;">[ 01 // FEATURED ]</span>
           <h2 style="font-family: 'Syne'; font-size: 3.5vw; margin-top: 0.5rem; text-transform: uppercase;">Valorant Montage</h2>
           <p style="color: var(--gray-text); font-size: 14px; margin-top: 0.5rem;">DaVinci Resolve · Fast Edits · High-Impact Color Grade</p>
         </div>
@@ -638,7 +623,7 @@ footer p {
         <video autoplay muted loop playsinline class="project-bg-media"><source src="montage.mp4" type="video/mp4"></video>
         <div class="project-overlay"></div>
         <div class="project-content">
-          <span style="font-family: 'Space Mono'; font-size: 11px; color: var(--red); letter-spacing: 2px;">[ 02 // ARCHIVE ]</span>
+          <span style="font-family: 'Space Mono'; font-size: 11px; color: var(--accent); letter-spacing: 2px;">[ 02 // ARCHIVE ]</span>
           <h2 style="font-family: 'Syne'; font-size: 3.5vw; margin-top: 0.5rem; text-transform: uppercase;">Valorant Montage (Old)</h2>
           <p style="color: var(--gray-text); font-size: 14px; margin-top: 0.5rem;">Classic Gaming Montage · Precision Timing</p>
         </div>
@@ -649,7 +634,7 @@ footer p {
         <video autoplay muted loop playsinline class="project-bg-media"><source src="montage.mp4" type="video/mp4"></video>
         <div class="project-overlay"></div>
         <div class="project-content">
-          <span style="font-family: 'Space Mono'; font-size: 11px; color: var(--red); letter-spacing: 2px;">[ 03 // EXPERIMENTAL ]</span>
+          <span style="font-family: 'Space Mono'; font-size: 11px; color: var(--accent); letter-spacing: 2px;">[ 03 // EXPERIMENTAL ]</span>
           <h2 style="font-family: 'Syne'; font-size: 3.5vw; margin-top: 0.5rem; text-transform: uppercase;">Practice Edit</h2>
           <p style="color: var(--gray-text); font-size: 14px; margin-top: 0.5rem;">Advanced Motion Design · Visual Effects</p>
         </div>
@@ -660,7 +645,7 @@ footer p {
 
   <!-- CONTACT -->
   <section class="section" id="contact">
-    <div class="section-label reveal">Contact</div>
+    <div class="section-label reveal">Transmission</div>
     <div class="contact-big reveal" style="transition-delay:0.1s">
       LET'S<br>BUILD<br><span class="accent">SOMETHING.</span>
     </div>
@@ -685,7 +670,7 @@ footer p {
 </main>
 
 <script>
-  // --- 1. Lenis Smooth Scrolling ---
+  // --- 1. Lenis Smooth Scrolling Engine ---
   const lenis = new Lenis({
     duration: 1.2,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
@@ -704,14 +689,14 @@ footer p {
   gsap.ticker.add((time) => { lenis.raf(time * 1000); });
   gsap.ticker.lagSmoothing(0);
 
-  // Scroll Progress Bar
+  // Scroll Progress Bar Update
   window.addEventListener('scroll', () => {
     const st = document.documentElement.scrollTop;
     const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
     document.getElementById('progress').style.width = (st / h * 100) + '%';
   });
 
-  // --- 2. Custom Magnetic Cursor ---
+  // --- 2. Custom Magnetic Cursor Physics ---
   const cursor = document.getElementById('custom-cursor');
   let mouse = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
   let pos = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
@@ -722,16 +707,16 @@ footer p {
   });
 
   function updateCursor() {
-    pos.x += (mouse.x - pos.x) * 0.15;
-    pos.y += (mouse.y - pos.y) * 0.15;
+    pos.x += (mouse.x - pos.x) * 0.18;
+    pos.y += (mouse.y - pos.y) * 0.18;
     cursor.style.transform = `translate(${pos.x}px, ${pos.y}px)`;
     requestAnimationFrame(updateCursor);
   }
   updateCursor();
 
-  document.querySelectorAll('a, button, [data-cursor]').forEach(el => {
+  document.querySelectorAll('a, button, [data-cursor], .project-showcase-card').forEach(el => {
     el.addEventListener('mouseenter', () => {
-      if (el.dataset.cursor === 'view') {
+      if (el.dataset.cursor === 'view' || el.classList.contains('project-showcase-card')) {
         document.body.classList.add('hover-view');
       } else {
         document.body.classList.add('hover-link');
@@ -742,7 +727,7 @@ footer p {
     });
   });
 
-  // --- 3. WebGL Particle Field Background (Active Theory style) ---
+  // --- 3. WebGL Particle Field (Active Theory Ambient Atmosphere) ---
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -751,23 +736,23 @@ footer p {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
   document.getElementById('webgl-container').appendChild(renderer.domElement);
 
-  const particleCount = 1500;
+  const particleCount = 2000;
   const geometry = new THREE.BufferGeometry();
   const positions = new Float32Array(particleCount * 3);
 
   for(let i = 0; i < particleCount * 3; i += 3) {
-    positions[i] = (Math.random() - 0.5) * 25;
-    positions[i+1] = (Math.random() - 0.5) * 25;
-    positions[i+2] = (Math.random() - 0.5) * 25;
+    positions[i] = (Math.random() - 0.5) * 30;
+    positions[i+1] = (Math.random() - 0.5) * 30;
+    positions[i+2] = (Math.random() - 0.5) * 30;
   }
 
   geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
   const material = new THREE.PointsMaterial({
-    size: 0.02,
-    color: 0x38bdf8,
+    size: 0.022,
+    color: 0x49c5b6,
     transparent: true,
-    opacity: 0.5,
+    opacity: 0.55,
     blending: THREE.AdditiveBlending
   });
 
@@ -777,14 +762,14 @@ footer p {
 
   let targetX = 0, targetY = 0;
   window.addEventListener('mousemove', (e) => {
-    targetX = (e.clientX - window.innerWidth / 2) * 0.0004;
-    targetY = (e.clientY - window.innerHeight / 2) * 0.0004;
+    targetX = (e.clientX - window.innerWidth / 2) * 0.0005;
+    targetY = (e.clientY - window.innerHeight / 2) * 0.0005;
   });
 
   function animateWebGL() {
     requestAnimationFrame(animateWebGL);
-    particleSystem.rotation.y += 0.0008 + (targetX - particleSystem.rotation.y) * 0.05;
-    particleSystem.rotation.x += 0.0008 + (targetY - particleSystem.rotation.x) * 0.05;
+    particleSystem.rotation.y += 0.0009 + (targetX - particleSystem.rotation.y) * 0.05;
+    particleSystem.rotation.x += 0.0009 + (targetY - particleSystem.rotation.x) * 0.05;
     renderer.render(scene, camera);
   }
   animateWebGL();
@@ -795,7 +780,7 @@ footer p {
     renderer.setSize(window.innerWidth, window.innerHeight);
   });
 
-  // --- 4. Horizontal Scroll-Driven Showcase (Active Theory Inspired) ---
+  // --- 4. Horizontal Scroll-Driven Showcase (Active Theory Experience) ---
   const horizontalWrapper = document.querySelector('.horizontal-wrapper');
   if (horizontalWrapper) {
     gsap.to(horizontalWrapper, {
@@ -811,48 +796,7 @@ footer p {
     });
   }
 
-  // --- 5. Damascus Background Procedural Generator ---
-  const canvas = document.getElementById('damascus-bg');
-  const ctx = canvas.getContext('2d');
-  const SCALE = 4;
-  let W, H, t = 0;
-
-  function resizeDamascus() {
-    W = Math.floor(window.innerWidth / SCALE);
-    H = Math.floor(window.innerHeight / SCALE);
-    canvas.width = W;
-    canvas.height = H;
-  }
-  resizeDamascus();
-  window.addEventListener('resize', resizeDamascus);
-
-  function drawDamascus() {
-    t += 0.002;
-    const img = ctx.createImageData(W, H);
-    const d = img.data;
-
-    for (let y = 0; y < H; y++) {
-      for (let x = 0; x < W; x++) {
-        const nx = x / W, ny = y / H;
-        const warp = Math.sin(ny * 6 + t + Math.sin(nx * 4 + t * 0.5) * 1.2) * 0.15;
-        const wx = nx + warp * 0.4, wy = ny + warp * 0.3;
-        const band1 = Math.sin(wx * 12 + wy * 8 + t * 0.3) * 0.5 + 0.5;
-        const v = band1;
-        const base = 4 + v * 10;
-
-        const i = (y * W + x) * 4;
-        d[i]   = base;
-        d[i+1] = base + 4;
-        d[i+2] = base + 12;
-        d[i+3] = 255;
-      }
-    }
-    ctx.putImageData(img, 0, 0);
-    requestAnimationFrame(drawDamascus);
-  }
-  drawDamascus();
-
-  // Intersection Observer for Revealing Content
+  // Intersection Observer for Content Fade-Ins
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
       if (e.isIntersecting) {
