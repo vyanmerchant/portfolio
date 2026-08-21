@@ -35,24 +35,18 @@
   --space-lg: 5rem; --space-xl: 10rem;
   
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
-  --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
 html.lenis { height: auto; }
 .lenis.lenis-smooth { scroll-behavior: auto; }
 .lenis.lenis-smooth [data-lenis-prevent] { overscroll-behavior: contain; }
 .lenis.lenis-stopped { overflow: hidden; }
 
 body {
-  background-color: var(--color-bg);
-  color: var(--color-text);
-  font-family: var(--font-sans);
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  overflow-x: hidden;
-  cursor: none; /* Custom Cursor */
+  background-color: var(--color-bg); color: var(--color-text);
+  font-family: var(--font-sans); -webkit-font-smoothing: antialiased;
+  overflow-x: hidden; cursor: none;
 }
 
 ::selection { background: var(--color-text); color: var(--color-bg); }
@@ -62,60 +56,46 @@ body {
    ========================================== */
 #cursor {
   position: fixed; top: 0; left: 0;
-  width: 12px; height: 12px;
-  background: var(--color-text);
-  border-radius: 50%;
-  pointer-events: none;
-  z-index: 9999;
-  transform: translate(-50%, -50%);
-  mix-blend-mode: exclusion;
+  width: 12px; height: 12px; background: var(--color-text);
+  border-radius: 50%; pointer-events: none; z-index: 9999;
+  transform: translate(-50%, -50%); mix-blend-mode: exclusion;
   transition: width 0.3s var(--ease-out-expo), height 0.3s var(--ease-out-expo), background 0.3s;
 }
 #cursor.hovered {
-  width: 60px; height: 60px;
-  background: rgba(255,255,255,0.1);
-  backdrop-filter: blur(4px);
-  border: 1px solid rgba(255,255,255,0.2);
+  width: 80px; height: 80px; background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(4px); border: 1px solid rgba(255,255,255,0.2);
 }
 .magnetic { display: inline-block; cursor: none; }
 
 /* ==========================================
    03. WEBGL BACKGROUND
    ========================================== */
-#webgl-container {
-  position: fixed; inset: 0;
-  width: 100vw; height: 100vh;
-  z-index: -2; pointer-events: none;
-  background: var(--color-bg);
-}
+#webgl-container { position: fixed; inset: 0; z-index: -2; pointer-events: none; background: var(--color-bg); }
 .noise-overlay {
-  position: fixed; inset: 0;
-  z-index: -1; pointer-events: none;
-  opacity: 0.04;
+  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.04;
   background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
 }
 
 /* ==========================================
    04. TYPOGRAPHY & UTILS
    ========================================== */
-.t-display { font-size: clamp(3rem, 12vw, 12rem); line-height: 0.85; font-weight: 800; letter-spacing: -0.02em; text-transform: uppercase; }
+.t-display { font-size: clamp(4rem, 12vw, 12rem); line-height: 0.85; font-weight: 800; letter-spacing: -0.02em; text-transform: uppercase; }
 .t-h2 { font-size: clamp(2rem, 5vw, 5rem); line-height: 1; font-weight: 700; letter-spacing: -0.01em; }
-.t-body { font-size: clamp(1rem, 1.5vw, 1.25rem); line-height: 1.5; font-weight: 400; color: var(--color-muted); }
+.t-body { font-size: clamp(1rem, 1.5vw, 1.25rem); line-height: 1.5; color: var(--color-muted); }
 .t-serif { font-family: var(--font-serif); font-style: italic; font-weight: 300; }
 .t-mono { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; }
-
 .accent { color: var(--color-accent); }
 .grid-layout { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--space-sm); padding: 0 4vw; }
+.line-reveal { overflow: hidden; display: inline-block; }
+.line-reveal-inner { display: inline-block; transform: translateY(110%); }
 
 /* ==========================================
    05. NAVIGATION
    ========================================== */
 nav {
-  position: fixed; top: 0; width: 100%;
-  padding: 2vw 4vw;
+  position: fixed; top: 0; width: 100%; padding: 2vw 4vw;
   display: flex; justify-content: space-between; align-items: center;
-  z-index: 100;
-  mix-blend-mode: difference;
+  z-index: 100; mix-blend-mode: difference;
 }
 .nav-logo { font-size: 1.5rem; font-weight: 700; color: var(--color-text); text-decoration: none; }
 .nav-links { display: flex; gap: 2rem; }
@@ -132,7 +112,7 @@ nav {
    ========================================== */
 .hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; }
 .hero-meta { grid-column: 1 / -1; display: flex; justify-content: space-between; margin-bottom: 2rem; }
-.hero-title-wrapper { grid-column: 1 / 11; overflow: hidden; }
+.hero-title-wrapper { grid-column: 1 / 11; }
 .hero-subtitle { grid-column: 8 / 13; margin-top: 4rem; text-align: right; }
 .scroll-indicator { position: absolute; bottom: 2vw; right: 4vw; display: flex; align-items: center; gap: 1rem; }
 .scroll-line { width: 40px; height: 1px; background: var(--color-muted); overflow: hidden; position: relative; }
@@ -143,64 +123,78 @@ nav {
 @keyframes scrollLine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
 /* ==========================================
-   07. EDITORIAL ABOUT SECTION
+   07. ABOUT SECTION
    ========================================== */
 .about { padding: var(--space-xl) 0; border-top: 1px solid var(--color-border); }
 .about-label { grid-column: 1 / 3; }
 .about-content { grid-column: 4 / 11; }
-.about-stats { grid-column: 4 / 11; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-top: 4rem; border-top: 1px solid var(--color-border); padding-top: 2rem; }
+.about-stats {
+  grid-column: 4 / 11; display: grid; grid-template-columns: 1fr 1fr;
+  gap: 2rem; margin-top: 4rem; border-top: 1px solid var(--color-border); padding-top: 2rem;
+}
 .stat h4 { font-size: 4rem; font-family: var(--font-serif); color: var(--color-text); line-height: 1; }
 
 /* ==========================================
-   08. INTERACTIVE PROJECT GALLERY
+   08. HORIZONTAL WORK SLIDER
    ========================================== */
-.projects { padding: var(--space-xl) 0; }
-.project-container { grid-column: 1 / -1; display: flex; gap: 4vw; position: relative; }
-.project-list { flex: 1; display: flex; flex-direction: column; }
-.project-item {
-  padding: 3rem 0; border-bottom: 1px solid var(--color-border);
-  display: flex; justify-content: space-between; align-items: center;
-  transition: padding-left 0.4s var(--ease-out-expo); cursor: none;
-}
-.project-item:first-child { border-top: 1px solid var(--color-border); }
-.project-item:hover { padding-left: 2rem; }
-.project-item:hover .project-title { color: var(--color-text); }
-.project-title { font-size: clamp(2rem, 4vw, 4rem); color: var(--color-muted); transition: color 0.4s; }
+.work-slider-section { position: relative; padding: var(--space-xl) 0; overflow: hidden; }
+.work-header { margin-bottom: var(--space-md); }
+.slider-viewport { width: 100vw; height: 70vh; overflow: hidden; }
+.slider-track { display: flex; width: max-content; height: 100%; padding: 0 4vw; gap: 4vw; }
+.slider-item { width: 60vw; height: 100%; display: flex; flex-direction: column; gap: 1.5rem; }
+.slider-visual { flex: 1; position: relative; overflow: hidden; border-radius: 4px; cursor: none; background: #111; }
+.parallax-img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.2); }
 
-.project-preview-wrapper { flex: 0 0 45%; position: relative; height: 60vh; }
-.project-preview { position: sticky; top: 20vh; width: 100%; height: 100%; overflow: hidden; border-radius: 4px; background: #111; }
-.project-preview iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: none; opacity: 0; transition: opacity 0.4s; pointer-events: none; }
-.project-preview iframe.active { opacity: 1; }
+.play-overlay {
+  position: absolute; inset: 0; background: rgba(5,5,5,0.4);
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; transition: opacity 0.4s var(--ease-out-expo); z-index: 2;
+}
+.play-overlay span { padding: 1rem 2rem; border: 1px solid var(--color-text); border-radius: 50px; }
+.slider-visual:hover .play-overlay { opacity: 1; }
+.slider-meta { display: flex; justify-content: space-between; align-items: flex-end; }
 
 /* ==========================================
-   09. FOOTER / CONTACT
+   09. VIDEO MODAL
+   ========================================== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
+  z-index: 1000; display: flex; justify-content: center; align-items: center;
+  opacity: 0; pointer-events: none; transition: opacity 0.4s;
+}
+.modal-overlay.active { opacity: 1; pointer-events: all; }
+#close-modal { position: absolute; top: 4vw; right: 4vw; background: none; border: none; color: var(--color-text); font-size: 1rem; }
+.modal-content { width: 80vw; height: 45vw; background: #000; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+.modal-content iframe { width: 100%; height: 100%; border: none; }
+
+/* ==========================================
+   10. CONTACT & FOOTER
    ========================================== */
 .contact { padding: var(--space-xl) 0 2rem; border-top: 1px solid var(--color-border); min-height: 80vh; display: flex; flex-direction: column; justify-content: space-between; }
 .contact-cta { grid-column: 1 / -1; text-align: center; }
-.contact-cta a { color: var(--color-text); text-decoration: none; font-size: clamp(3rem, 8vw, 8rem); font-family: var(--font-serif); }
+.contact-cta a { color: var(--color-text); text-decoration: none; font-size: clamp(3rem, 10vw, 10rem); font-family: var(--font-serif); }
 .contact-cta a:hover { color: var(--color-accent); }
 .footer-bottom { grid-column: 1 / -1; display: flex; justify-content: space-between; margin-top: auto; border-top: 1px solid var(--color-border); padding-top: 2rem; }
 
-/* Line reveal utility */
-.line-reveal { overflow: hidden; }
-.line-reveal-inner { display: inline-block; transform: translateY(100%); }
+@media (max-width: 768px) {
+  .hero-meta { flex-direction: column; gap: 0.5rem; }
+  .slider-item { width: 85vw; }
+  .modal-content { width: 95vw; height: 53vw; }
+}
 </style>
 </head>
 <body>
 
-<!-- CUSTOM CURSOR -->
 <div id="cursor"></div>
-
-<!-- WEBGL BACKGROUND -->
 <div id="webgl-container"></div>
 <div class="noise-overlay"></div>
 
-<!-- NAVIGATION -->
+<!-- NAV -->
 <nav>
   <a href="#" class="nav-logo magnetic magnetic-hover">VM<span class="accent">.</span></a>
   <div class="nav-links t-mono">
     <a href="#about" class="magnetic magnetic-hover">About</a>
-    <a href="#work" class="magnetic magnetic-hover">Work[cite: 1]</a>
+    <a href="#work" class="magnetic magnetic-hover">Work</a>
     <a href="#contact" class="magnetic magnetic-hover">Contact</a>
   </div>
 </nav>
@@ -253,34 +247,60 @@ nav {
   </div>
 </section>
 
-<!-- PROJECTS -->
-<section id="work" class="projects grid-layout">
-  <div class="project-container">
-    <div class="project-list">
-      <div class="t-mono accent" style="margin-bottom: 2rem;">02 / Selected Works</div>
+<!-- WORK SLIDER -->
+<section id="work" class="work-slider-section">
+  <div class="work-header grid-layout">
+    <div class="t-mono accent" style="grid-column: 1 / -1;">02 / Selected Works</div>
+  </div>
+  
+  <div class="slider-viewport">
+    <div class="slider-track">
       
-      <!-- Interactive Project Items -->
-      <div class="project-item magnetic-hover" data-video="d0qvLlFEEH8">
-        <h3 class="project-title">Valorant Montage[cite: 1]</h3>
-        <span class="t-mono t-serif">01</span>
+      <!-- Project 01 -->
+      <div class="slider-item">
+        <div class="slider-visual magnetic-hover" data-video="d0qvLlFEEH8">
+          <div class="play-overlay"><span class="t-mono">Play Edit</span></div>
+          <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Valorant Montage" class="parallax-img">
+        </div>
+        <div class="slider-meta">
+          <h3 class="t-h2">Valorant Montage[cite: 1]</h3>
+          <span class="t-mono t-serif">01</span>
+        </div>
       </div>
-      <div class="project-item magnetic-hover" data-video="4ZcBnbLWxvU">
-        <h3 class="project-title">Legacy Edit[cite: 1]</h3>
-        <span class="t-mono t-serif">02</span>
+
+      <!-- Project 02 -->
+      <div class="slider-item">
+        <div class="slider-visual magnetic-hover" data-video="4ZcBnbLWxvU">
+          <div class="play-overlay"><span class="t-mono">Play Edit</span></div>
+          <img src="https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg" alt="Legacy Edit" class="parallax-img">
+        </div>
+        <div class="slider-meta">
+          <h3 class="t-h2">Legacy Edit[cite: 1]</h3>
+          <span class="t-mono t-serif">02</span>
+        </div>
       </div>
-      <div class="project-item magnetic-hover" data-video="d0qvLlFEEH8">
-        <h3 class="project-title">Practice Reel[cite: 1]</h3>
-        <span class="t-mono t-serif">03</span>
+
+      <!-- Project 03 (Using ID from Project 1 as placeholder for local file context) -->
+      <div class="slider-item">
+        <div class="slider-visual magnetic-hover" data-video="d0qvLlFEEH8">
+          <div class="play-overlay"><span class="t-mono">Play Edit</span></div>
+          <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Practice Reel" class="parallax-img">
+        </div>
+        <div class="slider-meta">
+          <h3 class="t-h2">Practice Reel[cite: 1]</h3>
+          <span class="t-mono t-serif">03</span>
+        </div>
       </div>
-    </div>
-    
-    <div class="project-preview-wrapper">
-      <div class="project-preview" id="video-preview-container">
-        <!-- Iframes injected via JS for performance -->
-      </div>
+
     </div>
   </div>
 </section>
+
+<!-- MODAL -->
+<div id="video-modal" class="modal-overlay">
+  <button id="close-modal" class="t-mono magnetic magnetic-hover">Close [X]</button>
+  <div class="modal-content"></div>
+</div>
 
 <!-- CONTACT -->
 <section id="contact" class="contact grid-layout">
@@ -299,28 +319,24 @@ nav {
 
 <script>
 /* ==========================================
-   JS ARCHITECTURE: MODULES & INITIALIZATION
+   SYSTEM INITIALIZATION
    ========================================== */
-
 document.addEventListener("DOMContentLoaded", () => {
   initSmoothScroll();
   initCustomCursor();
   initWebGLBackground();
   initGSAPAnimations();
-  initProjectInteractions();
+  initSliderScroll();
+  initVideoModal();
 });
 
-/* --- 1. LENIS SMOOTH SCROLL --- */
 let lenis;
+
 function initSmoothScroll() {
   lenis = new Lenis({
     duration: 1.2,
     easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    direction: 'vertical',
-    gestureDirection: 'vertical',
-    smooth: true,
-    mouseMultiplier: 1,
-    smoothTouch: false,
+    direction: 'vertical', smooth: true
   });
   function raf(time) {
     lenis.raf(time);
@@ -329,21 +345,12 @@ function initSmoothScroll() {
   requestAnimationFrame(raf);
 }
 
-/* --- 2. MAGNETIC CUSTOM CURSOR --- */
 function initCustomCursor() {
   const cursor = document.getElementById('cursor');
-  const hoverElements = document.querySelectorAll('.magnetic-hover');
-  const magneticElements = document.querySelectorAll('.magnetic');
+  let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
   
-  let mouseX = 0, mouseY = 0;
-  let cursorX = 0, cursorY = 0;
+  window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
   
-  window.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-  });
-  
-  // Smooth follow interpolation
   gsap.ticker.add(() => {
     const dt = 1.0 - Math.pow(1.0 - 0.2, gsap.ticker.deltaRatio());
     cursorX += (mouseX - cursorX) * dt;
@@ -351,19 +358,16 @@ function initCustomCursor() {
     cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
   });
 
-  // Hover states
-  hoverElements.forEach(el => {
+  document.querySelectorAll('.magnetic-hover').forEach(el => {
     el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
     el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
   });
 
-  // Magnetic logic
-  magneticElements.forEach(el => {
+  document.querySelectorAll('.magnetic').forEach(el => {
     el.addEventListener('mousemove', function(e) {
       const rect = this.getBoundingClientRect();
-      const h = rect.width / 2;
-      const x = e.clientX - rect.left - h;
-      const y = e.clientY - rect.top - h;
+      const x = e.clientX - rect.left - rect.width/2;
+      const y = e.clientY - rect.top - rect.height/2;
       gsap.to(this, { x: x * 0.3, y: y * 0.3, duration: 0.4, ease: "power2.out" });
     });
     el.addEventListener('mouseleave', function() {
@@ -372,48 +376,34 @@ function initCustomCursor() {
   });
 }
 
-/* --- 3. CINEMATIC WEBGL BACKGROUND (THREE.JS) --- */
-// Creates a highly optimized, sophisticated fluid displacement shader (Replaces basic canvas code[cite: 1])
 function initWebGLBackground() {
   const container = document.getElementById('webgl-container');
   const scene = new THREE.Scene();
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
-  
   renderer.setSize(window.innerWidth, window.innerHeight);
   container.appendChild(renderer.domElement);
 
-  const geometry = new THREE.PlaneGeometry(2, 2);
   const material = new THREE.ShaderMaterial({
     uniforms: { u_time: { value: 0 }, u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) } },
-    vertexShader: `
-      varying vec2 vUv;
-      void main() { vUv = uv; gl_Position = vec4(position, 1.0); }
-    `,
+    vertexShader: `void main() { gl_Position = vec4(position, 1.0); }`,
     fragmentShader: `
       uniform float u_time;
       uniform vec2 u_resolution;
-      varying vec2 vUv;
-      
-      // Simplex noise function omitted for brevity, using sine-wave distortion for token efficiency
       void main() {
         vec2 st = gl_FragCoord.xy / u_resolution.xy;
         st.x *= u_resolution.x / u_resolution.y;
-        
         vec2 q = vec2(0.);
         q.x = sin(st.x * 2.0 + u_time * 0.2) + cos(st.y * 3.0 + u_time * 0.1);
         q.y = cos(st.x * 3.0 + u_time * 0.3) + sin(st.y * 2.0 + u_time * 0.2);
-        
         float colorValue = smoothstep(0.0, 2.0, length(q) * 0.5);
         vec3 color = mix(vec3(0.02, 0.02, 0.02), vec3(0.04, 0.05, 0.06), colorValue);
-        
         gl_FragColor = vec4(color, 1.0);
       }
     `
   });
 
-  const mesh = new THREE.Mesh(geometry, material);
-  scene.add(mesh);
+  scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
 
   function animate() {
     material.uniforms.u_time.value += 0.01;
@@ -421,24 +411,19 @@ function initWebGLBackground() {
     requestAnimationFrame(animate);
   }
   animate();
-
   window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
     material.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
   });
 }
 
-/* --- 4. GSAP SCROLL ANIMATIONS --- */
 function initGSAPAnimations() {
   gsap.registerPlugin(ScrollTrigger);
-
-  // Hero Reveal
   const tl = gsap.timeline();
   tl.to('.line-reveal-inner', { y: '0%', duration: 1.2, ease: "power4.out", stagger: 0.1, delay: 0.2 })
     .from('.hero-meta', { opacity: 0, y: 20, duration: 1, ease: "power2.out" }, "-=0.8")
     .from('.hero-subtitle', { opacity: 0, duration: 1 }, "-=0.5");
 
-  // General Scroll Reveals
   gsap.utils.toArray('.line-reveal-inner').forEach(el => {
     if(!el.closest('.hero')) {
       gsap.to(el, {
@@ -449,43 +434,49 @@ function initGSAPAnimations() {
   });
 }
 
-/* --- 5. PROJECT INTERACTIONS --- */
-function initProjectInteractions() {
-  const items = document.querySelectorAll('.project-item');
-  const previewContainer = document.getElementById('video-preview-container');
-  let currentVideo = null;
+function initSliderScroll() {
+  const track = document.querySelector('.slider-track');
+  const images = gsap.utils.toArray('.parallax-img');
+  
+  let sliderTween = gsap.to(track, {
+    x: () => -(track.scrollWidth - document.documentElement.clientWidth) + "px",
+    ease: "none",
+    scrollTrigger: {
+      trigger: ".work-slider-section", pin: true, scrub: 1, end: () => "+=" + track.scrollWidth
+    }
+  });
 
-  items.forEach(item => {
-    item.addEventListener('mouseenter', () => {
-      const videoId = item.getAttribute('data-video');
-      if(videoId === currentVideo) return;
-      currentVideo = videoId;
-      
-      // Deactivate siblings
-      const iframes = previewContainer.querySelectorAll('iframe');
-      iframes.forEach(iframe => iframe.classList.remove('active'));
-
-      // Check if iframe exists, otherwise create it (Lazy Loading)
-      let iframe = document.getElementById(`vid-${videoId}`);
-      if(!iframe) {
-        iframe = document.createElement('iframe');
-        iframe.id = `vid-${videoId}`;
-        // Using modestbranding and loop parameters similar to original[cite: 1]
-        iframe.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&modestbranding=1&loop=1&playlist=${videoId}`;
-        iframe.allow = "autoplay; encrypted-media";
-        previewContainer.appendChild(iframe);
+  images.forEach(img => {
+    gsap.to(img, {
+      x: () => img.parentElement.offsetWidth * 0.2,
+      ease: "none",
+      scrollTrigger: {
+        trigger: ".work-slider-section", containerAnimation: sliderTween, start: "left right", end: "right left", scrub: true
       }
-      
-      // Trigger layout to ensure CSS transition applies
-      void iframe.offsetWidth;
-      iframe.classList.add('active');
     });
   });
-  
-  // Trigger first item hover on load
-  if(items.length > 0) {
-    items[0].dispatchEvent(new Event('mouseenter'));
-  }
+}
+
+function initVideoModal() {
+  const visuals = document.querySelectorAll('.slider-visual');
+  const modal = document.getElementById('video-modal');
+  const modalContent = document.querySelector('.modal-content');
+  const closeBtn = document.getElementById('close-modal');
+
+  visuals.forEach(visual => {
+    visual.addEventListener('click', () => {
+      const vidId = visual.getAttribute('data-video');
+      modalContent.innerHTML = `<iframe src="https://www.youtube.com/embed/${vidId}?autoplay=1&mute=0&controls=1&modestbranding=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+      modal.classList.add('active');
+      lenis.stop();
+    });
+  });
+
+  closeBtn.addEventListener('click', () => {
+    modal.classList.remove('active');
+    setTimeout(() => { modalContent.innerHTML = ''; }, 400);
+    lenis.start();
+  });
 }
 </script>
 </body>
