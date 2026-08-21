@@ -22,10 +22,11 @@
    ========================================== */
 :root {
   --color-bg: #050505;
+  --color-surface: #111111;
   --color-text: #f0ede8;
   --color-accent: #7dd3fc;
   --color-muted: #888888;
-  --color-border: rgba(240, 237, 232, 0.1);
+  --color-border: rgba(240, 237, 232, 0.08);
   
   --font-sans: 'Syne', sans-serif;
   --font-serif: 'Cormorant Garamond', serif;
@@ -33,6 +34,9 @@
   
   --space-xs: 0.5rem; --space-sm: 1rem; --space-md: 2.5rem;
   --space-lg: 5rem; --space-xl: 10rem;
+  
+  --radius-md: 1.5rem;
+  --radius-full: 100px;
   
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
 }
@@ -79,30 +83,37 @@ body {
 /* ==========================================
    04. TYPOGRAPHY & UTILS
    ========================================== */
-.t-display { font-size: clamp(4rem, 12vw, 12rem); line-height: 0.85; font-weight: 800; letter-spacing: -0.02em; text-transform: uppercase; }
-.t-h2 { font-size: clamp(2rem, 5vw, 5rem); line-height: 1; font-weight: 700; letter-spacing: -0.01em; }
-.t-body { font-size: clamp(1rem, 1.5vw, 1.25rem); line-height: 1.5; color: var(--color-muted); }
+/* Adjusted Display font clamp so the name fits on mobile and scales smoothly */
+.t-display { font-size: clamp(3rem, 9.5vw, 10rem); line-height: 0.9; font-weight: 800; letter-spacing: -0.03em; text-transform: uppercase; word-wrap: break-word; }
+.t-h2 { font-size: clamp(2rem, 5vw, 4rem); line-height: 1; font-weight: 700; letter-spacing: -0.02em; }
+.t-body { font-size: clamp(1rem, 1.5vw, 1.25rem); line-height: 1.6; color: var(--color-muted); }
 .t-serif { font-family: var(--font-serif); font-style: italic; font-weight: 300; }
 .t-mono { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.1em; text-transform: uppercase; }
 .accent { color: var(--color-accent); }
 .grid-layout { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--space-sm); padding: 0 4vw; }
-.line-reveal { overflow: hidden; display: inline-block; }
+.line-reveal { overflow: hidden; display: block; } /* Changed to block for proper wrapping */
 .line-reveal-inner { display: inline-block; transform: translateY(110%); }
 
 /* ==========================================
-   05. NAVIGATION
+   05. NAVIGATION (Squarespace Pillar Style)
    ========================================== */
 nav {
-  position: fixed; top: 0; width: 100%; padding: 2vw 4vw;
+  position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%);
+  width: 92%; max-width: 1400px;
+  padding: 1.25rem 2.5rem;
   display: flex; justify-content: space-between; align-items: center;
-  z-index: 100; mix-blend-mode: difference;
+  z-index: 100; 
+  background: rgba(10, 10, 10, 0.6);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-full);
 }
-.nav-logo { font-size: 1.5rem; font-weight: 700; color: var(--color-text); text-decoration: none; }
-.nav-links { display: flex; gap: 2rem; }
+.nav-logo { font-size: 1.25rem; font-weight: 800; color: var(--color-text); text-decoration: none; }
+.nav-links { display: flex; gap: 2.5rem; }
 .nav-links a { color: var(--color-text); text-decoration: none; position: relative; overflow: hidden; padding-bottom: 4px; }
 .nav-links a::after {
   content: ''; position: absolute; bottom: 0; left: 0;
-  width: 100%; height: 1px; background: var(--color-text);
+  width: 100%; height: 1px; background: var(--color-accent);
   transform: translateX(-100%); transition: transform 0.4s var(--ease-out-expo);
 }
 .nav-links a:hover::after { transform: translateX(0); }
@@ -110,76 +121,114 @@ nav {
 /* ==========================================
    06. HERO SECTION
    ========================================== */
-.hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; }
+.hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; padding-top: 5rem; }
 .hero-meta { grid-column: 1 / -1; display: flex; justify-content: space-between; margin-bottom: 2rem; }
-.hero-title-wrapper { grid-column: 1 / 11; }
+.hero-title-wrapper { grid-column: 1 / 13; } /* Expanded to full width to prevent premature wrapping */
 .hero-subtitle { grid-column: 8 / 13; margin-top: 4rem; text-align: right; }
-.scroll-indicator { position: absolute; bottom: 2vw; right: 4vw; display: flex; align-items: center; gap: 1rem; }
-.scroll-line { width: 40px; height: 1px; background: var(--color-muted); overflow: hidden; position: relative; }
+.scroll-indicator { position: absolute; bottom: 3vw; left: 4vw; display: flex; align-items: center; gap: 1rem; }
+.scroll-line { width: 60px; height: 1px; background: var(--color-border); overflow: hidden; position: relative; }
 .scroll-line::after {
   content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-  background: var(--color-text); animation: scrollLine 2s infinite cubic-bezier(0.65, 0, 0.35, 1);
+  background: var(--color-accent); animation: scrollLine 2s infinite cubic-bezier(0.65, 0, 0.35, 1);
 }
 @keyframes scrollLine { 0% { transform: translateX(-100%); } 100% { transform: translateX(100%); } }
 
 /* ==========================================
-   07. ABOUT SECTION
+   07. ABOUT SECTION (Modular Cards)
    ========================================== */
-.about { padding: var(--space-xl) 0; border-top: 1px solid var(--color-border); }
+.about { padding: var(--space-xl) 0; }
 .about-label { grid-column: 1 / 3; }
 .about-content { grid-column: 4 / 11; }
 .about-stats {
   grid-column: 4 / 11; display: grid; grid-template-columns: 1fr 1fr;
-  gap: 2rem; margin-top: 4rem; border-top: 1px solid var(--color-border); padding-top: 2rem;
+  gap: 1.5rem; margin-top: 4rem;
 }
-.stat h4 { font-size: 4rem; font-family: var(--font-serif); color: var(--color-text); line-height: 1; }
+.stat {
+  background: var(--color-surface);
+  padding: 3rem;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--color-border);
+  display: flex; flex-direction: column; justify-content: center;
+}
+.stat h4 { font-size: 4.5rem; font-family: var(--font-serif); color: var(--color-text); line-height: 1; margin-bottom: 0.5rem; }
 
 /* ==========================================
    08. HORIZONTAL WORK SLIDER
    ========================================== */
 .work-slider-section { position: relative; padding: var(--space-xl) 0; overflow: hidden; }
 .work-header { margin-bottom: var(--space-md); }
-.slider-viewport { width: 100vw; height: 70vh; overflow: hidden; }
-.slider-track { display: flex; width: max-content; height: 100%; padding: 0 4vw; gap: 4vw; }
-.slider-item { width: 60vw; height: 100%; display: flex; flex-direction: column; gap: 1.5rem; }
-.slider-visual { flex: 1; position: relative; overflow: hidden; border-radius: 4px; cursor: none; background: #111; }
-.parallax-img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.2); }
+.slider-viewport { width: 100vw; height: 75vh; overflow: hidden; }
+.slider-track { display: flex; width: max-content; height: 100%; padding: 0 4vw; gap: 2vw; } /* Reduced gap for sleeker look */
+.slider-item { width: 55vw; height: 100%; display: flex; flex-direction: column; gap: 1.5rem; }
+.slider-visual { 
+  flex: 1; position: relative; overflow: hidden; 
+  border-radius: var(--radius-md); 
+  cursor: none; background: var(--color-surface); 
+  border: 1px solid var(--color-border);
+}
+.parallax-img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.15); }
 
 .play-overlay {
-  position: absolute; inset: 0; background: rgba(5,5,5,0.4);
+  position: absolute; inset: 0; background: rgba(5,5,5,0.3);
   display: flex; align-items: center; justify-content: center;
   opacity: 0; transition: opacity 0.4s var(--ease-out-expo); z-index: 2;
 }
-.play-overlay span { padding: 1rem 2rem; border: 1px solid var(--color-text); border-radius: 50px; }
+.play-overlay span { 
+  padding: 1.25rem 2.5rem; 
+  background: rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+  border: 1px solid rgba(255,255,255,0.2); 
+  border-radius: var(--radius-full); 
+  color: var(--color-text);
+}
 .slider-visual:hover .play-overlay { opacity: 1; }
-.slider-meta { display: flex; justify-content: space-between; align-items: flex-end; }
+.slider-meta { display: flex; justify-content: space-between; align-items: flex-end; padding: 0 0.5rem; }
 
 /* ==========================================
    09. VIDEO MODAL
    ========================================== */
 .modal-overlay {
-  position: fixed; inset: 0; background: rgba(0,0,0,0.95); backdrop-filter: blur(10px);
+  position: fixed; inset: 0; background: rgba(0,0,0,0.98); backdrop-filter: blur(15px);
   z-index: 1000; display: flex; justify-content: center; align-items: center;
   opacity: 0; pointer-events: none; transition: opacity 0.4s;
 }
 .modal-overlay.active { opacity: 1; pointer-events: all; }
-#close-modal { position: absolute; top: 4vw; right: 4vw; background: none; border: none; color: var(--color-text); font-size: 1rem; }
-.modal-content { width: 80vw; height: 45vw; background: #000; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+#close-modal { 
+  position: absolute; top: 2rem; right: 2rem; 
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); 
+  color: var(--color-text); border-radius: var(--radius-full);
+  padding: 0.75rem 1.5rem; cursor: none; 
+}
+.modal-content { 
+  width: 85vw; height: 48vw; background: var(--color-surface); 
+  border-radius: var(--radius-md); overflow: hidden;
+  box-shadow: 0 30px 60px rgba(0,0,0,0.8); 
+  border: 1px solid var(--color-border);
+}
 .modal-content iframe { width: 100%; height: 100%; border: none; }
 
 /* ==========================================
    10. CONTACT & FOOTER
    ========================================== */
-.contact { padding: var(--space-xl) 0 2rem; border-top: 1px solid var(--color-border); min-height: 80vh; display: flex; flex-direction: column; justify-content: space-between; }
-.contact-cta { grid-column: 1 / -1; text-align: center; }
-.contact-cta a { color: var(--color-text); text-decoration: none; font-size: clamp(3rem, 10vw, 10rem); font-family: var(--font-serif); }
+.contact { padding: var(--space-xl) 0 3rem; min-height: 80vh; display: flex; flex-direction: column; justify-content: space-between; }
+.contact-cta { grid-column: 1 / -1; text-align: center; margin: auto 0; }
+.contact-cta a { 
+  color: var(--color-text); text-decoration: none; 
+  font-size: clamp(3rem, 10vw, 10rem); font-family: var(--font-serif); 
+  transition: color 0.4s;
+}
 .contact-cta a:hover { color: var(--color-accent); }
-.footer-bottom { grid-column: 1 / -1; display: flex; justify-content: space-between; margin-top: auto; border-top: 1px solid var(--color-border); padding-top: 2rem; }
+.footer-bottom { 
+  grid-column: 1 / -1; display: flex; justify-content: space-between; 
+  padding-top: 2rem; border-top: 1px solid var(--color-border); 
+}
 
 @media (max-width: 768px) {
+  nav { width: 90%; padding: 1rem 1.5rem; top: 1rem; }
   .hero-meta { flex-direction: column; gap: 0.5rem; }
+  .hero-subtitle { grid-column: 1 / -1; text-align: left; margin-top: 2rem; }
+  .about-stats { grid-template-columns: 1fr; }
   .slider-item { width: 85vw; }
-  .modal-content { width: 95vw; height: 53vw; }
+  .modal-content { width: 95vw; height: 53vw; border-radius: 0.5rem; }
 }
 </style>
 </head>
@@ -209,7 +258,7 @@ nav {
   
   <div class="hero-title-wrapper">
     <h1 class="t-display">
-      <span class="line-reveal"><span class="line-reveal-inner">Vyan</span></span><br>
+      <span class="line-reveal"><span class="line-reveal-inner">Vyan</span></span>
       <span class="line-reveal"><span class="line-reveal-inner">Mer<span class="accent">chant</span></span></span>
     </h1>
   </div>
@@ -280,7 +329,7 @@ nav {
         </div>
       </div>
 
-      <!-- Project 03 (Using ID from Project 1 as placeholder for local file context) -->
+      <!-- Project 03 -->
       <div class="slider-item">
         <div class="slider-visual magnetic-hover" data-video="d0qvLlFEEH8">
           <div class="play-overlay"><span class="t-mono">Play Edit</span></div>
@@ -394,10 +443,11 @@ function initWebGLBackground() {
         vec2 st = gl_FragCoord.xy / u_resolution.xy;
         st.x *= u_resolution.x / u_resolution.y;
         vec2 q = vec2(0.);
-        q.x = sin(st.x * 2.0 + u_time * 0.2) + cos(st.y * 3.0 + u_time * 0.1);
-        q.y = cos(st.x * 3.0 + u_time * 0.3) + sin(st.y * 2.0 + u_time * 0.2);
+        q.x = sin(st.x * 2.0 + u_time * 0.15) + cos(st.y * 3.0 + u_time * 0.08);
+        q.y = cos(st.x * 3.0 + u_time * 0.2) + sin(st.y * 2.0 + u_time * 0.1);
         float colorValue = smoothstep(0.0, 2.0, length(q) * 0.5);
-        vec3 color = mix(vec3(0.02, 0.02, 0.02), vec3(0.04, 0.05, 0.06), colorValue);
+        // Softened colors to match cleaner aesthetic
+        vec3 color = mix(vec3(0.01, 0.01, 0.01), vec3(0.03, 0.04, 0.05), colorValue);
         gl_FragColor = vec4(color, 1.0);
       }
     `
@@ -420,9 +470,10 @@ function initWebGLBackground() {
 function initGSAPAnimations() {
   gsap.registerPlugin(ScrollTrigger);
   const tl = gsap.timeline();
-  tl.to('.line-reveal-inner', { y: '0%', duration: 1.2, ease: "power4.out", stagger: 0.1, delay: 0.2 })
-    .from('.hero-meta', { opacity: 0, y: 20, duration: 1, ease: "power2.out" }, "-=0.8")
-    .from('.hero-subtitle', { opacity: 0, duration: 1 }, "-=0.5");
+  tl.to('.line-reveal-inner', { y: '0%', duration: 1.4, ease: "power4.out", stagger: 0.1, delay: 0.2 })
+    .from('.hero-meta', { opacity: 0, y: 20, duration: 1, ease: "power2.out" }, "-=1")
+    .from('.hero-subtitle', { opacity: 0, duration: 1 }, "-=0.8")
+    .from('nav', { y: -20, opacity: 0, duration: 1, ease: "power2.out" }, "-=1.2");
 
   gsap.utils.toArray('.line-reveal-inner').forEach(el => {
     if(!el.closest('.hero')) {
@@ -448,7 +499,7 @@ function initSliderScroll() {
 
   images.forEach(img => {
     gsap.to(img, {
-      x: () => img.parentElement.offsetWidth * 0.2,
+      x: () => img.parentElement.offsetWidth * 0.15, // Smoother, less aggressive parallax
       ease: "none",
       scrollTrigger: {
         trigger: ".work-slider-section", containerAnimation: sliderTween, start: "left right", end: "right left", scrub: true
