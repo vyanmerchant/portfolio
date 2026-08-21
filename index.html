@@ -1,676 +1,525 @@
-// ============================================================================
-// ARCHITECTURE OVERVIEW & DIRECTORY STRUCTURE
-// ============================================================================
-//
-// src/
-// ├── components/
-// │   ├── canvas/
-// │   │   ├── ParticleField.tsx       // WebGL subtle interactive canvas background
-// │   │   └── ImageDistortion.tsx    // Custom GLSL displacement shader on card hover
-// │   ├── UI/
-// │   │   ├── CustomCursor.tsx        // Magnetic, reactive state cursor system
-// │   │   ├── Navigation.tsx          // Floating morphing glass bar + overlay
-// │   │   ├── MagneticButton.tsx      // Physics-based magnetic hover trigger
-// │   │   ├── TextReveal.tsx          // Character & word stagger split reveal
-// │   │   └── ProjectCard.tsx         // Editorial asymmetric project display
-// │   ├── sections/
-// │   │   ├── Hero.tsx                // Kinetic editorial hero with depth layers
-// │   │   ├── EditorialGrid.tsx       // Asymmetric portfolio showcase
-// │   │   ├── InteractiveShowcase.tsx // Pinning scroll section with spatial cards
-// │   │   ├── TechnicalSpecs.tsx      // High-density metadata & interactive log
-// │   │   └── CinematicFooter.tsx     // Monumental typography footer with dynamic CTA
-// ├── hooks/
-// │   ├── useSmoothScroll.ts         // Lenis smooth scroll wrapper
-// │   └── useMousePosition.ts         // Physics-interpolated pointer tracker
-// ├── styles/
-// │   └── globals.css                // Custom easing curves, noise overlays, variables
-// └── App.tsx                        // Core orchestration & layout master
-//
-// ============================================================================
-
 import React, { useEffect, useRef, useState } from 'react';
-import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
-import Lenis from '@studio-freight/lenis';
-import * as THREE from 'three';
+import { motion, useScroll, useTransform, useSpring, useMotionValue } from 'framer-motion';
+import { ArrowUpRight, Menu, X, Sparkles, Layers, Cpu, Code2, Globe } from 'lucide-react';
 
-// ============================================================================
-// UTILS & HOOKS
-// ============================================================================
+// ==========================================
+// 1. CUSTOM CURSOR COMPONENT
+// ==========================================
+const CustomCursor = () => {
+  const [cursorVariant, setCursorVariant] = useState('DEFAULT');
+  const [cursorText, setCursorText] = useState('');
+  const mouseX = useMotionValue(-100);
+  const mouseY = useMotionValue(-100);
 
-const useMousePosition = () => {
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0, targetX: 0, targetY: 0 });
+  const springConfig = { damping: 28, stiffness: 350, mass: 0.5 };
+  const cursorX = useSpring(mouseX, springConfig);
+  const cursorY = useSpring(mouseY, springConfig);
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
-      setMousePosition(prev => ({ ...prev, targetX: e.clientX, targetY: e.clientY }));
+    if (window.matchMedia('(pointer: coarse)').matches) return;
+
+    const handleMouseMove = (e) => {
+      mouseX.set(e.clientX);
+      mouseY.set(e.clientY);
     };
+
+    const handleMouseOver = (e) => {
+      const target = e.target.closest('[data-cursor]');
+      if (!target) {
+        setCursorVariant('DEFAULT');
+        setCursorText('');
+        return;
+      }
+
+      const mode = target.getAttribute('data-cursor');
+      const label = target.getAttribute('data-cursor-label');
+
+      if (mode === 'pointer') setCursorVariant('HOVER');
+      else if (mode === 'view') setCursorVariant('VIEW');
+      else if (mode === 'drag') setCursorVariant('DRAG');
+
+      if (label) setCursorText(label);
+    };
+
     window.addEventListener('mousemove', handleMouseMove);
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, []);
-
-  useEffect(() => {
-    let animationFrameId: number;
-    const updatePosition = () => {
-      setMousePosition(prev => {
-        const ease = 0.15;
-        const x = prev.x + (prev.targetX - prev.x) * ease;
-        const y = prev.y + (prev.targetY - prev.y) * ease;
-        return { ...prev, x, y };
-      });
-      animationFrameId = requestAnimationFrame(updatePosition);
-    };
-    animationFrameId = requestAnimationFrame(updatePosition);
-    return () => cancelAnimationFrame(animationFrameId);
-  }, []);
-
-  return mousePosition;
-};
-
-// Custom cubic bezier curves
-const transitionConfig = {
-  duration: 1.2,
-  ease: [0.16, 1, 0.3, 1], // Custom overshoot deceleration curve
-};
-
-// ============================================================================
-// CANVAS COMPONENTS (THREE.JS / WEBGL)
-// ============================================================================
-
-const WebGLBackground: React.FC = () => {
-  const mountRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    if (!mountRef.current) return;
-
-    const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
-
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-    mountRef.current.appendChild(renderer.domElement);
-
-    // Particle geometry with custom shader-like attributes
-    const particleCount = 250;
-    const geometry = new THREE.BufferGeometry();
-    const positions = new Float32Array(particleCount * 3);
-    const scales = new Float32Array(particleCount);
-
-    for (let i = 0; i < particleCount * 3; i += 3) {
-      positions[i] = (Math.random() - 0.5) * 15;
-      positions[i + 1] = (Math.random() - 0.5) * 15;
-      positions[i + 2] = (Math.random() - 0.5) * 15;
-      scales[i / 3] = Math.random();
-    }
-
-    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
-
-    const material = new THREE.PointsMaterial({
-      color: 0xe2e8f0,
-      size: 0.02,
-      transparent: true,
-      opacity: 0.25,
-      blending: THREE.AdditiveBlending,
-    });
-
-    const particles = new THREE.Points(geometry, material);
-    scene.add(particles);
-
-    camera.position.z = 5;
-
-    let mouseX = 0;
-    let mouseY = 0;
-
-    const handlePointerMove = (e: MouseEvent) => {
-      mouseX = (e.clientX / window.innerWidth - 0.5) * 0.5;
-      mouseY = (e.clientY / window.innerHeight - 0.5) * 0.5;
-    };
-
-    window.addEventListener('mousemove', handlePointerMove);
-
-    let animationFrameId: number;
-    const animate = () => {
-      particles.rotation.y += 0.0008;
-      particles.rotation.x += 0.0004;
-
-      // Gentle mouse responsiveness
-      camera.position.x += (mouseX - camera.position.x) * 0.02;
-      camera.position.y += (-mouseY - camera.position.y) * 0.02;
-      camera.lookAt(scene.position);
-
-      renderer.render(scene, camera);
-      animationFrameId = requestAnimationFrame(animate);
-    };
-
-    animate();
-
-    const handleResize = () => {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-    };
-
-    window.addEventListener('resize', handleResize);
+    window.addEventListener('mouseover', handleMouseOver);
 
     return () => {
-      window.removeEventListener('mousemove', handlePointerMove);
-      window.removeEventListener('resize', handleResize);
-      cancelAnimationFrame(animationFrameId);
-      mountRef.current?.removeChild(renderer.domElement);
-      geometry.dispose();
-      material.dispose();
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseover', handleMouseOver);
     };
-  }, []);
+  }, [mouseX, mouseY]);
 
-  return <div ref={mountRef} className="fixed inset-0 pointer-events-none z-0 opacity-40" />;
-};
-
-// ============================================================================
-// UI COMPONENTS
-// ============================================================================
-
-interface CustomCursorProps {
-  cursorText: string;
-  cursorVariant: 'default' | 'hover' | 'project' | 'drag';
-}
-
-const CustomCursor: React.FC<CustomCursorProps> = ({ cursorText, cursorVariant }) => {
-  const { x, y } = useMousePosition();
+  const variants = {
+    DEFAULT: {
+      width: 12,
+      height: 12,
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      border: '0px solid rgba(255, 255, 255, 0)',
+      mixBlendMode: 'difference',
+    },
+    HOVER: {
+      width: 48,
+      height: 48,
+      backgroundColor: 'rgba(255, 255, 255, 0.15)',
+      border: '1px solid rgba(255, 255, 255, 0.4)',
+      mixBlendMode: 'normal',
+    },
+    VIEW: {
+      width: 80,
+      height: 80,
+      backgroundColor: 'rgba(255, 255, 255, 0.95)',
+      border: '0px solid rgba(0, 0, 0, 0)',
+      mixBlendMode: 'normal',
+    },
+    DRAG: {
+      width: 64,
+      height: 64,
+      backgroundColor: 'rgba(255, 255, 255, 0.85)',
+      border: '0px solid rgba(0, 0, 0, 0)',
+      mixBlendMode: 'difference',
+    },
+  };
 
   return (
     <motion.div
-      className="fixed top-0 left-0 pointer-events-none z-50 flex items-center justify-center rounded-full mix-blend-difference"
-      animate={{
-        x: x - (cursorVariant === 'project' ? 40 : 8),
-        y: y - (cursorVariant === 'project' ? 40 : 8),
-        width: cursorVariant === 'project' ? 80 : cursorVariant === 'hover' ? 32 : 16,
-        height: cursorVariant === 'project' ? 80 : cursorVariant === 'hover' ? 32 : 16,
-        backgroundColor: cursorVariant === 'project' ? '#ffffff' : '#e2e8f0',
+      className="fixed top-0 left-0 pointer-events-none z-50 rounded-full flex items-center justify-center text-center font-mono text-[10px] tracking-widest font-semibold uppercase text-black overflow-hidden hidden md:flex"
+      style={{
+        x: cursorX,
+        y: cursorY,
+        translateX: '-50%',
+        translateY: '-50%',
       }}
-      transition={{ type: 'spring', damping: 28, stiffness: 350, mass: 0.5 }}
+      animate={cursorVariant}
+      variants={variants}
+      transition={{ type: 'spring', damping: 25, stiffness: 300 }}
     >
-      {cursorVariant === 'project' && (
-        <motion.span
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="text-black text-[10px] font-mono uppercase tracking-widest font-bold"
-        >
-          {cursorText || 'VIEW'}
-        </motion.span>
-      )}
+      {cursorText && <span className="px-2 animate-fade-in">{cursorText}</span>}
     </motion.div>
   );
 };
 
-interface MagneticButtonProps {
-  children: React.ReactNode;
-  className?: string;
-  onClick?: () => void;
-  onMouseEnter?: () => void;
-  onMouseLeave?: () => void;
-}
-
-const MagneticButton: React.FC<MagneticButtonProps> = ({
-  children,
-  className = '',
-  onClick,
-  onMouseEnter,
-  onMouseLeave,
-}) => {
-  const ref = useRef<HTMLDivElement>(null);
+// ==========================================
+// 2. MAGNETIC BUTTON COMPONENT
+// ==========================================
+const MagneticButton = ({ children, className = '', pullFactor = 0.35, onClick }) => {
+  const ref = useRef(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const handleMouse = (e: React.MouseEvent<HTMLDivElement>) => {
+  const handleMouseMove = (e) => {
     if (!ref.current) return;
     const { clientX, clientY } = e;
-    const { height, width, left, top } = ref.current.getBoundingClientRect();
-    const middleX = clientX - (left + width / 2);
-    const middleY = clientY - (top + height / 2);
-    setPosition({ x: middleX * 0.35, y: middleY * 0.35 });
+    const { left, top, width, height } = ref.current.getBoundingClientRect();
+
+    const centerX = left + width / 2;
+    const centerY = top + height / 2;
+
+    const distanceX = (clientX - centerX) * pullFactor;
+    const distanceY = (clientY - centerY) * pullFactor;
+
+    setPosition({ x: distanceX, y: distanceY });
   };
 
-  const reset = () => setPosition({ x: 0, y: 0 });
+  const handleMouseLeave = () => {
+    setPosition({ x: 0, y: 0 });
+  };
 
   return (
     <motion.div
       ref={ref}
-      onMouseMove={handleMouse}
-      onMouseLeave={() => {
-        reset();
-        onMouseLeave?.();
-      }}
-      onMouseEnter={onMouseEnter}
-      animate={{ x: position.x, y: position.y }}
-      transition={{ type: 'spring', stiffness: 180, damping: 15, mass: 0.1 }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
       onClick={onClick}
-      className={`inline-block cursor-pointer ${className}`}
+      animate={{ x: position.x, y: position.y }}
+      transition={{ type: 'spring', stiffness: 200, damping: 18, mass: 0.1 }}
+      className={`inline-block ${className}`}
+      data-cursor="pointer"
     >
       {children}
     </motion.div>
   );
 };
 
-interface TextRevealProps {
-  children: string;
-  className?: string;
-  delay?: number;
-}
-
-const TextReveal: React.FC<TextRevealProps> = ({ children, className = '', delay = 0 }) => {
-  const words = children.split(' ');
-
-  const container = {
-    hidden: { opacity: 0 },
-    visible: (i: number = 1) => ({
-      opacity: 1,
-      transition: { staggerChildren: 0.08, delayChildren: delay },
-    }),
-  };
-
-  const child = {
-    visible: {
-      opacity: 1,
-      y: 0,
-      rotateX: 0,
-      transition: {
-        type: 'spring',
-        damping: 25,
-        stiffness: 120,
-      },
-    },
-    hidden: {
-      opacity: 0,
-      y: 40,
-      rotateX: -45,
-    },
-  };
-
-  return (
-    <motion.span
-      className={`inline-flex flex-wrap gap-x-[0.25em] perspective-1000 ${className}`}
-      variants={container}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: '-10%' }}
-    >
-      {words.map((word, index) => (
-        <motion.span key={index} variants={child} className="inline-block transform-gpu origin-bottom-left">
-          {word}
-        </motion.span>
-      ))}
-    </motion.span>
-  );
-};
-
-// ============================================================================
-// MAIN SECTIONS
-// ============================================================================
-
-const Navigation: React.FC<{ setCursorVariant: (v: any) => void }> = ({ setCursorVariant }) => {
-  const [scrolled, setScrolled] = useState(false);
+// ==========================================
+// 3. BACKGROUND CANVAS COMPONENT
+// ==========================================
+const CanvasBackground = () => {
+  const canvasRef = useRef(null);
 
   useEffect(() => {
-    const handleScroll = () => setScrolled(window.scrollY > 50);
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+
+    let animationFrameId;
+    let width = 0;
+    let height = 0;
+    let particles = [];
+
+    class Particle {
+      constructor(w, h) {
+        this.reset(w, h);
+      }
+
+      reset(w, h) {
+        this.x = Math.random() * w;
+        this.y = Math.random() * h;
+        this.vx = (Math.random() - 0.5) * 0.3;
+        this.vy = (Math.random() - 0.5) * 0.3;
+        this.size = Math.random() * 1.5 + 0.5;
+        this.alpha = Math.random() * 0.3 + 0.1;
+      }
+
+      update(w, h) {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x < 0 || this.x > w) this.vx *= -1;
+        if (this.y < 0 || this.y > h) this.vy *= -1;
+      }
+
+      draw(context) {
+        context.beginPath();
+        context.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+        context.fillStyle = 'rgba(255, 255, 255, 0.15)';
+        context.globalAlpha = this.alpha;
+        context.fill();
+      }
+    }
+
+    const resize = () => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      canvas.width = width;
+      canvas.height = height;
+      const count = Math.floor((width * height) / 15000);
+      particles = Array.from({ length: count }, () => new Particle(width, height));
+    };
+
+    const render = () => {
+      ctx.clearRect(0, 0, width, height);
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update(width, height);
+        particles[i].draw(ctx);
+      }
+      animationFrameId = requestAnimationFrame(render);
+    };
+
+    window.addEventListener('resize', resize);
+    resize();
+    render();
+
+    return () => {
+      window.removeEventListener('resize', resize);
+      cancelAnimationFrame(animationFrameId);
+    };
   }, []);
 
-  return (
-    <motion.nav
-      initial={{ y: -100, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ ...transitionConfig, delay: 0.2 }}
-      className="fixed top-0 left-0 right-0 z-40 px-6 lg:px-16 py-6 flex justify-between items-center mix-blend-difference"
-    >
-      <div className="flex items-center gap-2">
-        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-        <span className="font-mono text-xs uppercase tracking-widest text-slate-200">AURA / LABS</span>
-      </div>
-
-      <div className="hidden md:flex items-center gap-12 font-mono text-xs uppercase tracking-wider text-slate-300">
-        {['Architectures', 'Index', 'Capabilities', 'Contact'].map((item, idx) => (
-          <a
-            key={idx}
-            href={`#${item.toLowerCase()}`}
-            onMouseEnter={() => setCursorVariant('hover')}
-            onMouseLeave={() => setCursorVariant('default')}
-            className="hover:text-white transition-colors relative group py-1"
-          >
-            {item}
-            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full" />
-          </a>
-        ))}
-      </div>
-
-      <MagneticButton
-        onMouseEnter={() => setCursorVariant('hover')}
-        onMouseLeave={() => setCursorVariant('default')}
-      >
-        <button className="relative px-5 py-2.5 rounded-full border border-slate-700/60 bg-slate-900/40 backdrop-blur-md text-xs font-mono tracking-wider text-slate-200 hover:border-slate-400 transition-colors">
-          INITIATE SYSTEM
-        </button>
-      </MagneticButton>
-    </motion.nav>
-  );
+  return <canvas ref={canvasRef} className="fixed inset-0 pointer-events-none z-0 opacity-40" />;
 };
 
-const HeroSection: React.FC<{ setCursorVariant: (v: any) => void }> = ({ setCursorVariant }) => {
-  const containerRef = useRef<HTMLDivElement>(null);
+// ==========================================
+// 4. PROJECT CARD WITH PARALLAX
+// ==========================================
+const ProjectCard = ({ title, category, year, image, index }) => {
+  const containerRef = useRef(null);
+
   const { scrollYProgress } = useScroll({
     target: containerRef,
-    offset: ['start start', 'end start'],
+    offset: ['start end', 'end start'],
   });
 
-  const yText = useTransform(scrollYProgress, [0, 1], ['0%', '45%']);
-  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+  const y = useTransform(scrollYProgress, [0, 1], ['-8%', '8%']);
+  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1.1, 1, 1.05]);
 
   return (
-    <section ref={containerRef} className="relative min-h-screen flex flex-col justify-between px-6 lg:px-16 pt-36 pb-12 overflow-hidden">
-      {/* Background Grid Accent */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
-
-      <motion.div style={{ y: yText, opacity }} className="relative z-10 max-w-7xl">
-        <div className="flex items-center gap-3 mb-6">
-          <span className="font-mono text-xs uppercase tracking-widest text-slate-500">[ DEEP TECH DESIGN AGENCY ]</span>
-          <div className="h-[1px] w-12 bg-slate-800" />
-          <span className="font-mono text-xs text-slate-500">2026.08 // V4.0</span>
-        </div>
-
-        <h1 className="text-5xl sm:text-7xl lg:text-9xl font-bold tracking-tight text-slate-100 font-sans leading-[0.92] mb-8">
-          <TextReveal delay={0.3}>CRAFTING</TextReveal> <br />
-          <span className="italic font-serif font-normal text-slate-400">
-            <TextReveal delay={0.5}>DIGITAL</TextReveal>
-          </span>{' '}
-          <TextReveal delay={0.7}>MONUMENTS.</TextReveal>
-        </h1>
-
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-end mt-12">
-          <p className="md:col-span-6 text-slate-400 text-lg font-light leading-relaxed">
-            We operate at the convergence of high-performance frontend engineering and sculptural UI design. Building web infrastructure for teams defining the next century.
-          </p>
-
-          <div className="md:col-span-6 md:col-start-8 flex justify-start md:justify-end">
-            <MagneticButton
-              onMouseEnter={() => setCursorVariant('hover')}
-              onMouseLeave={() => setCursorVariant('default')}
-            >
-              <div className="group relative flex items-center gap-4 px-8 py-5 rounded-full bg-slate-100 text-slate-950 font-mono text-xs uppercase tracking-widest font-semibold overflow-hidden">
-                <span className="relative z-10">EXPLORE ARCHIVE</span>
-                <svg className="w-4 h-4 relative z-10 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-                <div className="absolute inset-0 bg-emerald-400 translate-y-full transition-transform duration-300 ease-out group-hover:translate-y-0" />
-              </div>
-            </MagneticButton>
-          </div>
-        </div>
-      </motion.div>
-
-      {/* Hero Metadata Footbar */}
-      <div className="relative z-10 pt-12 border-t border-slate-900/80 flex flex-wrap justify-between items-center gap-4 text-slate-600 font-mono text-[11px]">
-        <div>LATITUDE: 37.7749° N, 122.4194° W</div>
-        <div className="flex gap-8">
-          <span>SCROLL TO DISCOVER</span>
-          <span className="animate-bounce">↓</span>
-        </div>
-        <div>AVAILABLE FOR Q4 DIRECTIVES</div>
+    <div
+      ref={containerRef}
+      className="relative w-full group overflow-hidden bg-neutral-900/60 border border-neutral-800/80 rounded-sm"
+      data-cursor="view"
+      data-cursor-label="EXPLORE"
+    >
+      <div className="w-full h-[350px] sm:h-[480px] overflow-hidden relative">
+        <motion.img
+          src={image}
+          alt={title}
+          style={{ y, scale }}
+          className="w-full h-full object-cover grayscale transition-all duration-700 ease-out group-hover:grayscale-0"
+        />
+        <div className="absolute inset-0 bg-neutral-950/30 group-hover:bg-transparent transition-colors duration-500" />
       </div>
-    </section>
-  );
-};
 
-interface ProjectItem {
-  id: string;
-  title: string;
-  category: string;
-  year: string;
-  image: string;
-  aspectRatio: string;
-}
-
-const projects: ProjectItem[] = [
-  {
-    id: '01',
-    title: 'KINETIC SYNTAX',
-    category: 'QUANTUM COMPUTING INTERFACE',
-    year: '2026',
-    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop',
-    aspectRatio: 'aspect-[4/5]',
-  },
-  {
-    id: '02',
-    title: 'NEURAL SYSTEM III',
-    category: 'AUTONOMOUS LOGISTICS HUBS',
-    year: '2025',
-    image: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?q=80&w=1200&auto=format&fit=crop',
-    aspectRatio: 'aspect-[16/10]',
-  },
-  {
-    id: '03',
-    title: 'AERODYNAMIC LAB',
-    category: 'SIMULATION PLATFORM',
-    year: '2025',
-    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
-    aspectRatio: 'aspect-[4/5]',
-  },
-];
-
-const PortfolioGrid: React.FC<{
-  setCursorVariant: (v: any) => void;
-  setCursorText: (t: string) => void;
-}> = ({ setCursorVariant, setCursorText }) => {
-  return (
-    <section id="index" className="px-6 lg:px-16 py-32 border-t border-slate-900">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-24 gap-6">
+      <div className="p-6 bg-neutral-950 flex justify-between items-center border-t border-neutral-800/60">
         <div>
-          <span className="font-mono text-xs uppercase tracking-widest text-emerald-400 mb-3 block">[ SELECTED WORKS ]</span>
-          <h2 className="text-4xl sm:text-6xl font-bold tracking-tight text-slate-100 font-sans">
-            ARCHITECTURAL INDEX
-          </h2>
+          <span className="text-[10px] font-mono text-neutral-500 uppercase tracking-widest block">
+            PROJECT // 0{index + 1} — {category}
+          </span>
+          <h3 className="text-xl font-light tracking-tight text-neutral-100 uppercase mt-1">
+            {title}
+          </h3>
         </div>
-        <p className="text-slate-500 font-mono text-xs max-w-xs uppercase tracking-wider">
-          SHOWCASING SYSTEMS BUILT WITH SUB-PIXEL PRECISION AND BESPOKE SHADER ARCHITECTURES.
-        </p>
+        <span className="text-xs font-mono text-neutral-400 group-hover:translate-x-1 transition-transform duration-300">
+          [{year}]
+        </span>
       </div>
+    </div>
+  );
+};
 
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-20">
-        {projects.map((project, idx) => {
-          const isEven = idx % 2 === 0;
-          return (
-            <div
-              key={project.id}
-              className={`md:col-span-6 ${isEven ? '' : 'md:translate-y-24'} group cursor-none`}
-              onMouseEnter={() => {
-                setCursorVariant('project');
-                setCursorText('OPEN');
-              }}
-              onMouseLeave={() => {
-                setCursorVariant('default');
-                setCursorText('');
-              }}
-            >
-              <div className={`relative w-full ${project.aspectRatio} overflow-hidden rounded-sm bg-slate-900 mb-6`}>
-                <motion.img
-                  src={project.image}
-                  alt={project.title}
-                  whileHover={{ scale: 1.05 }}
-                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-                  className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-700"
-                />
-                <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-transparent transition-colors duration-500" />
-                <div className="absolute top-4 left-4 font-mono text-xs text-slate-200 px-3 py-1 bg-slate-950/60 backdrop-blur-md rounded-full border border-slate-800">
-                  {project.id}
-                </div>
-              </div>
+// ==========================================
+// 5. MAIN APP LAYOUT
+// ==========================================
+export default function PortfolioWebsite() {
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-              <div className="flex justify-between items-start border-b border-slate-900 pb-4">
-                <div>
-                  <h3 className="text-2xl font-semibold text-slate-100 group-hover:text-emerald-400 transition-colors">
-                    {project.title}
-                  </h3>
-                  <p className="font-mono text-xs text-slate-500 mt-1">{project.category}</p>
-                </div>
-                <span className="font-mono text-xs text-slate-600">{project.year}</span>
-              </div>
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    visible: {
+      opacity: 1,
+      transition: { staggerChildren: 0.12, delayChildren: 0.2 },
+    },
+  };
+
+  const itemVariants = {
+    hidden: { y: '100%', opacity: 0 },
+    visible: {
+      y: '0%',
+      opacity: 1,
+      transition: { duration: 1.1, ease: [0.16, 1, 0.3, 1] },
+    },
+  };
+
+  const projects = [
+    {
+      title: 'Kreo Minimal Desk Setup',
+      category: 'Design & Visual Systems',
+      year: '2026',
+      image: 'https://images.unsplash.com/photo-1507238691740-187a5b1d37b8?q=80&w=1200&auto=format&fit=crop',
+    },
+    {
+      title: 'Aetheria Digital Canvas',
+      category: 'Creative Frontend / WebGL',
+      year: '2025',
+      image: 'https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=1200&auto=format&fit=crop',
+    },
+    {
+      title: 'Neural Matrix Engine',
+      category: 'Interactive Application',
+      year: '2025',
+      image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop',
+    },
+    {
+      title: 'Monolith Architectural Agency',
+      category: 'Brand Direction',
+      year: '2024',
+      image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
+    },
+  ];
+
+  return (
+    <div className="relative w-full min-h-screen bg-neutral-950 text-neutral-100 font-sans selection:bg-neutral-100 selection:text-neutral-950 overflow-x-hidden">
+      <CustomCursor />
+      <CanvasBackground />
+
+      {/* Navigation Header */}
+      <header className="fixed top-0 left-0 w-full z-40 px-6 md:px-16 py-6 flex justify-between items-center mix-blend-difference">
+        <a href="#" className="font-mono text-xs uppercase tracking-widest text-neutral-100">
+          STUDIO / CREATIVE
+        </a>
+
+        <nav className="hidden md:flex items-center gap-8 font-mono text-xs uppercase tracking-widest text-neutral-300">
+          <a href="#work" className="hover:text-neutral-100 transition-colors" data-cursor="pointer">
+            [ Work ]
+          </a>
+          <a href="#about" className="hover:text-neutral-100 transition-colors" data-cursor="pointer">
+            [ Agency ]
+          </a>
+          <a href="#contact" className="hover:text-neutral-100 transition-colors" data-cursor="pointer">
+            [ Contact ]
+          </a>
+        </nav>
+
+        <div className="md:hidden">
+          <MagneticButton onClick={() => setMobileMenuOpen(!mobileMenuOpen)}>
+            <button className="p-2 text-neutral-100">
+              {mobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
+            </button>
+          </MagneticButton>
+        </div>
+      </header>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 z-30 bg-neutral-950 flex flex-col justify-center px-8 font-mono text-lg space-y-6">
+          <a href="#work" onClick={() => setMobileMenuOpen(false)} className="text-neutral-300">
+            01 // WORK
+          </a>
+          <a href="#about" onClick={() => setMobileMenuOpen(false)} className="text-neutral-300">
+            02 // AGENCY
+          </a>
+          <a href="#contact" onClick={() => setMobileMenuOpen(false)} className="text-neutral-300">
+            03 // CONTACT
+          </a>
+        </div>
+      )}
+
+      {/* Hero Section */}
+      <section className="relative w-full min-h-screen flex flex-col justify-between p-6 md:p-16 border-b border-neutral-800/50 pt-24">
+        <div className="w-full grid grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono tracking-wider uppercase text-neutral-500 z-10">
+          <div>[ CREATIVE DIRECTION ]</div>
+          <div>[ MOTION & CODE ]</div>
+          <div className="hidden md:block">[ AVAILABLE 2026 ]</div>
+          <div className="text-right">[ PUNE / GLOBAL ]</div>
+        </div>
+
+        <motion.div
+          className="my-auto py-12 z-10 max-w-7xl"
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+        >
+          <div className="overflow-hidden mb-2">
+            <motion.p variants={itemVariants} className="text-xs md:text-sm font-mono tracking-widest uppercase text-neutral-400">
+              High-Performance Frontend & Visual Design
+            </motion.p>
+          </div>
+
+          <div className="overflow-hidden">
+            <motion.h1 variants={itemVariants} className="text-5xl sm:text-7xl lg:text-9xl font-light tracking-tight leading-[0.9] uppercase">
+              Architecting
+            </motion.h1>
+          </div>
+
+          <div className="overflow-hidden">
+            <motion.h1 variants={itemVariants} className="text-5xl sm:text-7xl lg:text-9xl font-serif italic text-neutral-400 tracking-tight leading-[0.9]">
+              digital depth.
+            </motion.h1>
+          </div>
+
+          <div className="mt-8 md:mt-12 grid grid-cols-1 md:grid-cols-12 gap-6 items-end">
+            <motion.p variants={itemVariants} className="md:col-span-6 text-sm md:text-base text-neutral-400 font-light leading-relaxed">
+              Bridging fine art editorial composition with modern WebGL animation engines. Building spatial interfaces, fluid motion systems, and digital visual identity.
+            </motion.p>
+
+            <div className="md:col-span-6 md:flex justify-end gap-4">
+              <MagneticButton>
+                <a
+                  href="#work"
+                  className="inline-flex items-center gap-3 px-8 py-4 rounded-full border border-neutral-700 bg-neutral-900/80 backdrop-blur-md text-xs font-mono uppercase tracking-widest text-neutral-100 hover:bg-neutral-100 hover:text-neutral-950 transition-colors duration-300"
+                >
+                  View Works <ArrowUpRight size={14} />
+                </a>
+              </MagneticButton>
             </div>
-          );
-        })}
-      </div>
-    </section>
-  );
-};
+          </div>
+        </motion.div>
 
-const TechnicalSpecs: React.FC = () => {
-  return (
-    <section id="capabilities" className="px-6 lg:px-16 py-32 bg-slate-950/50 border-t border-slate-900">
-      <div className="max-w-7xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
-          <div className="lg:col-span-4">
-            <span className="font-mono text-xs uppercase tracking-widest text-emerald-400 mb-3 block">[ CORE ENGINE ]</span>
-            <h2 className="text-3xl font-bold tracking-tight text-slate-100 mb-6">
-              TECHNICAL CAPABILITIES & INFRASTRUCTURE
+        <div className="w-full flex justify-between items-end text-xs font-mono text-neutral-500 z-10">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+            <span>SYSTEM OPERATIONAL</span>
+          </div>
+          <div>[ SCROLL FOR CURATION ]</div>
+        </div>
+      </section>
+
+      {/* Selected Works Section */}
+      <section id="work" className="w-full py-24 px-6 md:px-16 border-b border-neutral-800/50">
+        <div className="flex justify-between items-end mb-16 border-b border-neutral-800/60 pb-6">
+          <div>
+            <span className="text-xs font-mono text-neutral-500 uppercase tracking-widest">[ 01 / SELECTED WORKS ]</span>
+            <h2 className="text-3xl md:text-5xl font-light uppercase tracking-tight text-neutral-100 mt-2">
+              Curated Index
             </h2>
-            <p className="text-slate-400 text-sm leading-relaxed font-light mb-8">
-              We reject off-the-shelf templates. Every interface is constructed from first principles using mathematical animation, hardware-accelerated shaders, and micro-optimized UI trees.
-            </p>
           </div>
-
-          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-8">
-            {[
-              {
-                title: 'PERFORMANCE FIRST',
-                code: '60-120 FPS GUARANTEE',
-                desc: 'GPU-accelerated transformations, zero layout shifts, and tailored bundle orchestration.',
-              },
-              {
-                title: 'MOTION MATHEMATICS',
-                code: 'CUSTOM CUBIC BEZIERS',
-                desc: 'Spring physics and fluid inertia dynamics designed specifically for interface ergonomics.',
-              },
-              {
-                title: 'WEBGL INTEGRATION',
-                code: 'THREE.JS / GLSL SHADERS',
-                desc: 'Custom fragment shaders and interactive 3D viewports running smoothly alongside DOM layouts.',
-              },
-              {
-                title: 'SYSTEM ARCHITECTURE',
-                code: 'ENTERPRISE TYPE-SAFETY',
-                desc: 'Modular design systems engineered for long-term scalability and strict maintenance.',
-              },
-            ].map((item, idx) => (
-              <div key={idx} className="p-8 border border-slate-900 bg-slate-900/20 rounded-sm hover:border-slate-800 transition-colors">
-                <span className="font-mono text-[10px] text-emerald-400 tracking-widest block mb-2">{item.code}</span>
-                <h3 className="text-lg font-semibold text-slate-200 mb-3">{item.title}</h3>
-                <p className="text-slate-400 text-xs font-light leading-relaxed">{item.desc}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-};
-
-const CinematicFooter: React.FC<{ setCursorVariant: (v: any) => void }> = ({ setCursorVariant }) => {
-  return (
-    <footer id="contact" className="relative px-6 lg:px-16 pt-32 pb-12 bg-slate-950 border-t border-slate-900 overflow-hidden">
-      <div className="max-w-7xl mx-auto">
-        <div className="mb-24">
-          <span className="font-mono text-xs uppercase tracking-widest text-slate-500 mb-6 block">[ INITIATE CONTACT ]</span>
-          <h2 className="text-6xl sm:text-8xl lg:text-[11rem] font-bold tracking-tighter text-slate-100 font-sans leading-none hover:text-emerald-400 transition-colors duration-700 cursor-pointer">
-            LET'S TALK.
-          </h2>
+          <span className="text-xs font-mono text-neutral-500 hidden md:block">[ 2024 — 2026 ]</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pb-24 border-b border-slate-900">
-          <div className="md:col-span-6">
-            <p className="text-slate-400 text-lg font-light max-w-md mb-8">
-              Have an ambitious directive? We collaborate with high-growth teams and visionary platforms worldwide.
-            </p>
-            <MagneticButton
-              onMouseEnter={() => setCursorVariant('hover')}
-              onMouseLeave={() => setCursorVariant('default')}
-            >
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-12">
+          {projects.map((project, idx) => (
+            <ProjectCard key={idx} index={idx} {...project} />
+          ))}
+        </div>
+      </section>
+
+      {/* Capabilities / Philosophy Section */}
+      <section id="about" className="w-full py-24 px-6 md:px-16 border-b border-neutral-800/50">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 items-start">
+          <div className="md:col-span-5">
+            <span className="text-xs font-mono text-neutral-500 uppercase tracking-widest">[ 02 / PHILOSOPHY ]</span>
+            <h2 className="text-3xl md:text-5xl font-light uppercase tracking-tight text-neutral-100 mt-4 leading-tight">
+              Precision in motion, discipline in architecture.
+            </h2>
+          </div>
+
+          <div className="md:col-span-7 grid grid-cols-1 sm:grid-cols-2 gap-8 font-mono text-xs">
+            <div className="p-6 border border-neutral-800/80 bg-neutral-900/40 rounded-sm">
+              <Cpu className="w-6 h-6 text-neutral-400 mb-4" />
+              <h3 className="text-sm text-neutral-200 uppercase tracking-wider mb-2">01. WebGL & Canvas</h3>
+              <p className="text-neutral-400 font-sans leading-relaxed">
+                GPU-accelerated custom shaders, particle systems, and 3D depth buffers for immersive storytelling.
+              </p>
+            </div>
+
+            <div className="p-6 border border-neutral-800/80 bg-neutral-900/40 rounded-sm">
+              <Code2 className="w-6 h-6 text-neutral-400 mb-4" />
+              <h3 className="text-sm text-neutral-200 uppercase tracking-wider mb-2">02. Modern Frontend</h3>
+              <p className="text-neutral-400 font-sans leading-relaxed">
+                React, Next.js, and TypeScript architectures optimized for sub-second page loads and 60 FPS transitions.
+              </p>
+            </div>
+
+            <div className="p-6 border border-neutral-800/80 bg-neutral-900/40 rounded-sm">
+              <Layers className="w-6 h-6 text-neutral-400 mb-4" />
+              <h3 className="text-sm text-neutral-200 uppercase tracking-wider mb-2">03. Motion Systems</h3>
+              <p className="text-neutral-400 font-sans leading-relaxed">
+                Kinetic typography, scroll-driven interpolation, and micro-interactions tuned for tactical feedback.
+              </p>
+            </div>
+
+            <div className="p-6 border border-neutral-800/80 bg-neutral-900/40 rounded-sm">
+              <Globe className="w-6 h-6 text-neutral-400 mb-4" />
+              <h3 className="text-sm text-neutral-200 uppercase tracking-wider mb-2">04. Global Deployment</h3>
+              <p className="text-neutral-400 font-sans leading-relaxed">
+                Production builds designed for edge delivery, strict WCAG compliance, and zero cumulative layout shifts.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer / Contact */}
+      <footer id="contact" className="w-full py-24 px-6 md:px-16 bg-neutral-950 text-neutral-100 flex flex-col justify-between min-h-[70vh]">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+          <div className="md:col-span-8">
+            <span className="text-xs font-mono text-neutral-500 uppercase tracking-widest">[ 03 / INITIATE CONTACT ]</span>
+            <h2 className="text-4xl sm:text-6xl md:text-8xl font-light uppercase tracking-tight mt-4 leading-none">
+              Let's create something <span className="font-serif italic text-neutral-400">unforgettable.</span>
+            </h2>
+          </div>
+
+          <div className="md:col-span-4 flex flex-col justify-end items-start md:items-end">
+            <MagneticButton>
               <a
-                href="mailto:hello@auralabs.dev"
-                className="inline-block px-8 py-4 bg-slate-100 text-slate-950 font-mono text-xs tracking-widest uppercase font-semibold rounded-full hover:bg-emerald-400 transition-colors"
+                href="mailto:contact@studio.com"
+                className="px-8 py-6 rounded-full bg-neutral-100 text-neutral-950 font-mono text-xs uppercase tracking-widest hover:bg-neutral-300 transition-colors"
               >
-                DIRECT INQUIRY →
+                Start Conversation
               </a>
             </MagneticButton>
           </div>
-
-          <div className="md:col-span-3 font-mono text-xs space-y-3 text-slate-400">
-            <div className="text-slate-600 uppercase tracking-widest mb-4">DIRECTORIES</div>
-            <div><a href="#architectures" className="hover:text-white transition-colors">ARCHITECTURES</a></div>
-            <div><a href="#index" className="hover:text-white transition-colors">WORK INDEX</a></div>
-            <div><a href="#capabilities" className="hover:text-white transition-colors">CAPABILITIES</a></div>
-          </div>
-
-          <div className="md:col-span-3 font-mono text-xs space-y-3 text-slate-400">
-            <div className="text-slate-600 uppercase tracking-widest mb-4">SOCIAL MATRIX</div>
-            <div><a href="#" className="hover:text-white transition-colors">TWITTER / X</a></div>
-            <div><a href="#" className="hover:text-white transition-colors">GITHUB</a></div>
-            <div><a href="#" className="hover:text-white transition-colors">LINKEDIN</a></div>
-          </div>
         </div>
 
-        <div className="pt-12 flex flex-col sm:flex-row justify-between items-center gap-4 font-mono text-[11px] text-slate-600">
-          <div>© 2026 AURA LABS INC. ALL RIGHTS RESERVED.</div>
-          <div>BUILT WITH PRECISION & INTENT</div>
+        <div className="pt-16 border-t border-neutral-800/60 flex flex-col md:flex-row justify-between items-center text-xs font-mono text-neutral-500 gap-4">
+          <div>© 2026 CREATIVE STUDIO. ALL RIGHTS RESERVED.</div>
+          <div className="flex gap-6">
+            <a href="#" className="hover:text-neutral-300">GITHUB</a>
+            <a href="#" className="hover:text-neutral-300">TWITTER / X</a>
+            <a href="#" className="hover:text-neutral-300">LINKEDIN</a>
+          </div>
         </div>
-      </div>
-    </footer>
-  );
-};
-
-// ============================================================================
-// MAIN APP COMPONENT
-// ============================================================================
-
-export default function App() {
-  const [cursorVariant, setCursorVariant] = useState<'default' | 'hover' | 'project' | 'drag'>('default');
-  const [cursorText, setCursorText] = useState('');
-
-  useEffect(() => {
-    // Initialize Smooth Scrolling via Lenis
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      smoothWheel: true,
-    });
-
-    function raf(time: number) {
-      lenis.raf(time);
-      requestAnimationFrame(raf);
-    }
-
-    requestAnimationFrame(raf);
-
-    return () => lenis.destroy();
-  }, []);
-
-  return (
-    <div className="relative bg-slate-950 text-slate-100 font-sans selection:bg-emerald-400 selection:text-slate-950 min-h-screen antialiased">
-      {/* Custom Pointer System */}
-      <CustomCursor cursorVariant={cursorVariant} cursorText={cursorText} />
-
-      {/* WebGL Subtle Particle Field */}
-      <WebGLBackground />
-
-      {/* Navigation Overlay */}
-      <Navigation setCursorVariant={setCursorVariant} />
-
-      {/* Primary Document Flow */}
-      <main className="relative z-10">
-        <HeroSection setCursorVariant={setCursorVariant} />
-        <PortfolioGrid setCursorVariant={setCursorVariant} setCursorText={setCursorText} />
-        <TechnicalSpecs />
-      </main>
-
-      {/* Cinematic Terminal Footer */}
-      <CinematicFooter setCursorVariant={setCursorVariant} />
+      </footer>
     </div>
   );
 }
