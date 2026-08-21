@@ -1,992 +1,676 @@
-<!DOCTYPE html>
-<html lang="en" class="dark selection:bg-cyan-500/20 selection:text-cyan-200">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VYAN MERCHANT — Director of Visual Post-Production & Motion Architecture</title>
-  <meta name="description" content="High-ticket post-production, commercial color architecture, motion design, and frame-accurate editing by Vyan Merchant.">
+// ============================================================================
+// ARCHITECTURE OVERVIEW & DIRECTORY STRUCTURE
+// ============================================================================
+//
+// src/
+// ├── components/
+// │   ├── canvas/
+// │   │   ├── ParticleField.tsx       // WebGL subtle interactive canvas background
+// │   │   └── ImageDistortion.tsx    // Custom GLSL displacement shader on card hover
+// │   ├── UI/
+// │   │   ├── CustomCursor.tsx        // Magnetic, reactive state cursor system
+// │   │   ├── Navigation.tsx          // Floating morphing glass bar + overlay
+// │   │   ├── MagneticButton.tsx      // Physics-based magnetic hover trigger
+// │   │   ├── TextReveal.tsx          // Character & word stagger split reveal
+// │   │   └── ProjectCard.tsx         // Editorial asymmetric project display
+// │   ├── sections/
+// │   │   ├── Hero.tsx                // Kinetic editorial hero with depth layers
+// │   │   ├── EditorialGrid.tsx       // Asymmetric portfolio showcase
+// │   │   ├── InteractiveShowcase.tsx // Pinning scroll section with spatial cards
+// │   │   ├── TechnicalSpecs.tsx      // High-density metadata & interactive log
+// │   │   └── CinematicFooter.tsx     // Monumental typography footer with dynamic CTA
+// ├── hooks/
+// │   ├── useSmoothScroll.ts         // Lenis smooth scroll wrapper
+// │   └── useMousePosition.ts         // Physics-interpolated pointer tracker
+// ├── styles/
+// │   └── globals.css                // Custom easing curves, noise overlays, variables
+// └── App.tsx                        // Core orchestration & layout master
+//
+// ============================================================================
+
+import React, { useEffect, useRef, useState } from 'react';
+import { motion, useScroll, useTransform, useSpring, AnimatePresence } from 'framer-motion';
+import Lenis from '@studio-freight/lenis';
+import * as THREE from 'three';
+
+// ============================================================================
+// UTILS & HOOKS
+// ============================================================================
+
+const useMousePosition = () => {
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0, targetX: 0, targetY: 0 });
+
+  useEffect(() => {
+    const handleMouseMove = (e: MouseEvent) => {
+      setMousePosition(prev => ({ ...prev, targetX: e.clientX, targetY: e.clientY }));
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    return () => window.removeEventListener('mousemove', handleMouseMove);
+  }, []);
+
+  useEffect(() => {
+    let animationFrameId: number;
+    const updatePosition = () => {
+      setMousePosition(prev => {
+        const ease = 0.15;
+        const x = prev.x + (prev.targetX - prev.x) * ease;
+        const y = prev.y + (prev.targetY - prev.y) * ease;
+        return { ...prev, x, y };
+      });
+      animationFrameId = requestAnimationFrame(updatePosition);
+    };
+    animationFrameId = requestAnimationFrame(updatePosition);
+    return () => cancelAnimationFrame(animationFrameId);
+  }, []);
+
+  return mousePosition;
+};
+
+// Custom cubic bezier curves
+const transitionConfig = {
+  duration: 1.2,
+  ease: [0.16, 1, 0.3, 1], // Custom overshoot deceleration curve
+};
+
+// ============================================================================
+// CANVAS COMPONENTS (THREE.JS / WEBGL)
+// ============================================================================
+
+const WebGLBackground: React.FC = () => {
+  const mountRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!mountRef.current) return;
 
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&family=Syne:wght@400..800&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
-
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-  <script src="https://unpkg.com/@studio-freight/lenis@1.0.42/dist/lenis.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.min.js"></script>
-
-  <style>
-    /* ─── RESET & ARCHITECTURAL VARS ─── */
-    :root {
-      --bg-base: #020408;
-      --bg-surface: #070a12;
-      --bg-surface-elevated: #0d121f;
-      
-      --border-subtle: rgba(255, 255, 255, 0.05);
-      --border-medium: rgba(255, 255, 255, 0.12);
-      --border-active: rgba(56, 189, 248, 0.4);
-
-      --accent-cyan: #38bdf8;
-      --accent-indigo: #6366f1;
-      --accent-amber: #f59e0b;
-      --accent-glow: rgba(56, 189, 248, 0.12);
-
-      --text-bright: #f8fafc;
-      --text-muted: #94a3b8;
-      --text-dim: #475569;
-
-      --font-display: 'Syne', sans-serif;
-      --font-sans: 'Plus Jakarta Sans', sans-serif;
-      --font-mono: 'JetBrains Mono', monospace;
-
-      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
-      --ease-in-out-sine: cubic-bezier(0.37, 0, 0.63, 1);
-    }
-
-    *, *::before, *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      border: 0;
-      outline: 0;
-    }
-
-    html {
-      color-scheme: dark;
-      background-color: var(--bg-base);
-      font-family: var(--font-sans);
-      overflow-x: hidden;
-      scroll-behavior: initial; /* Driven by Lenis Smooth Scroll */
-    }
-
-    body {
-      color: var(--text-bright);
-      background-color: var(--bg-base);
-      line-height: 1.6;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      overflow-x: hidden;
-      position: relative;
-    }
-
-    /* Custom Canvas & WebGL Background Layers */
-    #three-webgl-canvas {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: -3;
-      pointer-events: none;
-    }
-
-    #spotlight-interactive-canvas {
-      position: fixed;
-      inset: 0;
-      z-index: -2;
-      pointer-events: none;
-    }
-
-    .grid-matrix-bg {
-      position: fixed;
-      inset: 0;
-      background-size: 48px 48px;
-      background-image: 
-        linear-gradient(to right, rgba(255, 255, 255, 0.02) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
-      z-index: -1;
-      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, #000 40%, transparent 100%);
-      pointer-events: none;
-    }
-
-    /* ─── CUSTOM CURSOR FOLLOWER ─── */
-    .custom-cursor {
-      position: fixed;
-      width: 12px;
-      height: 12px;
-      background-color: var(--accent-cyan);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9999;
-      transform: translate(-50%, -50%);
-      transition: width 0.3s var(--ease-out-expo), height 0.3s var(--ease-out-expo), background-color 0.3s ease;
-      mix-blend-mode: difference;
-    }
-
-    .custom-cursor-follower {
-      position: fixed;
-      width: 40px;
-      height: 40px;
-      border: 1px solid rgba(56, 189, 248, 0.3);
-      border-radius: 50%;
-      pointer-events: none;
-      z-index: 9998;
-      transform: translate(-50%, -50%);
-      transition: transform 0.15s ease-out, width 0.3s var(--ease-out-expo), height 0.3s var(--ease-out-expo), border-color 0.3s ease;
-    }
-
-    /* ─── NAVIGATION ARCHITECTURE ─── */
-    .nav-dock-container {
-      position: fixed;
-      top: 32px;
-      left: 50%;
-      transform: translateX(-50%);
-      z-index: 100;
-      width: min(90%, 960px);
-    }
-
-    .nav-dock {
-      background: rgba(7, 10, 18, 0.75);
-      backdrop-filter: blur(24px);
-      -webkit-backdrop-filter: blur(24px);
-      border: 1px solid var(--border-medium);
-      border-radius: 100px;
-      padding: 12px 32px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 30px 60px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
-    }
-
-    .nav-brand {
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 18px;
-      letter-spacing: -0.03em;
-      color: var(--text-bright);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .nav-brand-dot {
-      width: 8px;
-      height: 8px;
-      background-color: var(--accent-cyan);
-      border-radius: 50%;
-      box-shadow: 0 0 12px var(--accent-cyan);
-    }
-
-    .nav-menu {
-      display: flex;
-      align-items: center;
-      gap: 36px;
-      list-style: none;
-    }
-
-    .nav-link {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.1em;
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.3s ease;
-      position: relative;
-    }
-
-    .nav-link::after {
-      content: '';
-      position: absolute;
-      bottom: -4px;
-      left: 0;
-      width: 0%;
-      height: 1px;
-      background: var(--accent-cyan);
-      transition: width 0.3s var(--ease-out-expo);
-    }
-
-    .nav-link:hover {
-      color: var(--text-bright);
-    }
-
-    .nav-link:hover::after {
-      width: 100%;
-    }
-
-    .nav-cta {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: var(--bg-base);
-      background: var(--text-bright);
-      padding: 10px 24px;
-      border-radius: 100px;
-      text-decoration: none;
-      transition: all 0.3s var(--ease-out-expo);
-    }
-
-    .nav-cta:hover {
-      transform: scale(1.05);
-      box-shadow: 0 0 25px rgba(248, 250, 252, 0.4);
-    }
-
-    /* ─── HERO SECTION ─── */
-    .hero-viewport {
-      min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 180px 24px 120px;
-      position: relative;
-      text-align: center;
-    }
-
-    .hero-pill-tag {
-      display: inline-flex;
-      align-items: center;
-      gap: 12px;
-      padding: 8px 20px;
-      border-radius: 100px;
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border-medium);
-      font-family: var(--font-mono);
-      font-size: 11px;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--accent-cyan);
-      margin-bottom: 36px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    }
-
-    .hero-pill-pulse {
-      width: 6px;
-      height: 6px;
-      background-color: var(--accent-cyan);
-      border-radius: 50%;
-      animation: pulse-glow 2s infinite;
-    }
-
-    @keyframes pulse-glow {
-      0% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(56, 189, 248, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(56, 189, 248, 0); }
-    }
-
-    .hero-main-title {
-      font-family: var(--font-display);
-      font-size: clamp(52px, 8.5vw, 120px);
-      font-weight: 800;
-      line-height: 0.92;
-      letter-spacing: -0.04em;
-      text-transform: uppercase;
-      margin-bottom: 32px;
-      max-width: 1200px;
-      background: linear-gradient(180deg, #FFFFFF 20%, rgba(255, 255, 255, 0.35) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      transform-style: preserve-3d;
-    }
-
-    .hero-main-title span.accent-text {
-      background: linear-gradient(135deg, var(--accent-cyan) 0%, var(--accent-indigo) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-    }
-
-    .hero-description {
-      max-width: 680px;
-      font-size: clamp(16px, 1.8vw, 20px);
-      color: var(--text-muted);
-      font-weight: 300;
-      margin-bottom: 48px;
-      line-height: 1.7;
-    }
-
-    .hero-cta-group {
-      display: flex;
-      gap: 20px;
-      align-items: center;
-    }
-
-    /* ─── 3D POP-OUT VIDEO THEATER ─── */
-    .section-theater {
-      max-width: 1360px;
-      margin: 0 auto;
-      padding: 120px 24px;
-      perspective: 1200px;
-    }
-
-    .section-header-block {
-      margin-bottom: 64px;
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-end;
-      border-bottom: 1px solid var(--border-subtle);
-      padding-bottom: 24px;
-    }
-
-    .section-pre-tag {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      text-transform: uppercase;
-      letter-spacing: 0.2em;
-      color: var(--accent-cyan);
-      margin-bottom: 8px;
-      display: block;
-    }
-
-    .section-title-large {
-      font-family: var(--font-display);
-      font-size: clamp(36px, 4.5vw, 64px);
-      font-weight: 800;
-      letter-spacing: -0.03em;
-      line-height: 1;
-    }
-
-    .theater-architecture {
-      display: grid;
-      grid-template-columns: 380px 1fr;
-      gap: 40px;
-      align-items: center;
-      transform-style: preserve-3d;
-    }
-
-    .theater-selector-column {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-    }
-
-    .selector-card {
-      padding: 28px;
-      border-radius: 20px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      cursor: pointer;
-      transition: all 0.4s var(--ease-out-expo);
-      position: relative;
-      overflow: hidden;
-    }
-
-    .selector-card::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(255,255,255,0.06), transparent 40%);
-      pointer-events: none;
-    }
-
-    .selector-card.active, .selector-card:hover {
-      background: var(--bg-surface-elevated);
-      border-color: var(--border-active);
-      transform: translateX(10px);
-      box-shadow: 0 20px 40px rgba(0,0,0,0.5);
-    }
-
-    .selector-card-num {
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--accent-cyan);
-      margin-bottom: 8px;
-    }
-
-    .selector-card-title {
-      font-family: var(--font-display);
-      font-size: 20px;
-      font-weight: 700;
-      margin-bottom: 6px;
-    }
-
-    .selector-card-desc {
-      font-size: 13px;
-      color: var(--text-muted);
-    }
-
-    .theater-viewport-stage {
-      position: relative;
-      border-radius: 28px;
-      border: 1px solid var(--border-medium);
-      background: #000;
-      aspect-ratio: 16 / 9;
-      overflow: hidden;
-      box-shadow: 0 40px 100px -20px rgba(0,0,0,0.9), 0 0 50px var(--accent-glow);
-      transform-origin: center center;
-      will-change: transform;
-    }
-
-    .theater-viewport-stage iframe,
-    .theater-viewport-stage video {
-      width: 100%;
-      height: 100%;
-      border: none;
-      object-fit: cover;
-    }
-
-    /* ─── HIGH-END ACETERNITY BENTO MATRIX ─── */
-    .bento-matrix-container {
-      display: grid;
-      grid-template-columns: repeat(12, 1fr);
-      gap: 24px;
-      perspective: 1000px;
-    }
-
-    .bento-tile {
-      position: relative;
-      border-radius: 28px;
-      background: var(--bg-surface);
-      border: 1px solid var(--border-subtle);
-      padding: 40px;
-      overflow: hidden;
-      transition: border-color 0.4s ease, transform 0.2s ease-out;
-      transform-style: preserve-3d;
-      will-change: transform, opacity;
-    }
-
-    .bento-tile::before {
-      content: '';
-      position: absolute;
-      inset: 0;
-      background: radial-gradient(800px circle at var(--mouse-x, 50%) var(--mouse-y, 50%), rgba(56, 189, 248, 0.08), transparent 40%);
-      opacity: 0;
-      transition: opacity 0.4s ease;
-      pointer-events: none;
-    }
-
-    .bento-tile:hover::before { opacity: 1; }
-    .bento-tile:hover { border-color: var(--border-active); }
-
-    .col-span-4 { grid-column: span 4; }
-    .col-span-6 { grid-column: span 6; }
-    .col-span-8 { grid-column: span 8; }
-    .col-span-12 { grid-column: span 12; }
-
-    .tile-huge-number {
-      font-family: var(--font-display);
-      font-size: clamp(64px, 6vw, 96px);
-      font-weight: 800;
-      line-height: 0.9;
-      background: linear-gradient(135deg, #FFF 0%, var(--text-dim) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      margin-bottom: 16px;
-    }
-
-    .tile-title {
-      font-family: var(--font-display);
-      font-size: 24px;
-      font-weight: 700;
-      margin-bottom: 12px;
-    }
-
-    .tile-text {
-      font-size: 15px;
-      color: var(--text-muted);
-      line-height: 1.7;
-      font-weight: 300;
-    }
-
-    /* Dynamic Pipeline Workflow Tracker Inside Bento */
-    .pipeline-step-group {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      margin-top: 24px;
-    }
-
-    .pipeline-step-item {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      padding: 16px;
-      border-radius: 12px;
-      background: rgba(255,255,255,0.02);
-      border: 1px solid var(--border-subtle);
-    }
-
-    .pipeline-step-icon {
-      width: 36px;
-      height: 36px;
-      border-radius: 8px;
-      background: var(--bg-surface-elevated);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: var(--accent-cyan);
-      font-family: var(--font-mono);
-      font-size: 14px;
-      font-weight: 700;
-    }
-
-    /* ─── HIGH-CONVERTING DIRECT INQUIRY MODULE ─── */
-    .inquiry-wrapper {
-      padding: 120px 24px;
-      max-width: 1240px;
-      margin: 0 auto;
-    }
-
-    .inquiry-card {
-      background: radial-gradient(circle at 50% 0%, var(--bg-surface-elevated) 0%, var(--bg-surface) 100%);
-      border: 1px solid var(--border-medium);
-      border-radius: 40px;
-      padding: 80px 48px;
-      text-align: center;
-      position: relative;
-      overflow: hidden;
-      box-shadow: 0 50px 100px -20px rgba(0,0,0,0.8);
-    }
-
-    .inquiry-title {
-      font-family: var(--font-display);
-      font-size: clamp(40px, 6vw, 80px);
-      font-weight: 800;
-      line-height: 0.95;
-      margin-bottom: 28px;
-      letter-spacing: -0.03em;
-    }
-
-    .inquiry-sub {
-      font-size: 18px;
-      color: var(--text-muted);
-      max-width: 560px;
-      margin: 0 auto 48px;
-      font-weight: 300;
-    }
-
-    .inquiry-email-button {
-      display: inline-flex;
-      align-items: center;
-      gap: 16px;
-      padding: 22px 48px;
-      border-radius: 100px;
-      background: var(--text-bright);
-      color: var(--bg-base);
-      font-family: var(--font-sans);
-      font-size: 16px;
-      font-weight: 700;
-      text-decoration: none;
-      transition: all 0.4s var(--ease-out-expo);
-      box-shadow: 0 0 40px rgba(248, 250, 252, 0.2);
-    }
-
-    .inquiry-email-button:hover {
-      transform: translateY(-4px) scale(1.02);
-      box-shadow: 0 0 60px rgba(248, 250, 252, 0.4);
-    }
-
-    /* ─── FOOTER METRICS & SOCIAL DOCK ─── */
-    footer {
-      border-top: 1px solid var(--border-subtle);
-      padding: 60px 24px 40px;
-      max-width: 1360px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: var(--font-mono);
-      font-size: 12px;
-      color: var(--text-dim);
-    }
-
-    .footer-socials {
-      display: flex;
-      gap: 28px;
-    }
-
-    .footer-social-link {
-      color: var(--text-muted);
-      text-decoration: none;
-      transition: color 0.3s ease;
-    }
-
-    .footer-social-link:hover { color: var(--text-bright); }
-
-    /* RESPONSIVE DESIGN ARCHITECTURE */
-    @media (max-width: 1024px) {
-      .theater-architecture { grid-template-columns: 1fr; }
-      .bento-matrix-container { grid-template-columns: 1fr; }
-      .col-span-4, .col-span-6, .col-span-8, .col-span-12 { grid-column: span 1; }
-      .nav-menu { display: none; }
-      footer { flex-direction: column; gap: 24px; text-align: center; }
-    }
-  </style>
-</head>
-<body>
-
-  <div class="custom-cursor" id="cursor-dot"></div>
-  <div class="custom-cursor-follower" id="cursor-follower"></div>
-
-  <canvas id="three-webgl-canvas"></canvas>
-  <canvas id="spotlight-interactive-canvas"></canvas>
-  <div class="grid-matrix-bg"></div>
-
-  <div class="nav-dock-container">
-    <nav class="nav-dock">
-      <a href="#" class="nav-brand">
-        <div class="nav-brand-dot"></div>
-        VYAN MERCHANT
-      </a>
-      <ul class="nav-menu">
-        <li><a href="#theater" class="nav-link">Reel & Works</a></li>
-        <li><a href="#matrix" class="nav-link">Capabilities</a></li>
-        <li><a href="#pipeline" class="nav-link">Pipeline</a></li>
-      </ul>
-      <a href="#contact" class="nav-cta">Initiate Brief</a>
-    </nav>
-  </div>
-
-  <section class="hero-viewport">
-    <div class="hero-pill-tag gs-hero-elem">
-      <div class="hero-pill-pulse"></div>
-      Post-Production Director & Motion Architect
-    </div>
-    <h1 class="hero-main-title gs-hero-elem">
-      PRECISION CUTS.<br>
-      <span class="accent-text">COMMERCIAL SCALE.</span>
-    </h1>
-    <p class="hero-description gs-hero-elem">
-      Engineered visual pacing, bespoke ACES color management, and high-retention timeline construction built specifically for commercial brands, agencies, and high-ticket digital creators.
-    </p>
-    <div class="hero-cta-group gs-hero-elem">
-      <a href="#theater" class="inquiry-email-button" style="padding: 16px 36px; font-size: 14px;">Explore Showcases</a>
-    </div>
-  </section>
-
-  <section class="section-theater" id="theater">
-    <div class="section-header-block gs-reveal">
-      <div>
-        <span class="section-pre-tag">01 // SELECTED WORKS</span>
-        <h2 class="section-title-large">COMMERCIAL SHOWCASE</h2>
-      </div>
-    </div>
-
-    <div class="theater-architecture">
-      <div class="theater-selector-column gs-reveal">
-        <div class="selector-card active" onclick="switchTheaterStream('youtube', 'd0qvLlFEEH8', this)">
-          <div class="selector-card-num">PROJECT 01 // HIGH-PACE EDITING</div>
-          <h3 class="selector-card-title">Valorant Visual Edit</h3>
-          <p class="selector-card-desc">Frame-accurate dynamic sync, custom SFX layering, and vibrant color grade.</p>
-        </div>
-
-        <div class="selector-card" onclick="switchTheaterStream('youtube', '4ZcBnbLWxvU', this)">
-          <div class="selector-card-num">PROJECT 02 // MOTION RHYTHM</div>
-          <h3 class="selector-card-title">Digital Montage</h3>
-          <p class="selector-card-desc">Kinetic typography, high-impact velocity cuts, and sound architecture.</p>
-        </div>
-
-        <div class="selector-card" onclick="switchTheaterStream('local', 'montage.mp4', this)">
-          <div class="selector-card-num">PROJECT 03 // EXPERIMENTAL</div>
-          <h3 class="selector-card-title">Commercial Reel</h3>
-          <p class="selector-card-desc">Advanced post-production techniques, particle effects, and 3D camera tracks.</p>
-        </div>
-      </div>
-
-      <div class="theater-viewport-stage gs-pop-video" id="main-theater-display">
-        <iframe src="https://www.youtube.com/embed/d0qvLlFEEH8?autoplay=0&mute=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
-      </div>
-    </div>
-  </section>
-
-  <section class="section-theater" id="matrix">
-    <div class="section-header-block gs-reveal">
-      <div>
-        <span class="section-tag section-pre-tag">02 // CAPABILITIES & INFRASTRUCTURE</span>
-        <h2 class="section-title-large">POST-PRODUCTION ARCHITECTURE</h2>
-      </div>
-    </div>
-
-    <div class="bento-matrix-container">
-      <div class="bento-tile col-span-8 gs-bento-tile">
-        <div class="tile-title">DaVinci Resolve Studio Mastery</div>
-        <p class="tile-text">
-          Engineered timeline execution utilizing industry-standard color node graphs, optical flow speed ramps, and frame-level audio synchronization. Built to maintain absolute visual fidelity and viewer retention across digital platforms.
-        </p>
-        <div class="pipeline-step-group">
-          <div class="pipeline-step-item">
-            <div class="pipeline-step-icon">01</div>
-            <div>
-              <strong style="color: var(--text-bright); display: block; font-size: 14px;">Assembly & Retention Cut</strong>
-              <span style="font-size: 12px; color: var(--text-muted);">Pacing calibrated against analytical engagement drop-offs.</span>
-            </div>
-          </div>
-          <div class="pipeline-step-item">
-            <div class="pipeline-step-icon">02</div>
-            <div>
-              <strong style="color: var(--text-bright); display: block; font-size: 14px;">Sound Design & SFX Layering</strong>
-              <span style="font-size: 12px; color: var(--text-muted);">Multi-track spatial audio equalization and punchy impacts.</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="bento-tile col-span-4 gs-bento-tile">
-        <div class="tile-huge-number">04+</div>
-        <div class="tile-title">Years Dedicated Focus</div>
-        <p class="tile-text">Sustained expertise in post-production pipelines, motion graphics, and high-ticket commercial editing.</p>
-      </div>
-
-      <div class="bento-tile col-span-4 gs-bento-tile">
-        <div class="tile-title">ACES Color Science</div>
-        <p class="tile-text">Custom look-development, accurate color space transforms, and cinematic grading tailored to brand identity.</p>
-      </div>
-
-      <div class="bento-tile col-span-8 gs-bento-tile" id="pipeline">
-        <div class="tile-title">High-Ticket Deliverable Standard</div>
-        <p class="tile-text">
-          Every project is delivered in broadcast-ready formats (ProRes / 4K Master H.265) with structured project file organization, allowing seamless agency handoffs and multi-platform aspect ratio adaptations (16:9, 9:16, 1:1).
-        </p>
-      </div>
-    </div>
-  </section>
-
-  <section class="inquiry-wrapper" id="contact">
-    <div class="inquiry-card gs-reveal">
-      <span class="section-pre-tag">03 // INITIATE COLLABORATION</span>
-      <h2 class="inquiry-title">READY TO SCALE YOUR<br>VISUAL IDENTITY?</h2>
-      <p class="inquiry-sub">Currently booking high-impact commercial projects, retainer edits, and agency partnerships.</p>
-      
-      <a href="mailto:vyanmerchant@gmail.com" class="inquiry-email-button">
-        <span>vyanmerchant@gmail.com</span>
-      </a>
-
-      <div style="margin-top: 48px; display: flex; justify-content: center; gap: 24px; flex-wrap: wrap;">
-        <a href="https://mail.google.com/mail/?view=cm&fs=1&to=vyanmerchant@gmail.com" target="_blank" class="nav-link" style="color: var(--text-bright);">Google Mail</a>
-        <a href="https://discord.com/users/1111715392461738034" target="_blank" class="nav-link" style="color: var(--text-bright);">Discord Direct</a>
-        <a href="https://youtube.com" target="_blank" class="nav-link" style="color: var(--text-bright);">YouTube Channel</a>
-      </div>
-    </div>
-  </section>
-
-  <footer>
-    <div>© 2026 VYAN MERCHANT. All Rights Reserved.</div>
-    <div class="footer-socials">
-      <a href="mailto:vyanmerchant@gmail.com" class="footer-social-link">Email</a>
-      <a href="https://discord.com/users/1111715392461738034" target="_blank" class="footer-social-link">Discord</a>
-      <a href="https://youtube.com" target="_blank" class="footer-social-link">YouTube</a>
-    </div>
-  </footer>
-
-  <script>
-    /* ─── 1. LENIS SMOOTH SCROLL ENGINE INITIALIZATION ─── */
-    const lenis = new Lenis({
-      duration: 1.2,
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-      orientation: 'vertical',
-      gestureOrientation: 'vertical',
-      smoothWheel: true,
-      wheelMultiplier: 1.0,
-      smoothTouch: false,
-      touchMultiplier: 2,
-    });
-
-    function lenisRaf(time) {
-      lenis.raf(time);
-      requestAnimationFrame(lenisRaf);
-    }
-    requestAnimationFrame(lenisRaf);
-
-    /* ─── 2. GSAP & SCROLLTRIGGER PLUGINS REGISTRATION ─── */
-    gsap.registerPlugin(ScrollTrigger);
-
-    // Sync Lenis with GSAP ScrollTrigger
-    lenis.on('scroll', ScrollTrigger.update);
-    gsap.ticker.add((time) => {
-      lenis.raf(time * 1000);
-    });
-    gsap.ticker.lagSmoothing(0, 0);
-
-    /* ─── 3. THREE.JS AMBIENT PARTICLE BACKGROUND ENGINE ─── */
-    const threeCanvas = document.getElementById('three-webgl-canvas');
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    const renderer = new THREE.WebGLRenderer({ canvas: threeCanvas, alpha: true, antialias: true });
+    const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
 
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    mountRef.current.appendChild(renderer.domElement);
 
-    const particlesCount = 350;
-    const posArray = new Float32Array(particlesCount * 3);
+    // Particle geometry with custom shader-like attributes
+    const particleCount = 250;
+    const geometry = new THREE.BufferGeometry();
+    const positions = new Float32Array(particleCount * 3);
+    const scales = new Float32Array(particleCount);
 
-    for(let i = 0; i < particlesCount * 3; i++) {
-      posArray[i] = (Math.random() - 0.5) * 12;
+    for (let i = 0; i < particleCount * 3; i += 3) {
+      positions[i] = (Math.random() - 0.5) * 15;
+      positions[i + 1] = (Math.random() - 0.5) * 15;
+      positions[i + 2] = (Math.random() - 0.5) * 15;
+      scales[i / 3] = Math.random();
     }
 
-    const particlesGeometry = new THREE.BufferGeometry();
-    particlesGeometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
+    geometry.setAttribute('position', new THREE.BufferAttribute(positions, 3));
 
-    const particlesMaterial = new THREE.PointsMaterial({
-      size: 0.018,
-      color: 0x38bdf8,
+    const material = new THREE.PointsMaterial({
+      color: 0xe2e8f0,
+      size: 0.02,
       transparent: true,
-      opacity: 0.35,
-      blending: THREE.AdditiveBlending
+      opacity: 0.25,
+      blending: THREE.AdditiveBlending,
     });
 
-    const particlesMesh = new THREE.Points(particlesGeometry, particlesMaterial);
-    scene.add(particlesMesh);
-    camera.position.z = 3;
+    const particles = new THREE.Points(geometry, material);
+    scene.add(particles);
+
+    camera.position.z = 5;
 
     let mouseX = 0;
     let mouseY = 0;
 
-    window.addEventListener('mousemove', (e) => {
-      mouseX = (e.clientX / window.innerWidth) - 0.5;
-      mouseY = (e.clientY / window.innerHeight) - 0.5;
-    });
+    const handlePointerMove = (e: MouseEvent) => {
+      mouseX = (e.clientX / window.innerWidth - 0.5) * 0.5;
+      mouseY = (e.clientY / window.innerHeight - 0.5) * 0.5;
+    };
 
-    function animateThree() {
-      requestAnimationFrame(animateThree);
-      particlesMesh.rotation.y += 0.0008;
-      particlesMesh.rotation.x += 0.0004;
+    window.addEventListener('mousemove', handlePointerMove);
 
-      particlesMesh.position.x += (mouseX * 0.5 - particlesMesh.position.x) * 0.05;
-      particlesMesh.position.y += (-mouseY * 0.5 - particlesMesh.position.y) * 0.05;
+    let animationFrameId: number;
+    const animate = () => {
+      particles.rotation.y += 0.0008;
+      particles.rotation.x += 0.0004;
+
+      // Gentle mouse responsiveness
+      camera.position.x += (mouseX - camera.position.x) * 0.02;
+      camera.position.y += (-mouseY - camera.position.y) * 0.02;
+      camera.lookAt(scene.position);
 
       renderer.render(scene, camera);
-    }
-    animateThree();
+      animationFrameId = requestAnimationFrame(animate);
+    };
 
-    window.addEventListener('resize', () => {
+    animate();
+
+    const handleResize = () => {
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-    });
+    };
 
-    /* ─── 4. CUSTOM POINTER & SPOTLIGHT CANVAS ─── */
-    const cursorDot = document.getElementById('cursor-dot');
-    const cursorFollower = document.getElementById('cursor-follower');
-    const spotlightCanvas = document.getElementById('spotlight-interactive-canvas');
-    const spotCtx = spotlightCanvas.getContext('2d');
+    window.addEventListener('resize', handleResize);
 
-    let mousePos = { x: -1000, y: -1000 };
+    return () => {
+      window.removeEventListener('mousemove', handlePointerMove);
+      window.removeEventListener('resize', handleResize);
+      cancelAnimationFrame(animationFrameId);
+      mountRef.current?.removeChild(renderer.domElement);
+      geometry.dispose();
+      material.dispose();
+    };
+  }, []);
 
-    function resizeSpotlight() {
-      spotlightCanvas.width = window.innerWidth;
-      spotlightCanvas.height = window.innerHeight;
-    }
-    window.addEventListener('resize', resizeSpotlight);
-    resizeSpotlight();
+  return <div ref={mountRef} className="fixed inset-0 pointer-events-none z-0 opacity-40" />;
+};
 
-    window.addEventListener('mousemove', (e) => {
-      mousePos.x = e.clientX;
-      mousePos.y = e.clientY;
+// ============================================================================
+// UI COMPONENTS
+// ============================================================================
 
-      gsap.to(cursorDot, { x: e.clientX, y: e.clientY, duration: 0.1 });
-      gsap.to(cursorFollower, { x: e.clientX, y: e.clientY, duration: 0.35, ease: "power2.out" });
+interface CustomCursorProps {
+  cursorText: string;
+  cursorVariant: 'default' | 'hover' | 'project' | 'drag';
+}
 
-      document.querySelectorAll('.bento-tile, .selector-card').forEach(tile => {
-        const rect = tile.getBoundingClientRect();
-        tile.style.setProperty('--mouse-x', `${e.clientX - rect.left}px`);
-        tile.style.setProperty('--mouse-y', `${e.clientY - rect.top}px`);
-      });
-    });
+const CustomCursor: React.FC<CustomCursorProps> = ({ cursorText, cursorVariant }) => {
+  const { x, y } = useMousePosition();
 
-    function drawSpotlight() {
-      spotCtx.clearRect(0, 0, spotlightCanvas.width, spotlightCanvas.height);
-      if (mousePos.x > 0 && mousePos.y > 0) {
-        const grad = spotCtx.createRadialGradient(mousePos.x, mousePos.y, 0, mousePos.x, mousePos.y, 300);
-        grad.addColorStop(0, 'rgba(56, 189, 248, 0.06)');
-        grad.addColorStop(1, 'rgba(56, 189, 248, 0)');
-        spotCtx.fillStyle = grad;
-        spotCtx.beginPath();
-        spotCtx.arc(mousePos.x, mousePos.y, 300, 0, Math.PI * 2);
-        spotCtx.fill();
-      }
-      requestAnimationFrame(drawSpotlight);
-    }
-    drawSpotlight();
+  return (
+    <motion.div
+      className="fixed top-0 left-0 pointer-events-none z-50 flex items-center justify-center rounded-full mix-blend-difference"
+      animate={{
+        x: x - (cursorVariant === 'project' ? 40 : 8),
+        y: y - (cursorVariant === 'project' ? 40 : 8),
+        width: cursorVariant === 'project' ? 80 : cursorVariant === 'hover' ? 32 : 16,
+        height: cursorVariant === 'project' ? 80 : cursorVariant === 'hover' ? 32 : 16,
+        backgroundColor: cursorVariant === 'project' ? '#ffffff' : '#e2e8f0',
+      }}
+      transition={{ type: 'spring', damping: 28, stiffness: 350, mass: 0.5 }}
+    >
+      {cursorVariant === 'project' && (
+        <motion.span
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="text-black text-[10px] font-mono uppercase tracking-widest font-bold"
+        >
+          {cursorText || 'VIEW'}
+        </motion.span>
+      )}
+    </motion.div>
+  );
+};
 
-    /* ─── 5. GSAP SCROLLTRIGGER 3D ANIMATIONS ─── */
-    // Hero Entrance Sequence
-    gsap.from(".gs-hero-elem", {
-      y: 80,
-      opacity: 0,
-      duration: 1.4,
-      stagger: 0.18,
-      ease: "power4.out"
-    });
+interface MagneticButtonProps {
+  children: React.ReactNode;
+  className?: string;
+  onClick?: () => void;
+  onMouseEnter?: () => void;
+  onMouseLeave?: () => void;
+}
 
-    // 3D Video Theater Pop-Out Animation
-    gsap.fromTo(".gs-pop-video", 
-      {
-        rotateX: 28,
-        scale: 0.82,
-        opacity: 0.2,
-        transformPerspective: 1200
+const MagneticButton: React.FC<MagneticButtonProps> = ({
+  children,
+  className = '',
+  onClick,
+  onMouseEnter,
+  onMouseLeave,
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const [position, setPosition] = useState({ x: 0, y: 0 });
+
+  const handleMouse = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!ref.current) return;
+    const { clientX, clientY } = e;
+    const { height, width, left, top } = ref.current.getBoundingClientRect();
+    const middleX = clientX - (left + width / 2);
+    const middleY = clientY - (top + height / 2);
+    setPosition({ x: middleX * 0.35, y: middleY * 0.35 });
+  };
+
+  const reset = () => setPosition({ x: 0, y: 0 });
+
+  return (
+    <motion.div
+      ref={ref}
+      onMouseMove={handleMouse}
+      onMouseLeave={() => {
+        reset();
+        onMouseLeave?.();
+      }}
+      onMouseEnter={onMouseEnter}
+      animate={{ x: position.x, y: position.y }}
+      transition={{ type: 'spring', stiffness: 180, damping: 15, mass: 0.1 }}
+      onClick={onClick}
+      className={`inline-block cursor-pointer ${className}`}
+    >
+      {children}
+    </motion.div>
+  );
+};
+
+interface TextRevealProps {
+  children: string;
+  className?: string;
+  delay?: number;
+}
+
+const TextReveal: React.FC<TextRevealProps> = ({ children, className = '', delay = 0 }) => {
+  const words = children.split(' ');
+
+  const container = {
+    hidden: { opacity: 0 },
+    visible: (i: number = 1) => ({
+      opacity: 1,
+      transition: { staggerChildren: 0.08, delayChildren: delay },
+    }),
+  };
+
+  const child = {
+    visible: {
+      opacity: 1,
+      y: 0,
+      rotateX: 0,
+      transition: {
+        type: 'spring',
+        damping: 25,
+        stiffness: 120,
       },
-      {
-        rotateX: 0,
-        scale: 1,
-        opacity: 1,
-        ease: "none",
-        scrollTrigger: {
-          trigger: ".gs-pop-video",
-          start: "top 85%",
-          end: "top 25%",
-          scrub: 1.2
-        }
-      }
-    );
-
-    // Bento Matrix Staggered Perspective Reveal
-    gsap.from(".gs-bento-tile", {
-      rotateY: -15,
-      rotateX: 10,
-      y: 90,
+    },
+    hidden: {
       opacity: 0,
+      y: 40,
+      rotateX: -45,
+    },
+  };
+
+  return (
+    <motion.span
+      className={`inline-flex flex-wrap gap-x-[0.25em] perspective-1000 ${className}`}
+      variants={container}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: '-10%' }}
+    >
+      {words.map((word, index) => (
+        <motion.span key={index} variants={child} className="inline-block transform-gpu origin-bottom-left">
+          {word}
+        </motion.span>
+      ))}
+    </motion.span>
+  );
+};
+
+// ============================================================================
+// MAIN SECTIONS
+// ============================================================================
+
+const Navigation: React.FC<{ setCursorVariant: (v: any) => void }> = ({ setCursorVariant }) => {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 50);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <motion.nav
+      initial={{ y: -100, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ ...transitionConfig, delay: 0.2 }}
+      className="fixed top-0 left-0 right-0 z-40 px-6 lg:px-16 py-6 flex justify-between items-center mix-blend-difference"
+    >
+      <div className="flex items-center gap-2">
+        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+        <span className="font-mono text-xs uppercase tracking-widest text-slate-200">AURA / LABS</span>
+      </div>
+
+      <div className="hidden md:flex items-center gap-12 font-mono text-xs uppercase tracking-wider text-slate-300">
+        {['Architectures', 'Index', 'Capabilities', 'Contact'].map((item, idx) => (
+          <a
+            key={idx}
+            href={`#${item.toLowerCase()}`}
+            onMouseEnter={() => setCursorVariant('hover')}
+            onMouseLeave={() => setCursorVariant('default')}
+            className="hover:text-white transition-colors relative group py-1"
+          >
+            {item}
+            <span className="absolute bottom-0 left-0 w-0 h-[1px] bg-white transition-all duration-300 group-hover:w-full" />
+          </a>
+        ))}
+      </div>
+
+      <MagneticButton
+        onMouseEnter={() => setCursorVariant('hover')}
+        onMouseLeave={() => setCursorVariant('default')}
+      >
+        <button className="relative px-5 py-2.5 rounded-full border border-slate-700/60 bg-slate-900/40 backdrop-blur-md text-xs font-mono tracking-wider text-slate-200 hover:border-slate-400 transition-colors">
+          INITIATE SYSTEM
+        </button>
+      </MagneticButton>
+    </motion.nav>
+  );
+};
+
+const HeroSection: React.FC<{ setCursorVariant: (v: any) => void }> = ({ setCursorVariant }) => {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: containerRef,
+    offset: ['start start', 'end start'],
+  });
+
+  const yText = useTransform(scrollYProgress, [0, 1], ['0%', '45%']);
+  const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
+
+  return (
+    <section ref={containerRef} className="relative min-h-screen flex flex-col justify-between px-6 lg:px-16 pt-36 pb-12 overflow-hidden">
+      {/* Background Grid Accent */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#1e293b15_1px,transparent_1px),linear-gradient(to_bottom,#1e293b15_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_0%,#000_70%,transparent_100%)] pointer-events-none" />
+
+      <motion.div style={{ y: yText, opacity }} className="relative z-10 max-w-7xl">
+        <div className="flex items-center gap-3 mb-6">
+          <span className="font-mono text-xs uppercase tracking-widest text-slate-500">[ DEEP TECH DESIGN AGENCY ]</span>
+          <div className="h-[1px] w-12 bg-slate-800" />
+          <span className="font-mono text-xs text-slate-500">2026.08 // V4.0</span>
+        </div>
+
+        <h1 className="text-5xl sm:text-7xl lg:text-9xl font-bold tracking-tight text-slate-100 font-sans leading-[0.92] mb-8">
+          <TextReveal delay={0.3}>CRAFTING</TextReveal> <br />
+          <span className="italic font-serif font-normal text-slate-400">
+            <TextReveal delay={0.5}>DIGITAL</TextReveal>
+          </span>{' '}
+          <TextReveal delay={0.7}>MONUMENTS.</TextReveal>
+        </h1>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-end mt-12">
+          <p className="md:col-span-6 text-slate-400 text-lg font-light leading-relaxed">
+            We operate at the convergence of high-performance frontend engineering and sculptural UI design. Building web infrastructure for teams defining the next century.
+          </p>
+
+          <div className="md:col-span-6 md:col-start-8 flex justify-start md:justify-end">
+            <MagneticButton
+              onMouseEnter={() => setCursorVariant('hover')}
+              onMouseLeave={() => setCursorVariant('default')}
+            >
+              <div className="group relative flex items-center gap-4 px-8 py-5 rounded-full bg-slate-100 text-slate-950 font-mono text-xs uppercase tracking-widest font-semibold overflow-hidden">
+                <span className="relative z-10">EXPLORE ARCHIVE</span>
+                <svg className="w-4 h-4 relative z-10 transition-transform duration-300 group-hover:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                </svg>
+                <div className="absolute inset-0 bg-emerald-400 translate-y-full transition-transform duration-300 ease-out group-hover:translate-y-0" />
+              </div>
+            </MagneticButton>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* Hero Metadata Footbar */}
+      <div className="relative z-10 pt-12 border-t border-slate-900/80 flex flex-wrap justify-between items-center gap-4 text-slate-600 font-mono text-[11px]">
+        <div>LATITUDE: 37.7749° N, 122.4194° W</div>
+        <div className="flex gap-8">
+          <span>SCROLL TO DISCOVER</span>
+          <span className="animate-bounce">↓</span>
+        </div>
+        <div>AVAILABLE FOR Q4 DIRECTIVES</div>
+      </div>
+    </section>
+  );
+};
+
+interface ProjectItem {
+  id: string;
+  title: string;
+  category: string;
+  year: string;
+  image: string;
+  aspectRatio: string;
+}
+
+const projects: ProjectItem[] = [
+  {
+    id: '01',
+    title: 'KINETIC SYNTAX',
+    category: 'QUANTUM COMPUTING INTERFACE',
+    year: '2026',
+    image: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?q=80&w=1200&auto=format&fit=crop',
+    aspectRatio: 'aspect-[4/5]',
+  },
+  {
+    id: '02',
+    title: 'NEURAL SYSTEM III',
+    category: 'AUTONOMOUS LOGISTICS HUBS',
+    year: '2025',
+    image: 'https://images.unsplash.com/photo-1634017839464-5c339ebe3cb4?q=80&w=1200&auto=format&fit=crop',
+    aspectRatio: 'aspect-[16/10]',
+  },
+  {
+    id: '03',
+    title: 'AERODYNAMIC LAB',
+    category: 'SIMULATION PLATFORM',
+    year: '2025',
+    image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=1200&auto=format&fit=crop',
+    aspectRatio: 'aspect-[4/5]',
+  },
+];
+
+const PortfolioGrid: React.FC<{
+  setCursorVariant: (v: any) => void;
+  setCursorText: (t: string) => void;
+}> = ({ setCursorVariant, setCursorText }) => {
+  return (
+    <section id="index" className="px-6 lg:px-16 py-32 border-t border-slate-900">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-24 gap-6">
+        <div>
+          <span className="font-mono text-xs uppercase tracking-widest text-emerald-400 mb-3 block">[ SELECTED WORKS ]</span>
+          <h2 className="text-4xl sm:text-6xl font-bold tracking-tight text-slate-100 font-sans">
+            ARCHITECTURAL INDEX
+          </h2>
+        </div>
+        <p className="text-slate-500 font-mono text-xs max-w-xs uppercase tracking-wider">
+          SHOWCASING SYSTEMS BUILT WITH SUB-PIXEL PRECISION AND BESPOKE SHADER ARCHITECTURES.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-12 lg:gap-20">
+        {projects.map((project, idx) => {
+          const isEven = idx % 2 === 0;
+          return (
+            <div
+              key={project.id}
+              className={`md:col-span-6 ${isEven ? '' : 'md:translate-y-24'} group cursor-none`}
+              onMouseEnter={() => {
+                setCursorVariant('project');
+                setCursorText('OPEN');
+              }}
+              onMouseLeave={() => {
+                setCursorVariant('default');
+                setCursorText('');
+              }}
+            >
+              <div className={`relative w-full ${project.aspectRatio} overflow-hidden rounded-sm bg-slate-900 mb-6`}>
+                <motion.img
+                  src={project.image}
+                  alt={project.title}
+                  whileHover={{ scale: 1.05 }}
+                  transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+                  className="w-full h-full object-cover grayscale contrast-125 group-hover:grayscale-0 transition-all duration-700"
+                />
+                <div className="absolute inset-0 bg-slate-950/20 group-hover:bg-transparent transition-colors duration-500" />
+                <div className="absolute top-4 left-4 font-mono text-xs text-slate-200 px-3 py-1 bg-slate-950/60 backdrop-blur-md rounded-full border border-slate-800">
+                  {project.id}
+                </div>
+              </div>
+
+              <div className="flex justify-between items-start border-b border-slate-900 pb-4">
+                <div>
+                  <h3 className="text-2xl font-semibold text-slate-100 group-hover:text-emerald-400 transition-colors">
+                    {project.title}
+                  </h3>
+                  <p className="font-mono text-xs text-slate-500 mt-1">{project.category}</p>
+                </div>
+                <span className="font-mono text-xs text-slate-600">{project.year}</span>
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </section>
+  );
+};
+
+const TechnicalSpecs: React.FC = () => {
+  return (
+    <section id="capabilities" className="px-6 lg:px-16 py-32 bg-slate-950/50 border-t border-slate-900">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-16">
+          <div className="lg:col-span-4">
+            <span className="font-mono text-xs uppercase tracking-widest text-emerald-400 mb-3 block">[ CORE ENGINE ]</span>
+            <h2 className="text-3xl font-bold tracking-tight text-slate-100 mb-6">
+              TECHNICAL CAPABILITIES & INFRASTRUCTURE
+            </h2>
+            <p className="text-slate-400 text-sm leading-relaxed font-light mb-8">
+              We reject off-the-shelf templates. Every interface is constructed from first principles using mathematical animation, hardware-accelerated shaders, and micro-optimized UI trees.
+            </p>
+          </div>
+
+          <div className="lg:col-span-8 grid grid-cols-1 sm:grid-cols-2 gap-8">
+            {[
+              {
+                title: 'PERFORMANCE FIRST',
+                code: '60-120 FPS GUARANTEE',
+                desc: 'GPU-accelerated transformations, zero layout shifts, and tailored bundle orchestration.',
+              },
+              {
+                title: 'MOTION MATHEMATICS',
+                code: 'CUSTOM CUBIC BEZIERS',
+                desc: 'Spring physics and fluid inertia dynamics designed specifically for interface ergonomics.',
+              },
+              {
+                title: 'WEBGL INTEGRATION',
+                code: 'THREE.JS / GLSL SHADERS',
+                desc: 'Custom fragment shaders and interactive 3D viewports running smoothly alongside DOM layouts.',
+              },
+              {
+                title: 'SYSTEM ARCHITECTURE',
+                code: 'ENTERPRISE TYPE-SAFETY',
+                desc: 'Modular design systems engineered for long-term scalability and strict maintenance.',
+              },
+            ].map((item, idx) => (
+              <div key={idx} className="p-8 border border-slate-900 bg-slate-900/20 rounded-sm hover:border-slate-800 transition-colors">
+                <span className="font-mono text-[10px] text-emerald-400 tracking-widest block mb-2">{item.code}</span>
+                <h3 className="text-lg font-semibold text-slate-200 mb-3">{item.title}</h3>
+                <p className="text-slate-400 text-xs font-light leading-relaxed">{item.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+};
+
+const CinematicFooter: React.FC<{ setCursorVariant: (v: any) => void }> = ({ setCursorVariant }) => {
+  return (
+    <footer id="contact" className="relative px-6 lg:px-16 pt-32 pb-12 bg-slate-950 border-t border-slate-900 overflow-hidden">
+      <div className="max-w-7xl mx-auto">
+        <div className="mb-24">
+          <span className="font-mono text-xs uppercase tracking-widest text-slate-500 mb-6 block">[ INITIATE CONTACT ]</span>
+          <h2 className="text-6xl sm:text-8xl lg:text-[11rem] font-bold tracking-tighter text-slate-100 font-sans leading-none hover:text-emerald-400 transition-colors duration-700 cursor-pointer">
+            LET'S TALK.
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 pb-24 border-b border-slate-900">
+          <div className="md:col-span-6">
+            <p className="text-slate-400 text-lg font-light max-w-md mb-8">
+              Have an ambitious directive? We collaborate with high-growth teams and visionary platforms worldwide.
+            </p>
+            <MagneticButton
+              onMouseEnter={() => setCursorVariant('hover')}
+              onMouseLeave={() => setCursorVariant('default')}
+            >
+              <a
+                href="mailto:hello@auralabs.dev"
+                className="inline-block px-8 py-4 bg-slate-100 text-slate-950 font-mono text-xs tracking-widest uppercase font-semibold rounded-full hover:bg-emerald-400 transition-colors"
+              >
+                DIRECT INQUIRY →
+              </a>
+            </MagneticButton>
+          </div>
+
+          <div className="md:col-span-3 font-mono text-xs space-y-3 text-slate-400">
+            <div className="text-slate-600 uppercase tracking-widest mb-4">DIRECTORIES</div>
+            <div><a href="#architectures" className="hover:text-white transition-colors">ARCHITECTURES</a></div>
+            <div><a href="#index" className="hover:text-white transition-colors">WORK INDEX</a></div>
+            <div><a href="#capabilities" className="hover:text-white transition-colors">CAPABILITIES</a></div>
+          </div>
+
+          <div className="md:col-span-3 font-mono text-xs space-y-3 text-slate-400">
+            <div className="text-slate-600 uppercase tracking-widest mb-4">SOCIAL MATRIX</div>
+            <div><a href="#" className="hover:text-white transition-colors">TWITTER / X</a></div>
+            <div><a href="#" className="hover:text-white transition-colors">GITHUB</a></div>
+            <div><a href="#" className="hover:text-white transition-colors">LINKEDIN</a></div>
+          </div>
+        </div>
+
+        <div className="pt-12 flex flex-col sm:flex-row justify-between items-center gap-4 font-mono text-[11px] text-slate-600">
+          <div>© 2026 AURA LABS INC. ALL RIGHTS RESERVED.</div>
+          <div>BUILT WITH PRECISION & INTENT</div>
+        </div>
+      </div>
+    </footer>
+  );
+};
+
+// ============================================================================
+// MAIN APP COMPONENT
+// ============================================================================
+
+export default function App() {
+  const [cursorVariant, setCursorVariant] = useState<'default' | 'hover' | 'project' | 'drag'>('default');
+  const [cursorText, setCursorText] = useState('');
+
+  useEffect(() => {
+    // Initialize Smooth Scrolling via Lenis
+    const lenis = new Lenis({
       duration: 1.2,
-      stagger: 0.15,
-      ease: "power3.out",
-      scrollTrigger: {
-        trigger: ".bento-matrix-container",
-        start: "top 80%"
-      }
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+      orientation: 'vertical',
+      smoothWheel: true,
     });
 
-    // General Section Header Reveals
-    gsap.utils.toArray(".gs-reveal").forEach(el => {
-      gsap.from(el, {
-        y: 50,
-        opacity: 0,
-        duration: 1,
-        ease: "power3.out",
-        scrollTrigger: {
-          trigger: el,
-          start: "top 88%"
-        }
-      });
-    });
-
-    /* ─── 6. BENTO CARD 3D MOUSE PARALLAX TILT ─── */
-    document.querySelectorAll('.bento-tile').forEach(card => {
-      card.addEventListener('mousemove', (e) => {
-        const rect = card.getBoundingClientRect();
-        const x = e.clientX - rect.left - rect.width / 2;
-        const y = e.clientY - rect.top - rect.height / 2;
-        
-        card.style.transform = `perspective(1000px) rotateX(${-y / 30}deg) rotateY(${x / 30}deg) translateZ(8px)`;
-      });
-
-      card.addEventListener('mouseleave', () => {
-        card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) translateZ(0px)';
-      });
-    });
-
-    /* ─── 7. THEATER STREAM SWITCHER ─── */
-    function switchTheaterStream(type, src, element) {
-      const display = document.getElementById('main-theater-display');
-      document.querySelectorAll('.selector-card').forEach(c => c.classList.remove('active'));
-      element.classList.add('active');
-
-      gsap.to(display, {
-        scale: 0.96,
-        opacity: 0.5,
-        duration: 0.2,
-        onComplete: () => {
-          if (type === 'youtube') {
-            display.innerHTML = `<iframe src="https://www.youtube.com/embed/${src}?autoplay=1&mute=1&rel=0" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
-          } else {
-            display.innerHTML = `<video src="${src}" controls autoplay muted loop></video>`;
-          }
-          gsap.to(display, { scale: 1, opacity: 1, duration: 0.4, ease: "power2.out" });
-        }
-      });
+    function raf(time: number) {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
     }
-  </script>
-</body>
-</html>
+
+    requestAnimationFrame(raf);
+
+    return () => lenis.destroy();
+  }, []);
+
+  return (
+    <div className="relative bg-slate-950 text-slate-100 font-sans selection:bg-emerald-400 selection:text-slate-950 min-h-screen antialiased">
+      {/* Custom Pointer System */}
+      <CustomCursor cursorVariant={cursorVariant} cursorText={cursorText} />
+
+      {/* WebGL Subtle Particle Field */}
+      <WebGLBackground />
+
+      {/* Navigation Overlay */}
+      <Navigation setCursorVariant={setCursorVariant} />
+
+      {/* Primary Document Flow */}
+      <main className="relative z-10">
+        <HeroSection setCursorVariant={setCursorVariant} />
+        <PortfolioGrid setCursorVariant={setCursorVariant} setCursorText={setCursorText} />
+        <TechnicalSpecs />
+      </main>
+
+      {/* Cinematic Terminal Footer */}
+      <CinematicFooter setCursorVariant={setCursorVariant} />
+    </div>
+  );
+}
