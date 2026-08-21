@@ -3,12 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vyan Merchant — Cinematic Video Editor</title>
+<title>Vyan Merchant | High-End Editor</title>
 
-<!-- PRECONNECT & FONTS -->
+<!-- FONTS -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&family=Syne:wght@400;700;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
 
 <!-- DEPENDENCIES -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
@@ -18,28 +18,22 @@
 
 <style>
 /* ==========================================
-   01. CORE SYSTEM & VARIABLES (REJOUICE/OBYS VIBE)
+   01. CORE SYSTEM (BRUTALIST / CINEMATIC)
    ========================================== */
 :root {
-  --color-bg: #030303;
-  --color-surface: #0a0a0a;
-  --color-text: #f4f4f0;
-  --color-accent: #a3a3a3; /* Sophisticated metallic accent instead of bright blue */
-  --color-muted: #666666;
-  --color-border: rgba(255, 255, 255, 0.1);
+  --bg: #030303;
+  --fg: #f4f0ea;
+  --accent: #ff2a00; /* Aggressive Electric Vermilion */
+  --muted: #4a4a4a;
+  --border: rgba(244, 240, 234, 0.15);
   
-  --font-sans: 'Syne', sans-serif;
-  --font-serif: 'Cormorant Garamond', serif;
-  --font-mono: 'Space Mono', monospace;
+  --f-display: 'Anton', sans-serif;
+  --f-sans: 'Syne', sans-serif;
+  --f-serif: 'Cormorant Garamond', serif;
+  --f-mono: 'Space Mono', monospace;
   
-  --space-xs: 0.5rem; --space-sm: 1rem; --space-md: 2.5rem;
-  --space-lg: 5rem; --space-xl: 10vw;
-  
-  --radius-md: 1rem;
-  --radius-full: 100px;
-  
-  --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
-  --ease-in-out-circ: cubic-bezier(0.85, 0, 0.15, 1);
+  --ease: cubic-bezier(0.19, 1, 0.22, 1);
+  --ease-elastic: cubic-bezier(0.68, -0.55, 0.26, 1.55);
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -49,544 +43,521 @@ html.lenis { height: auto; }
 .lenis.lenis-stopped { overflow: hidden; }
 
 body {
-  background-color: var(--color-bg); color: var(--color-text);
-  font-family: var(--font-sans); -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  background: var(--bg); color: var(--fg);
+  font-family: var(--f-sans); -webkit-font-smoothing: antialiased;
   overflow-x: hidden; cursor: none;
 }
-
-::selection { background: var(--color-text); color: var(--color-bg); }
+::selection { background: var(--accent); color: var(--bg); }
 
 /* ==========================================
-   02. PRELOADER (AWWWARDS STANDARD)
+   02. KINETIC CURSOR
    ========================================== */
-#preloader {
-  position: fixed; inset: 0; background: var(--color-bg);
-  z-index: 10000; display: flex; flex-direction: column;
-  justify-content: flex-end; padding: 4vw;
+#cursor-dot {
+  position: fixed; top: 0; left: 0; width: 6px; height: 6px;
+  background: var(--accent); border-radius: 50%;
+  pointer-events: none; z-index: 10000; transform: translate(-50%, -50%);
 }
-.loader-text {
-  font-family: var(--font-display); font-size: clamp(4rem, 10vw, 12rem);
-  line-height: 0.8; font-weight: 800; text-transform: uppercase;
-  color: var(--color-text); overflow: hidden;
+#cursor-ring {
+  position: fixed; top: 0; left: 0; width: 40px; height: 40px;
+  border: 1px solid var(--accent); border-radius: 50%;
+  pointer-events: none; z-index: 9999; transform: translate(-50%, -50%);
+  transition: width 0.3s var(--ease), height 0.3s var(--ease), border-width 0.3s;
 }
-.loader-progress {
-  font-family: var(--font-mono); font-size: 1rem; color: var(--color-muted);
-  margin-top: 2rem; display: flex; justify-content: space-between;
-  border-top: 1px solid var(--color-border); padding-top: 1rem;
+.cursor-hover #cursor-ring { width: 80px; height: 80px; border-width: 2px; mix-blend-mode: difference; background: var(--fg); border-color: var(--fg); }
+.cursor-play #cursor-ring { width: 100px; height: 100px; background: var(--accent); border-color: var(--accent); mix-blend-mode: normal; }
+.cursor-play::after {
+  content: 'PLAY'; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-family: var(--f-mono); font-size: 10px; color: var(--bg); font-weight: 700; z-index: 10001; pointer-events: none;
 }
-.loader-bar-wrap { width: 100%; height: 1px; background: var(--color-border); position: absolute; bottom: 0; left: 0; }
-.loader-bar { width: 0%; height: 100%; background: var(--color-text); }
 
 /* ==========================================
-   03. MORPHING CURSOR (CUBERTO STYLE)
+   03. GLITCH FILTER & WEBGL
    ========================================== */
-#cursor {
-  position: fixed; top: 0; left: 0;
-  width: 10px; height: 10px; background: var(--color-text);
-  border-radius: 50%; pointer-events: none; z-index: 9999;
-  transform: translate(-50%, -50%); mix-blend-mode: difference;
-  display: flex; justify-content: center; align-items: center;
-  text-align: center; font-family: var(--font-mono); font-size: 0.6rem; font-weight: 700; color: var(--color-bg);
-  transition: width 0.4s var(--ease-out-expo), height 0.4s var(--ease-out-expo), background 0.4s, opacity 0.2s;
-}
-#cursor span { opacity: 0; transition: opacity 0.2s; text-transform: uppercase; letter-spacing: 0.1em; }
-#cursor.hovered { width: 60px; height: 60px; background: rgba(255,255,255,0.1); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.2); mix-blend-mode: normal; }
-#cursor.play-mode { width: 90px; height: 90px; background: var(--color-text); mix-blend-mode: normal; }
-#cursor.play-mode span { opacity: 1; }
+.svg-filters { position: absolute; width: 0; height: 0; pointer-events: none; }
+#webgl-canvas { position: fixed; inset: 0; z-index: -2; pointer-events: none; opacity: 0.6; }
+.noise { position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.06; background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
 
 /* ==========================================
-   04. WEBGL & NOISE
+   04. TYPOGRAPHY & UTILS
    ========================================== */
-#webgl-container { position: fixed; inset: 0; z-index: -2; pointer-events: none; background: var(--color-bg); }
-.noise-overlay {
-  position: fixed; inset: 0; z-index: -1; pointer-events: none; opacity: 0.05;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
-}
+.t-giant { font-family: var(--f-display); font-size: clamp(5rem, 18vw, 22rem); line-height: 0.8; text-transform: uppercase; letter-spacing: 0.02em; }
+.t-h2 { font-family: var(--f-display); font-size: clamp(3rem, 8vw, 10rem); line-height: 0.85; text-transform: uppercase; }
+.t-serif { font-family: var(--f-serif); font-style: italic; font-weight: 300; }
+.t-mono { font-family: var(--f-mono); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; }
+.t-body { font-size: clamp(1rem, 1.5vw, 1.5rem); line-height: 1.5; font-weight: 600; }
+
+.char { display: inline-block; transform: translateY(110%); }
+.word { display: inline-block; overflow: hidden; vertical-align: bottom; }
+.text-outline { -webkit-text-stroke: 1px var(--fg); color: transparent; }
 
 /* ==========================================
-   05. TYPOGRAPHY
-   ========================================== */
-.t-display { font-size: clamp(4rem, 11vw, 14rem); line-height: 0.85; font-weight: 800; letter-spacing: -0.04em; text-transform: uppercase; }
-.t-h2 { font-size: clamp(2.5rem, 6vw, 6rem); line-height: 0.9; font-weight: 700; letter-spacing: -0.03em; text-transform: uppercase; }
-.t-body { font-size: clamp(1.1rem, 1.8vw, 1.5rem); line-height: 1.6; color: var(--color-muted); font-weight: 400; }
-.t-serif { font-family: var(--font-serif); font-style: italic; font-weight: 300; }
-.t-mono { font-family: var(--font-mono); font-size: 0.75rem; letter-spacing: 0.15em; text-transform: uppercase; }
-
-.grid-layout { display: grid; grid-template-columns: repeat(12, 1fr); gap: var(--space-sm); padding: 0 4vw; }
-.line-reveal { overflow: hidden; display: block; }
-.line-reveal-inner { display: inline-block; transform: translateY(115%); transform-origin: top left; }
-
-/* ==========================================
-   06. HIDE-ON-SCROLL NAVIGATION
+   05. NAVIGATION
    ========================================== */
 nav {
-  position: fixed; top: 1.5rem; left: 50%; transform: translateX(-50%);
-  width: calc(100% - 4vw); max-width: 1600px;
-  padding: 1.25rem 2rem; display: flex; justify-content: space-between; align-items: center;
-  z-index: 100; background: rgba(5, 5, 5, 0.4); backdrop-filter: blur(12px);
-  border: 1px solid var(--color-border); border-radius: var(--radius-full);
-  transition: transform 0.6s var(--ease-out-expo), opacity 0.6s;
+  position: fixed; top: 0; width: 100%; padding: 2vw 4vw;
+  display: flex; justify-content: space-between; align-items: flex-start;
+  z-index: 100; mix-blend-mode: difference;
 }
-nav.hidden { transform: translate(-50%, -150%); opacity: 0; }
-.nav-logo { font-size: 1.2rem; font-weight: 800; color: var(--color-text); text-decoration: none; }
-.nav-links { display: flex; gap: 3rem; }
-.nav-links a { color: var(--color-text); text-decoration: none; position: relative; overflow: hidden; padding-bottom: 2px; }
-.nav-links a::after {
-  content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 1px; background: var(--color-text);
-  transform: translateX(-100%); transition: transform 0.4s var(--ease-out-expo);
-}
-.nav-links a:hover::after { transform: translateX(0); }
+.nav-logo { font-family: var(--f-display); font-size: 2rem; color: var(--fg); text-decoration: none; line-height: 1; }
+.nav-logo span { color: var(--accent); }
+.nav-meta { text-align: right; display: flex; flex-direction: column; gap: 0.5rem; }
+.nav-meta p { color: var(--fg); margin: 0; }
 
 /* ==========================================
-   07. HERO SECTION
+   06. HERO SECTION
    ========================================== */
-.hero { height: 100vh; display: flex; flex-direction: column; justify-content: center; position: relative; padding-top: 4rem; }
-.hero-meta { grid-column: 1 / -1; display: flex; justify-content: space-between; margin-bottom: 3rem; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem; }
-.hero-title-wrapper { grid-column: 1 / 13; }
-.hero-subtitle { grid-column: 7 / 13; margin-top: 5rem; text-align: left; }
-.hero-subtitle .t-body { max-width: 500px; }
+.hero { height: 100vh; padding: 0 4vw; display: flex; flex-direction: column; justify-content: center; position: relative; }
+.hero-title-container { position: relative; z-index: 2; margin-top: auto; padding-bottom: 5vh; }
+.hero-title-container .t-giant { margin-left: -0.5vw; }
+.hero-line { display: flex; align-items: center; gap: 2vw; }
+.badge-spin {
+  width: 120px; height: 120px; border: 1px solid var(--border); border-radius: 50%;
+  display: flex; justify-content: center; align-items: center; position: absolute; right: 10vw; bottom: 20vh;
+}
+.badge-spin svg { width: 100%; height: 100%; animation: spin 10s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
 /* ==========================================
-   08. REFINED ABOUT SECTION
+   07. MANIFESTO (SCROLL COLOR SHIFT)
    ========================================== */
-.about { padding: var(--space-xl) 0; }
-.about-label { grid-column: 1 / 3; }
-.about-content { grid-column: 4 / 12; }
-.about-stats { grid-column: 4 / 12; display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-top: 5rem; background: var(--color-border); border: 1px solid var(--color-border); }
-.stat { background: var(--color-bg); padding: 4rem 3rem; display: flex; flex-direction: column; justify-content: center; transition: background 0.4s; }
-.stat:hover { background: var(--color-surface); }
-.stat h4 { font-size: clamp(4rem, 8vw, 7rem); font-family: var(--font-serif); color: var(--color-text); line-height: 0.8; margin-bottom: 1rem; }
+.manifesto { padding: 15vw 4vw; border-top: 1px solid var(--border); }
+.manifesto-text { font-family: var(--f-sans); font-size: clamp(2rem, 5vw, 6rem); line-height: 1.1; font-weight: 700; max-width: 90vw; }
+.manifesto-text span { color: var(--muted); transition: color 0.4s; }
+.manifesto-text span.active { color: var(--fg); }
+.manifesto-text .highlight.active { color: var(--accent); }
 
 /* ==========================================
-   09. CINEMATIC WORK SECTION (THE UPGRADE)
+   08. CRAZY WORK SECTION (SKEWED SCROLL)
    ========================================== */
-.work-section { position: relative; background: var(--color-bg); }
-.work-header { padding: var(--space-xl) 4vw 2rem; display: flex; justify-content: space-between; align-items: flex-end; }
-.work-header h2 { margin: 0; }
+.work-sec { position: relative; background: var(--bg); overflow: hidden; padding-top: 10vw; }
+.work-header { padding: 0 4vw 5vw; display: flex; justify-content: space-between; align-items: flex-end; }
+.work-header .t-h2 { margin: 0; }
+.work-count { font-family: var(--f-mono); font-size: 2rem; color: var(--accent); }
 
-.work-slider-wrap { height: 100vh; width: 100%; overflow: hidden; position: relative; display: flex; align-items: center; }
-.work-track { display: flex; gap: 4vw; padding: 0 4vw; height: 75vh; width: max-content; will-change: transform; }
+.scroll-container { height: 100vh; width: 100%; overflow: hidden; position: relative; perspective: 1000px; }
+.scroll-track { display: flex; gap: 8vw; padding: 0 10vw; height: 70vh; width: max-content; align-items: center; transform-style: preserve-3d; }
 
-.work-item { 
-  width: 65vw; height: 100%; display: flex; flex-direction: column; 
-  position: relative; cursor: none;
+.proj-card {
+  width: 50vw; height: 100%; position: relative; display: flex; flex-direction: column;
+  transform-origin: center center; will-change: transform;
 }
-.work-image-container { 
-  flex: 1; width: 100%; overflow: hidden; position: relative; 
-  border-radius: 4px; clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
-  transition: filter 0.5s;
+.proj-img-wrap {
+  flex: 1; width: 100%; position: relative; overflow: hidden; background: #111;
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+  filter: url(#glitch-filter); /* SVG Filter applied */
+  transition: clip-path 0.6s var(--ease);
 }
-.work-image-container img { 
-  width: 100%; height: 100%; object-fit: cover; 
-  transform: scale(1.3); will-change: transform;
-  filter: grayscale(80%) contrast(1.2); transition: filter 0.5s, transform 0.8s var(--ease-out-expo);
-}
-.work-item:hover .work-image-container img { filter: grayscale(0%) contrast(1); transform: scale(1.15); }
+.proj-card:hover .proj-img-wrap { clip-path: polygon(2% 2%, 98% -2%, 102% 98%, -2% 102%); } /* Distorted clip path on hover */
 
-.work-meta { 
-  display: flex; justify-content: space-between; align-items: center; 
-  padding-top: 1.5rem; overflow: hidden;
+.proj-img-wrap img {
+  width: 100%; height: 100%; object-fit: cover; transform: scale(1.4);
+  filter: grayscale(100%) contrast(1.2); transition: filter 0.6s, transform 0.6s var(--ease);
 }
-.work-meta h3 { margin: 0; font-size: clamp(1.5rem, 3vw, 3rem); font-weight: 700; text-transform: uppercase; letter-spacing: -0.02em; }
-.work-meta span { color: var(--color-muted); }
+.proj-card:hover .proj-img-wrap img { filter: grayscale(0%) contrast(1.1); transform: scale(1.1); }
+
+/* RGB Split Fake Effect on Hover */
+.rgb-layer {
+  position: absolute; inset: 0; background-size: cover; background-position: center;
+  mix-blend-mode: screen; opacity: 0; transition: transform 0.3s, opacity 0.3s; pointer-events: none;
+}
+.proj-card:hover .rgb-layer.red { opacity: 1; background-image: inherit; transform: translate(-8px, 4px); filter: brightness(0.5) sepia(1) hue-rotate(-50deg) saturate(5); }
+.proj-card:hover .rgb-layer.cyan { opacity: 1; background-image: inherit; transform: translate(8px, -4px); filter: brightness(0.5) sepia(1) hue-rotate(150deg) saturate(5); }
+
+.proj-meta {
+  position: absolute; bottom: -4vw; left: 0; width: 100%;
+  display: flex; justify-content: space-between; align-items: baseline;
+  mix-blend-mode: difference; z-index: 10;
+}
+.proj-title { font-family: var(--f-display); font-size: clamp(3rem, 6vw, 8rem); color: var(--fg); text-transform: uppercase; line-height: 0.8; margin: 0; white-space: nowrap; }
+.proj-num { font-family: var(--f-mono); font-size: 1.5rem; color: var(--accent); }
 
 /* ==========================================
-   10. VIDEO MODAL (FULLSCREEN EXPANSION)
+   09. HUGE MARQUEE FOOTER
    ========================================== */
-.modal-overlay {
-  position: fixed; inset: 0; background: var(--color-bg);
-  z-index: 10000; display: flex; justify-content: center; align-items: center;
-  opacity: 0; pointer-events: none; transition: opacity 0.6s var(--ease-out-expo);
+.footer { padding: 10vw 0 2vw; border-top: 1px solid var(--border); overflow: hidden; display: flex; flex-direction: column; }
+.marquee-wrap { display: flex; width: max-content; white-space: nowrap; animation: moveLeft 15s linear infinite; }
+.marquee-wrap.reverse { animation: moveRight 15s linear infinite; }
+.marquee-text { font-family: var(--f-display); font-size: clamp(5rem, 12vw, 15rem); line-height: 0.85; text-transform: uppercase; padding-right: 4vw; }
+@keyframes moveLeft { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
+@keyframes moveRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0); } }
+
+.footer-bottom { padding: 5vw 4vw 0; display: flex; justify-content: space-between; align-items: flex-end; }
+.contact-link { font-family: var(--f-display); font-size: clamp(2rem, 4vw, 4rem); color: var(--fg); text-decoration: none; position: relative; }
+.contact-link:hover { color: var(--accent); }
+
+/* ==========================================
+   10. VIDEO MODAL
+   ========================================== */
+.modal {
+  position: fixed; inset: 0; background: var(--bg); z-index: 10000;
+  display: flex; justify-content: center; align-items: center;
+  clip-path: circle(0% at 50% 50%); transition: clip-path 0.8s var(--ease); pointer-events: none;
 }
-.modal-overlay.active { opacity: 1; pointer-events: all; }
-#close-modal { 
-  position: absolute; top: 2rem; right: 4vw; 
-  background: none; border: none; color: var(--color-text); 
-  font-family: var(--font-mono); font-size: 1rem; text-transform: uppercase;
-  cursor: none; z-index: 2; mix-blend-mode: difference;
-}
-.modal-content { width: 100vw; height: 100vh; }
+.modal.active { clip-path: circle(150% at 50% 50%); pointer-events: all; }
+.modal-close { position: absolute; top: 4vw; right: 4vw; background: none; border: none; color: var(--fg); font-family: var(--f-mono); font-size: 1rem; cursor: none; }
+.modal-content { width: 90vw; height: 50vw; max-height: 80vh; background: #000; }
 .modal-content iframe { width: 100%; height: 100%; border: none; }
 
-/* ==========================================
-   11. CONTACT & FOOTER
-   ========================================== */
-.contact { padding: var(--space-xl) 0 3rem; min-height: 90vh; display: flex; flex-direction: column; justify-content: space-between; border-top: 1px solid var(--color-border); }
-.contact-cta { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: center; margin: auto 0; }
-.contact-cta h2 { font-size: clamp(3rem, 12vw, 14rem); line-height: 0.8; font-weight: 800; letter-spacing: -0.04em; text-transform: uppercase; }
-.contact-cta a { 
-  color: var(--color-text); text-decoration: none; 
-  font-family: var(--font-serif); font-size: clamp(2rem, 5vw, 5rem); font-style: italic;
-  margin-top: 2rem; position: relative;
-}
-.contact-cta a::after { content: ''; position: absolute; bottom: 10%; left: 0; width: 100%; height: 2px; background: var(--color-text); transform: scaleX(0); transform-origin: right; transition: transform 0.6s var(--ease-out-expo); }
-.contact-cta a:hover::after { transform: scaleX(1); transform-origin: left; }
-
-.footer-bottom { grid-column: 1 / -1; display: flex; justify-content: space-between; padding-top: 3rem; border-top: 1px solid var(--color-border); }
-.footer-links { display: flex; gap: 3rem; }
-
 @media (max-width: 768px) {
-  nav { width: 92%; padding: 1rem; top: 1rem; }
-  .nav-links { display: none; } /* Hamburger menu implied for mobile */
-  .hero-meta { flex-direction: column; gap: 0.5rem; }
-  .hero-subtitle { grid-column: 1 / -1; margin-top: 3rem; }
-  .about-stats { grid-template-columns: 1fr; }
-  .work-item { width: 85vw; }
-  .footer-bottom { flex-direction: column; gap: 2rem; }
+  .nav-meta { display: none; }
+  .proj-card { width: 85vw; }
+  .proj-title { font-size: 3rem; }
+  .badge-spin { display: none; }
 }
 </style>
 </head>
 <body>
 
-<!-- PRELOADER -->
-<div id="preloader">
-  <div class="loader-text"><span class="line-reveal-inner">Vyan</span></div>
-  <div class="loader-text"><span class="line-reveal-inner">Merchant</span></div>
-  <div class="loader-progress">
-    <span class="t-mono">Loading Experience</span>
-    <span class="t-mono" id="loader-percent">0%</span>
-  </div>
-  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
-</div>
+<!-- SVG FILTERS FOR CRAZY GLITCH EFFECTS -->
+<svg class="svg-filters">
+  <defs>
+    <filter id="glitch-filter">
+      <feTurbulence type="fractalNoise" baseFrequency="0.0001 0.0001" numOctaves="1" result="warp" />
+      <feDisplacementMap xChannelSelector="R" yChannelSelector="G" scale="0" in="SourceGraphic" in2="warp" id="glitch-map" />
+    </filter>
+  </defs>
+</svg>
 
 <!-- CURSOR -->
-<div id="cursor"><span>Play</span></div>
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
 
-<!-- WEBGL -->
-<div id="webgl-container"></div>
-<div class="noise-overlay"></div>
+<!-- WEBGL BACKGROUND -->
+<canvas id="webgl-canvas"></canvas>
+<div class="noise"></div>
 
 <!-- NAV -->
-<nav id="navbar">
-  <a href="#" class="nav-logo magnetic magnetic-hover">VM.</a>
-  <div class="nav-links t-mono">
-    <a href="#about" class="magnetic magnetic-hover">About</a>
-    <a href="#work" class="magnetic magnetic-hover">Work</a>
-    <a href="#contact" class="magnetic magnetic-hover">Contact</a>
+<nav>
+  <a href="#" class="nav-logo mag">VM<span>.</span></a>
+  <div class="nav-meta t-mono">
+    <p>EST. 2021</p>
+    <p>PUNE, INDIA</p>
+    <p style="color: var(--accent)">AVAILABLE</p>
   </div>
 </nav>
 
 <!-- HERO -->
-<section class="hero grid-layout">
-  <div class="hero-meta t-mono">
-    <span>Gaming Video Editor</span>
-    <span>DaVinci Resolve Specialist</span>
-    <span>Pune, India</span>
+<section class="hero">
+  <div class="badge-spin mag">
+    <svg viewBox="0 0 100 100">
+      <path id="curve" d="M 50, 50 m -35, 0 a 35,35 0 1,1 70,0 a 35,35 0 1,1 -70,0" fill="transparent"/>
+      <text font-family="Space Mono" font-size="12" fill="#f4f0ea" letter-spacing="4"><textPath href="#curve">DAVINCI RESOLVE · EDITOR ·</textPath></text>
+    </svg>
   </div>
   
-  <div class="hero-title-wrapper">
-    <h1 class="t-display">
-      <span class="line-reveal"><span class="line-reveal-inner">Cinematic</span></span>
-      <span class="line-reveal"><span class="line-reveal-inner" style="color: var(--color-muted)">Cuts.</span></span>
-    </h1>
-  </div>
-  
-  <div class="hero-subtitle">
-    <p class="t-body">Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages designed to retain attention.</p>
+  <div class="hero-title-container">
+    <div class="hero-line"><h1 class="t-giant split-text text-outline">VYAN</h1></div>
+    <div class="hero-line" style="margin-left: 10vw;"><h1 class="t-giant split-text">MERCHANT</h1></div>
   </div>
 </section>
 
-<!-- ABOUT -->
-<section id="about" class="about grid-layout">
-  <div class="about-label t-mono">01 / Profile</div>
-  <div class="about-content">
-    <h2 class="t-h2 line-reveal" style="margin-bottom: 2rem;">
-      <span class="line-reveal-inner">Edit.</span>
-      <span class="line-reveal-inner" style="color: var(--color-muted)">Fast.</span>
-      <span class="line-reveal-inner">Hard.</span>
-    </h2>
-    <p class="t-body">
-      I'm a video editor obsessed with making gaming content that actually slaps. Working extensively with DaVinci Resolve, I cut, grade, and sync footage to create cinematic montages that keep viewers locked in from the first frame to the last.
-    </p>
-  </div>
-  <div class="about-stats">
-    <div class="stat">
-      <h4>04</h4>
-      <span class="t-mono">Years Editing</span>
-    </div>
-    <div class="stat">
-      <h4>&infin;</h4>
-      <span class="t-mono">Hours in Resolve</span>
-    </div>
-  </div>
+<!-- SCROLL MANIFESTO -->
+<section class="manifesto">
+  <p class="manifesto-text split-words">
+    Crafting fast-paced gaming edits that hit different. From clutch montages to full creator packages. <span class="highlight">Edit. Fast. Hard.</span>
+  </p>
 </section>
 
-<!-- WORK SECTION (AWWWARDS SLIDER) -->
-<section id="work" class="work-section">
+<!-- CRAZY WORK SECTION -->
+<section id="work" class="work-sec">
   <div class="work-header">
-    <span class="t-mono">02 / Selected Works</span>
-    <h2 class="t-h2">Archives</h2>
+    <h2 class="t-h2 split-text">ARCHIVES</h2>
+    <span class="work-count">(03)</span>
   </div>
   
-  <div class="work-slider-wrap">
-    <div class="work-track">
+  <div class="scroll-container">
+    <div class="scroll-track">
       
-      <!-- ITEM 01 -->
-      <div class="work-item hover-play" data-video="d0qvLlFEEH8">
-        <div class="work-image-container">
+      <!-- CARD 1 -->
+      <div class="proj-card mag-play" data-vid="d0qvLlFEEH8">
+        <div class="proj-img-wrap">
           <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Valorant Montage">
+          <div class="rgb-layer red" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg')"></div>
+          <div class="rgb-layer cyan" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg')"></div>
         </div>
-        <div class="work-meta">
-          <h3>Valorant Montage</h3>
-          <span class="t-mono">01</span>
+        <div class="proj-meta">
+          <h3 class="proj-title">Valorant</h3>
+          <span class="proj-num">01</span>
         </div>
       </div>
 
-      <!-- ITEM 02 -->
-      <div class="work-item hover-play" data-video="4ZcBnbLWxvU">
-        <div class="work-image-container">
+      <!-- CARD 2 -->
+      <div class="proj-card mag-play" data-vid="4ZcBnbLWxvU">
+        <div class="proj-img-wrap">
           <img src="https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg" alt="Legacy Edit">
+          <div class="rgb-layer red" style="background-image: url('https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg')"></div>
+          <div class="rgb-layer cyan" style="background-image: url('https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg')"></div>
         </div>
-        <div class="work-meta">
-          <h3>Legacy Edit</h3>
-          <span class="t-mono">02</span>
+        <div class="proj-meta">
+          <h3 class="proj-title">Legacy</h3>
+          <span class="proj-num">02</span>
         </div>
       </div>
 
-      <!-- ITEM 03 -->
-      <div class="work-item hover-play" data-video="d0qvLlFEEH8">
-        <div class="work-image-container">
+      <!-- CARD 3 -->
+      <div class="proj-card mag-play" data-vid="d0qvLlFEEH8">
+        <div class="proj-img-wrap">
           <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Practice Reel">
+          <div class="rgb-layer red" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg')"></div>
+          <div class="rgb-layer cyan" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg')"></div>
         </div>
-        <div class="work-meta">
-          <h3>Practice Reel</h3>
-          <span class="t-mono">03</span>
+        <div class="proj-meta">
+          <h3 class="proj-title">Practice</h3>
+          <span class="proj-num">03</span>
         </div>
       </div>
-      
+
     </div>
   </div>
 </section>
 
-<!-- MODAL -->
-<div id="video-modal" class="modal-overlay">
-  <button id="close-modal" class="magnetic magnetic-hover">Close [X]</button>
-  <div class="modal-content"></div>
+<!-- FOOTER -->
+<section id="contact" class="footer">
+  <div class="marquee-wrap">
+    <div class="marquee-text">LET'S BUILD SOMETHING CRAZY <span style="color:var(--accent)">✦</span> </div>
+    <div class="marquee-text">LET'S BUILD SOMETHING CRAZY <span style="color:var(--accent)">✦</span> </div>
+  </div>
+  <div class="marquee-wrap reverse text-outline">
+    <div class="marquee-text">DAVINCI RESOLVE SPECIALIST <span style="color:var(--accent); -webkit-text-stroke:0;">✦</span> </div>
+    <div class="marquee-text">DAVINCI RESOLVE SPECIALIST <span style="color:var(--accent); -webkit-text-stroke:0;">✦</span> </div>
+  </div>
+  
+  <div class="footer-bottom">
+    <a href="mailto:vyanmerchant@gmail.com" class="contact-link mag">vyanmerchant@gmail.com</a>
+    <div style="display:flex; gap: 2vw;">
+      <a href="https://youtube.com" class="contact-link mag" style="font-size:1.5rem">YT</a>
+      <a href="https://discord.com/users/1111715392461738034" class="contact-link mag" style="font-size:1.5rem">DC</a>
+    </div>
+  </div>
+</section>
+
+<!-- VIDEO MODAL -->
+<div class="modal" id="vid-modal">
+  <button class="modal-close mag" id="close-modal">CLOSE</button>
+  <div class="modal-content" id="modal-inner"></div>
 </div>
-
-<!-- CONTACT -->
-<section id="contact" class="contact grid-layout">
-  <div class="about-label t-mono">03 / Initiate</div>
-  <div class="contact-cta">
-    <h2>Let's Build</h2>
-    <a href="mailto:vyanmerchant@gmail.com" class="magnetic magnetic-hover">vyanmerchant@gmail.com</a>
-  </div>
-  <div class="footer-bottom t-mono">
-    <span>© 2026 Vyan Merchant. Pune, India.</span>
-    <div class="footer-links">
-      <a href="https://youtube.com" class="magnetic magnetic-hover" style="color:var(--color-text); text-decoration:none;">YouTube</a>
-      <a href="https://discord.com/users/1111715392461738034" class="magnetic magnetic-hover" style="color:var(--color-text); text-decoration:none;">Discord</a>
-    </div>
-  </div>
-</section>
 
 <script>
 /* ==========================================
-   JS ARCHITECTURE (GSAP + THREEJS + LENIS)
+   JS ARCHITECTURE
    ========================================== */
 gsap.registerPlugin(ScrollTrigger);
 
+// 1. UTILS: Custom Text Splitter (Replaces paid plugins)
+function splitTextCustom(selector, type = 'chars') {
+  document.querySelectorAll(selector).forEach(el => {
+    const text = el.innerText;
+    el.innerHTML = '';
+    if (type === 'chars') {
+      text.split(' ').forEach(word => {
+        const wordDiv = document.createElement('span');
+        wordDiv.classList.add('word');
+        word.split('').forEach(char => {
+          const charDiv = document.createElement('span');
+          charDiv.classList.add('char');
+          charDiv.innerHTML = char === ' ' ? '&nbsp;' : char;
+          wordDiv.appendChild(charDiv);
+        });
+        el.appendChild(wordDiv);
+        el.innerHTML += ' ';
+      });
+    } else if (type === 'words') {
+      text.split(' ').forEach(word => {
+        const wordDiv = document.createElement('span');
+        wordDiv.classList.add('word'); // using same class for overflow hidden
+        const inner = document.createElement('span');
+        inner.classList.add('char'); // repurposing char class for the animation transform
+        inner.innerText = word + ' ';
+        wordDiv.appendChild(inner);
+        el.appendChild(wordDiv);
+      });
+    }
+  });
+}
+
+// 2. INIT
 document.addEventListener("DOMContentLoaded", () => {
-  initPreloader();
-  initCustomCursor();
-  initWebGLBackground();
-  initNavScroll();
+  splitTextCustom('.split-text', 'chars');
+  splitTextCustom('.split-words', 'words');
+  initLenis();
+  initCursor();
+  initWebGLShader();
+  initAnimations();
+  initSkewScroll();
+  initVideoModal();
 });
 
+// 3. SMOOTH SCROLL
 let lenis;
-function initSmoothScroll() {
-  lenis = new Lenis({
-    duration: 1.5, // Slower, more cinematic scroll
-    easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
-    direction: 'vertical', smooth: true
-  });
+function initLenis() {
+  lenis = new Lenis({ duration: 1.2, easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)) });
   function raf(time) { lenis.raf(time); requestAnimationFrame(raf); }
   requestAnimationFrame(raf);
 }
 
-function initPreloader() {
-  const tl = gsap.timeline({
-    onComplete: () => {
-      initSmoothScroll();
-      initGSAPAnimations();
-      initHorizontalSlider();
-      initVideoModal();
-    }
-  });
-
-  // Fake loading progress
-  let progress = { value: 0 };
-  tl.to(progress, {
-    value: 100, duration: 2, ease: "power2.inOut",
-    onUpdate: () => {
-      document.getElementById('loader-percent').innerText = Math.round(progress.value) + '%';
-      document.querySelector('.loader-bar').style.width = progress.value + '%';
-    }
-  })
-  .to('.loader-text .line-reveal-inner', { y: '0%', duration: 1, stagger: 0.1, ease: "power4.out" }, "-=1")
-  .to('#preloader', { yPercent: -100, duration: 1.2, ease: "expo.inOut", delay: 0.5 })
-  .from('.hero .line-reveal-inner', { y: '115%', duration: 1.5, stagger: 0.1, ease: "power4.out" }, "-=0.8")
-  .from('.hero-meta, .hero-subtitle, #navbar', { opacity: 0, y: 20, duration: 1, ease: "power2.out", stagger: 0.1 }, "-=1");
-}
-
-function initCustomCursor() {
-  const cursor = document.getElementById('cursor');
-  let mouseX = 0, mouseY = 0, cursorX = 0, cursorY = 0;
+// 4. KINETIC CURSOR
+function initCursor() {
+  const dot = document.getElementById('cursor-dot');
+  const ring = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, dx = 0, dy = 0, rx = 0, ry = 0;
   
-  window.addEventListener('mousemove', e => { mouseX = e.clientX; mouseY = e.clientY; });
+  window.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
   
   gsap.ticker.add(() => {
-    const dt = 1.0 - Math.pow(1.0 - 0.25, gsap.ticker.deltaRatio());
-    cursorX += (mouseX - cursorX) * dt;
-    cursorY += (mouseY - cursorY) * dt;
-    cursor.style.transform = `translate3d(${cursorX}px, ${cursorY}px, 0) translate(-50%, -50%)`;
+    // Fast follow for dot
+    dx += (mx - dx) * 0.5; dy += (my - dy) * 0.5;
+    dot.style.transform = `translate3d(${dx}px, ${dy}px, 0) translate(-50%, -50%)`;
+    // Slow follow for ring
+    rx += (mx - rx) * 0.15; ry += (my - ry) * 0.15;
+    ring.style.transform = `translate3d(${rx}px, ${ry}px, 0) translate(-50%, -50%)`;
   });
 
-  // Standard Hover
-  document.querySelectorAll('.magnetic-hover').forEach(el => {
-    el.addEventListener('mouseenter', () => cursor.classList.add('hovered'));
-    el.addEventListener('mouseleave', () => cursor.classList.remove('hovered'));
+  document.querySelectorAll('.mag').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.add('cursor-hover', false));
   });
 
-  // Play Hover (For Work Images)
-  document.querySelectorAll('.hover-play').forEach(el => {
-    el.addEventListener('mouseenter', () => cursor.classList.add('play-mode'));
-    el.addEventListener('mouseleave', () => cursor.classList.remove('play-mode'));
-  });
-
-  // Magnetic Pull Logic
-  document.querySelectorAll('.magnetic').forEach(el => {
-    el.addEventListener('mousemove', function(e) {
-      const rect = this.getBoundingClientRect();
-      const x = (e.clientX - rect.left - rect.width/2) * 0.4;
-      const y = (e.clientY - rect.top - rect.height/2) * 0.4;
-      gsap.to(this, { x: x, y: y, duration: 0.4, ease: "power2.out" });
+  document.querySelectorAll('.mag-play').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-play'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-play'));
+    
+    // Distort Glitch Filter on hover
+    el.addEventListener('mousemove', (e) => {
+      const rect = el.getBoundingClientRect();
+      const relX = (e.clientX - rect.left) / rect.width;
+      gsap.to('#glitch-map', { attr: { scale: relX * 50 }, duration: 0.3 });
     });
-    el.addEventListener('mouseleave', function() {
-      gsap.to(this, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" });
+    el.addEventListener('mouseleave', () => {
+      gsap.to('#glitch-map', { attr: { scale: 0 }, duration: 0.5, ease: 'power2.out' });
     });
   });
 }
 
-function initNavScroll() {
-  const nav = document.getElementById('navbar');
-  let lastScrollY = window.scrollY;
-
-  window.addEventListener('scroll', () => {
-    if(window.scrollY > 100 && window.scrollY > lastScrollY) {
-      nav.classList.add('hidden');
-    } else {
-      nav.classList.remove('hidden');
-    }
-    lastScrollY = window.scrollY;
-  });
-}
-
-function initWebGLBackground() {
-  const container = document.getElementById('webgl-container');
+// 5. LIQUID METAL SHADER
+function initWebGLShader() {
+  const canvas = document.getElementById('webgl-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: false });
+  renderer.setSize(window.innerWidth, window.innerHeight);
   const scene = new THREE.Scene();
   const camera = new THREE.OrthographicCamera(-1, 1, 1, -1, 0, 1);
-  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: false });
-  renderer.setSize(window.innerWidth, window.innerHeight);
-  container.appendChild(renderer.domElement);
-
-  // Mouse interaction for Shader
-  const mouse = new THREE.Vector2(0.5, 0.5);
-  window.addEventListener('mousemove', (e) => {
-    mouse.x = e.clientX / window.innerWidth;
-    mouse.y = 1.0 - (e.clientY / window.innerHeight); // Invert Y for WebGL
-  });
-
+  
   const material = new THREE.ShaderMaterial({
-    uniforms: { 
-      u_time: { value: 0 }, 
-      u_resolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-      u_mouse: { value: mouse }
-    },
+    uniforms: { u_time: { value: 0 }, u_res: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) } },
     vertexShader: `void main() { gl_Position = vec4(position, 1.0); }`,
     fragmentShader: `
       uniform float u_time;
-      uniform vec2 u_resolution;
-      uniform vec2 u_mouse;
+      uniform vec2 u_res;
       
+      // Simplex noise approximation
+      vec3 permute(vec3 x) { return mod(((x*34.0)+1.0)*x, 289.0); }
+      float snoise(vec2 v){
+        const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+        vec2 i  = floor(v + dot(v, C.yy) );
+        vec2 x0 = v -   i + dot(i, C.xx);
+        vec2 i1; i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+        vec4 x12 = x0.xyxy + C.xxzz;
+        x12.xy -= i1;
+        i = mod(i, 289.0);
+        vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+        vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+        m = m*m ; m = m*m ;
+        vec3 x = 2.0 * fract(p * C.www) - 1.0;
+        vec3 h = abs(x) - 0.5;
+        vec3 ox = floor(x + 0.5);
+        vec3 a0 = x - ox;
+        m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+        vec3 g;
+        g.x  = a0.x  * x0.x  + h.x  * x0.y;
+        g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+        return 130.0 * dot(m, g);
+      }
+
       void main() {
-        vec2 st = gl_FragCoord.xy / u_resolution.xy;
-        st.x *= u_resolution.x / u_resolution.y;
+        vec2 uv = gl_FragCoord.xy / u_res.xy;
+        uv.x *= u_res.x / u_res.y;
         
-        vec2 mouse_adj = u_mouse;
-        mouse_adj.x *= u_resolution.x / u_resolution.y;
+        // Fluid distortion
+        vec2 p = uv;
+        p.x += snoise(vec2(uv.y * 2.0, u_time * 0.1)) * 0.2;
+        p.y += snoise(vec2(uv.x * 2.0, u_time * 0.15)) * 0.2;
         
-        // Fluid distortion heavily influenced by mouse proximity
-        float dist = distance(st, mouse_adj);
-        float interaction = smoothstep(0.6, 0.0, dist);
+        float n = snoise(p * 3.0 + u_time * 0.2);
         
-        vec2 q = vec2(0.);
-        q.x = sin(st.x * 3.0 + u_time * 0.1) + cos(st.y * 2.0 + u_time * 0.05) + interaction * 0.5;
-        q.y = cos(st.x * 2.0 + u_time * 0.15) + sin(st.y * 3.0 + u_time * 0.1) - interaction * 0.5;
+        // High contrast obsidian and red
+        vec3 bg = vec3(0.01, 0.01, 0.01);
+        vec3 highlight = vec3(0.3, 0.0, 0.0); // Deep red undertone
         
-        float colorValue = smoothstep(0.0, 2.5, length(q));
+        float intensity = smoothstep(0.0, 1.0, n);
+        vec3 col = mix(bg, highlight, intensity * 0.3);
         
-        // Ultra dark, cinematic aesthetic
-        vec3 color = mix(vec3(0.012, 0.012, 0.012), vec3(0.04, 0.04, 0.04), colorValue);
-        
-        // Add subtle glow near mouse
-        color += vec3(0.02) * interaction;
-        
-        gl_FragColor = vec4(color, 1.0);
+        gl_FragColor = vec4(col, 1.0);
       }
     `
   });
-
+  
   scene.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), material));
-
-  function animate() {
+  
+  function render() {
     material.uniforms.u_time.value += 0.01;
     renderer.render(scene, camera);
-    requestAnimationFrame(animate);
+    requestAnimationFrame(render);
   }
-  animate();
+  render();
   
   window.addEventListener('resize', () => {
     renderer.setSize(window.innerWidth, window.innerHeight);
-    material.uniforms.u_resolution.value.set(window.innerWidth, window.innerHeight);
+    material.uniforms.u_res.value.set(window.innerWidth, window.innerHeight);
   });
 }
 
-function initGSAPAnimations() {
-  gsap.utils.toArray('.about .line-reveal-inner').forEach(el => {
-    gsap.to(el, {
-      scrollTrigger: { trigger: el.closest('.line-reveal'), start: "top 85%" },
-      y: '0%', duration: 1.2, ease: "power4.out"
+// 6. GSAP SEQUENCING
+function initAnimations() {
+  // Hero load
+  gsap.to('.hero .char', {
+    y: '0%', duration: 1.2, ease: "power4.out", stagger: 0.02, delay: 0.2
+  });
+
+  // Manifesto Scroll Color Change
+  const words = gsap.utils.toArray('.manifesto-text .char'); // Our custom splitter used 'char' for the inner wrapper of words
+  words.forEach((word) => {
+    gsap.to(word, {
+      color: word.innerText.includes('Edit') || word.innerText.includes('Fast') || word.innerText.includes('Hard') ? 'var(--accent)' : 'var(--fg)',
+      scrollTrigger: {
+        trigger: word,
+        start: "top 80%",
+        end: "top 40%",
+        scrub: true
+      }
     });
   });
 }
 
-function initHorizontalSlider() {
-  const track = document.querySelector('.work-track');
-  const images = gsap.utils.toArray('.work-image-container img');
-  const items = gsap.utils.toArray('.work-item');
-  
-  // 1. Horizontal Scroll
-  let sliderTween = gsap.to(track, {
+// 7. SKEW HORIZONTAL SCROLL (The "Crazy" Effect)
+function initSkewScroll() {
+  const track = document.querySelector('.scroll-track');
+  const cards = gsap.utils.toArray('.proj-card');
+  const images = gsap.utils.toArray('.proj-img-wrap img');
+
+  // Main Horizontal Pin
+  let scrollTween = gsap.to(track, {
     x: () => -(track.scrollWidth - document.documentElement.clientWidth) + "px",
     ease: "none",
     scrollTrigger: {
-      trigger: ".work-slider-wrap",
+      trigger: ".scroll-container",
       pin: true,
       scrub: 1,
       end: () => "+=" + track.scrollWidth
     }
   });
 
-  // 2. Interior Image Parallax
+  // Parallax Images inside Cards
   images.forEach(img => {
     gsap.to(img, {
-      x: () => img.parentElement.offsetWidth * 0.25, // Strong parallax
+      x: () => img.parentElement.offsetWidth * 0.3,
       ease: "none",
       scrollTrigger: {
-        trigger: ".work-slider-wrap",
-        containerAnimation: sliderTween,
+        trigger: ".scroll-container",
+        containerAnimation: scrollTween,
         start: "left right",
         end: "right left",
         scrub: true
@@ -594,45 +565,42 @@ function initHorizontalSlider() {
     });
   });
 
-  // 3. Clip-path Reveal on Enter
-  items.forEach(item => {
-    let imgContainer = item.querySelector('.work-image-container');
-    gsap.fromTo(imgContainer, 
-      { clipPath: "polygon(10% 0, 90% 0, 90% 100%, 10% 100%)" }, // Squeezed start
-      { 
-        clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)", // Full expand
-        ease: "none",
-        scrollTrigger: {
-          trigger: item,
-          containerAnimation: sliderTween,
-          start: "left center+=300",
-          end: "left center-=300",
-          scrub: 1
-        }
+  // Velocity Skew Effect (Proxy object for proxying scroll speed to rotation)
+  let proxy = { skew: 0 },
+      skewSetter = gsap.quickSetter(cards, "rotationY", "deg"),
+      clamp = gsap.utils.clamp(-15, 15);
+
+  ScrollTrigger.create({
+    onUpdate: (self) => {
+      let skew = clamp(self.getVelocity() / -100);
+      if (Math.abs(skew) > Math.abs(proxy.skew)) {
+        proxy.skew = skew;
+        gsap.to(proxy, { skew: 0, duration: 0.8, ease: "power3", overwrite: true, onUpdate: () => skewSetter(proxy.skew) });
       }
-    );
+    }
   });
 }
 
+// 8. VIDEO MODAL (EXPANDING CIRCLE)
 function initVideoModal() {
-  const items = document.querySelectorAll('.hover-play');
-  const modal = document.getElementById('video-modal');
-  const modalContent = document.querySelector('.modal-content');
+  const triggers = document.querySelectorAll('.mag-play');
+  const modal = document.getElementById('vid-modal');
+  const inner = document.getElementById('modal-inner');
   const closeBtn = document.getElementById('close-modal');
 
-  items.forEach(item => {
-    item.addEventListener('click', () => {
-      const vidId = item.getAttribute('data-video');
-      modalContent.innerHTML = `<iframe src="https://www.youtube.com/embed/${vidId}?autoplay=1&mute=0&controls=1&modestbranding=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
+  triggers.forEach(trigger => {
+    trigger.addEventListener('click', () => {
+      const vid = trigger.getAttribute('data-vid');
+      inner.innerHTML = `<iframe src="https://www.youtube.com/embed/${vid}?autoplay=1&mute=0&controls=1&modestbranding=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>`;
       modal.classList.add('active');
       lenis.stop();
-      document.getElementById('cursor').classList.remove('play-mode');
+      document.body.classList.remove('cursor-play');
     });
   });
 
   closeBtn.addEventListener('click', () => {
     modal.classList.remove('active');
-    setTimeout(() => { modalContent.innerHTML = ''; }, 600);
+    setTimeout(() => { inner.innerHTML = ''; }, 800);
     lenis.start();
   });
 }
