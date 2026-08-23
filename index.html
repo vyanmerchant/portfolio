@@ -3,31 +3,34 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VYAN MERCHANT | Award-Winning Video Editor</title>
+    <title>VYAN MERCHANT | Premium Editor</title>
 
-    <!-- Premium Fonts -->
+    <!-- Editorial & Display Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Syne:wght@400;500;700;800&display=swap" rel="stylesheet">
     
     <style>
         /* ==========================================
-           RESET, VARIABLES & CORE UTILS
+           RESET, VARIABLES & VISUAL SYSTEM
            ========================================== */
         :root {
-            --bg: #030303;
-            --text: #f4f4f4;
+            --bg: #020202;
+            --surface: #0a0a0a;
+            --text: #eaeaea;
+            --text-muted: #888888;
             --accent: #38bdf8;
-            --accent-dim: rgba(56, 189, 248, 0.2);
             --font-display: 'Anton', sans-serif;
             --font-sans: 'Syne', sans-serif;
             --font-mono: 'Space Mono', monospace;
+            --ease-cinematic: cubic-bezier(0.19, 1, 0.22, 1);
+            --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            cursor: none; /* Custom cursor override */
+            cursor: none; 
         }
 
         body {
@@ -36,6 +39,7 @@
             font-family: var(--font-sans);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             overscroll-behavior: none;
         }
 
@@ -45,19 +49,17 @@
         }
 
         /* ==========================================
-           CUSTOM CURSOR SYSTEM
+           REFINED CURSOR (Subtle, elegant)
            ========================================== */
         .cursor-wrapper {
             position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
+            inset: 0;
             pointer-events: none;
             z-index: 10000;
-            mix-blend-mode: difference;
         }
         .cursor-dot {
             position: absolute;
-            width: 8px; height: 8px;
+            width: 4px; height: 4px;
             background: var(--text);
             border-radius: 50%;
             transform: translate(-50%, -50%);
@@ -65,63 +67,64 @@
         }
         .cursor-outline {
             position: absolute;
-            width: 50px; height: 50px;
-            border: 1px solid var(--text);
+            width: 40px; height: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
             border-radius: 50%;
             transform: translate(-50%, -50%);
-            will-change: transform, width, height;
+            will-change: transform, width, height, background-color, border-color;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: var(--font-mono);
-            font-size: 9px;
+            font-size: 8px;
             text-transform: uppercase;
-            font-weight: 700;
             letter-spacing: 1px;
-            color: var(--bg);
+            color: transparent;
             background: transparent;
-            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
-                        height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
-                        background 0.4s ease;
+            backdrop-filter: blur(0px);
+            transition: width 0.5s var(--ease-cinematic), 
+                        height 0.5s var(--ease-cinematic),
+                        background-color 0.4s ease,
+                        border-color 0.4s ease,
+                        backdrop-filter 0.4s ease;
         }
 
         /* ==========================================
-           CINEMATIC LOADER
+           CINEMATIC LOADER (Smooth, unhurried)
            ========================================== */
         .loader {
             position: fixed;
             inset: 0;
-            background: #000;
+            background: var(--bg);
             z-index: 9000;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 2vw;
-            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+            padding: 2.5vw;
+            will-change: clip-path;
         }
         .loader-top, .loader-bottom {
             display: flex;
             justify-content: space-between;
             font-family: var(--font-mono);
             font-size: 10px;
-            color: var(--accent);
+            color: var(--text-muted);
             text-transform: uppercase;
-            letter-spacing: 2px;
-            overflow: hidden;
+            letter-spacing: 0.2em;
         }
         .loader-center {
             position: absolute;
             top: 50%; left: 50%;
             transform: translate(-50%, -50%);
-            width: 100%;
             text-align: center;
+            overflow: hidden;
         }
         .loader-counter {
             font-family: var(--font-display);
-            font-size: clamp(100px, 25vw, 400px);
-            line-height: 0.8;
+            font-size: clamp(80px, 20vw, 300px);
+            line-height: 0.85;
             color: transparent;
-            -webkit-text-stroke: 1px rgba(255,255,255,0.1);
+            -webkit-text-stroke: 1px rgba(255,255,255,0.05);
             position: relative;
         }
         .loader-counter-fill {
@@ -131,10 +134,11 @@
             color: var(--text);
             -webkit-text-stroke: 0px;
             clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
+            will-change: clip-path;
         }
 
         /* ==========================================
-           WEBGL BACKGROUND
+           WEBGL OBSIDIAN LIQUID BACKGROUND
            ========================================== */
         #webgl-container {
             position: fixed;
@@ -142,37 +146,37 @@
             width: 100vw; height: 100vh;
             z-index: -1;
             pointer-events: none;
+            opacity: 0.8; /* Subtle presence */
         }
 
         /* ==========================================
-           NAVIGATION
+           NAVIGATION (Minimal, high-end editorial)
            ========================================== */
         nav {
             position: fixed;
             top: 0; width: 100%;
-            padding: 2vw;
+            padding: 2.5vw;
             display: flex;
             justify-content: space-between;
+            align-items: flex-start;
             z-index: 100;
             font-family: var(--font-mono);
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.15em;
+            color: var(--text);
             mix-blend-mode: difference;
         }
         .nav-logo {
             font-family: var(--font-display);
-            font-size: 24px;
-            letter-spacing: 0;
+            font-size: 20px;
+            letter-spacing: 0.05em;
         }
         .nav-logo span { color: var(--accent); }
-        
-        .magnetic-wrap {
-            display: inline-block;
-        }
+        .magnetic-wrap { display: inline-block; padding: 10px; margin: -10px; }
 
         /* ==========================================
-           HERO SECTION
+           HERO SECTION (Breathing room, flawless typography)
            ========================================== */
         .hero {
             height: 100vh;
@@ -185,96 +189,100 @@
         }
         .hero-title-container {
             position: relative;
-            margin-bottom: 2vh;
+            margin-bottom: 4vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .hero-line {
+            overflow: hidden;
+            display: block;
+            padding-bottom: 1vw; /* Prevent cutoffs */
         }
         .hero h1 {
             font-family: var(--font-display);
-            font-size: clamp(60px, 15vw, 250px);
-            line-height: 0.85;
-            letter-spacing: -0.02em;
+            font-size: clamp(50px, 14vw, 220px);
+            line-height: 0.8;
+            letter-spacing: 0em;
             text-transform: uppercase;
             margin: 0;
+            transform: translateY(110%);
             will-change: transform;
         }
-        .hero h1 .char {
-            display: inline-block;
-            transform: translateY(110%) rotate(10deg);
-            transform-origin: bottom left;
-            opacity: 0;
-        }
+        .hero h1 .accent { color: var(--accent); }
+        
         .hero-details {
             display: flex;
             justify-content: space-between;
             align-items: flex-end;
             width: 100%;
             border-top: 1px solid rgba(255,255,255,0.1);
-            padding-top: 20px;
+            padding-top: 2.5vh;
             overflow: hidden;
         }
-        .hero-tag, .hero-desc {
+        .hero-tag {
             font-family: var(--font-mono);
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
+            letter-spacing: 0.2em;
             color: var(--accent);
-            transform: translateY(100%);
-            opacity: 0;
         }
         .hero-desc {
             font-family: var(--font-sans);
-            font-size: 16px;
-            color: var(--text);
-            max-width: 400px;
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-muted);
+            max-width: 380px;
             text-align: right;
-            text-transform: none;
-            letter-spacing: 0;
+            line-height: 1.5;
+        }
+        .hero-detail-inner {
+            transform: translateY(100%);
+            opacity: 0;
+            display: block;
         }
 
         /* ==========================================
-           EXPERIMENTAL ABOUT SECTION (SCRUB TEXT)
+           ABOUT SECTION (Calm, highly legible motion)
            ========================================== */
         .about {
-            min-height: 150vh;
+            min-height: 120vh;
             position: relative;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 0 4vw;
+            padding: 10vw 4vw;
             z-index: 2;
         }
         .about-text {
-            font-family: var(--font-display);
-            font-size: clamp(40px, 8vw, 120px);
-            line-height: 1;
+            font-family: var(--font-sans);
+            font-weight: 600;
+            font-size: clamp(24px, 5vw, 64px);
+            line-height: 1.2;
             text-align: center;
-            max-width: 1400px;
-            text-transform: uppercase;
+            max-width: 1200px;
+            color: var(--text);
         }
         .about-text .word {
             display: inline-block;
-            color: rgba(255, 255, 255, 0.05);
-            background: linear-gradient(to right, var(--text) 50%, rgba(255, 255, 255, 0.05) 50%);
-            background-size: 200% 100%;
-            background-position: 100% 0;
-            -webkit-background-clip: text;
-            background-clip: text;
-            will-change: background-position;
+            opacity: 0.15;
+            transform: translateY(15px);
+            will-change: opacity, transform;
         }
 
         /* ==========================================
-           HORIZONTAL 3D WORK SHOWCASE
+           3D HORIZONTAL WORK (Smooth, controlled perspective)
            ========================================== */
         .work-wrapper {
-            background: var(--bg);
+            background: transparent;
             overflow: hidden;
             position: relative;
             z-index: 5;
         }
         .work-container {
             display: flex;
-            width: 400vw; /* 4 panels (1 intro + 3 projects) */
+            width: 400vw; 
             height: 100vh;
-            perspective: 1000px;
+            perspective: 1200px;
         }
         .work-intro {
             width: 100vw;
@@ -285,10 +293,10 @@
         }
         .work-intro h2 {
             font-family: var(--font-display);
-            font-size: 15vw;
-            line-height: 0.8;
+            font-size: 12vw;
+            line-height: 0.85;
             color: transparent;
-            -webkit-text-stroke: 2px var(--accent);
+            -webkit-text-stroke: 1px var(--text-muted);
         }
         .work-panel {
             width: 100vw;
@@ -296,88 +304,81 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 10vw;
+            padding: 8vw;
             transform-style: preserve-3d;
         }
         .project-card {
             width: 100%;
-            max-width: 1200px;
-            height: 70vh;
+            max-width: 1000px;
+            height: 65vh;
             position: relative;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end;
+            justify-content: space-between;
             padding: 3vw;
             text-decoration: none;
             transform-style: preserve-3d;
-            will-change: transform;
+            border: 1px solid rgba(255,255,255,0.05);
+            background: rgba(5,5,5,0.3);
+            backdrop-filter: blur(10px);
         }
         .project-image-wrap {
             position: absolute;
             inset: 0;
             overflow: hidden;
             z-index: -1;
-            transform: translateZ(-50px);
+            transform: translateZ(-30px);
         }
         .project-image {
-            width: 110%;
-            height: 110%;
+            width: 105%;
+            height: 105%;
             position: absolute;
-            top: -5%; left: -5%;
+            top: -2.5%; left: -2.5%;
             background-size: cover;
             background-position: center;
-            transition: transform 0.1s;
-            filter: grayscale(100%) brightness(0.4);
+            transition: transform 0.8s var(--ease-cinematic), filter 0.8s ease;
+            filter: grayscale(100%) brightness(0.3) contrast(1.2);
             will-change: transform, filter;
         }
         .project-card:hover .project-image {
-            filter: grayscale(0%) brightness(0.8);
-        }
-        .project-glare {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.2) 25%, transparent 30%);
-            z-index: 1;
-            transform: translateX(-100%);
-            transition: transform 0.6s ease;
-            mix-blend-mode: overlay;
-        }
-        .project-card:hover .project-glare {
-            transform: translateX(100%);
+            filter: grayscale(0%) brightness(0.6) contrast(1.1);
+            transform: scale(1.03);
         }
         .project-info {
-            transform: translateZ(50px); /* 3D pop out */
+            transform: translateZ(40px); /* Subtle 3D pop */
             color: var(--text);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         .project-num {
             font-family: var(--font-mono);
-            font-size: 14px;
+            font-size: 10px;
             color: var(--accent);
-            margin-bottom: 20px;
-            display: block;
+            letter-spacing: 0.1em;
         }
         .project-info h3 {
             font-family: var(--font-display);
-            font-size: 6vw;
+            font-size: clamp(40px, 6vw, 100px);
             line-height: 0.9;
             text-transform: uppercase;
-            margin-bottom: 10px;
         }
         .project-info p {
             font-family: var(--font-mono);
-            font-size: 11px;
+            font-size: 10px;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: rgba(255,255,255,0.5);
+            color: var(--text-muted);
         }
 
         /* ==========================================
-           VELOCITY MARQUEE
+           VELOCITY MARQUEE (Slower, elegant)
            ========================================== */
         .marquee-section {
-            padding: 10vh 0;
-            background: var(--accent);
-            color: var(--bg);
+            padding: 8vh 0;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+            background: var(--surface);
             overflow: hidden;
             position: relative;
             z-index: 6;
@@ -385,18 +386,20 @@
         .marquee-track {
             display: flex;
             white-space: nowrap;
-            font-family: var(--font-display);
-            font-size: 8vw;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            letter-spacing: 0.15em;
             text-transform: uppercase;
-            line-height: 1;
+            color: var(--text-muted);
             will-change: transform;
         }
         .marquee-track span {
-            padding: 0 40px;
+            padding: 0 30px;
         }
+        .marquee-track .dot { color: var(--accent); }
 
         /* ==========================================
-           CINEMATIC FOOTER
+           CINEMATIC FOOTER (Epic conclusion)
            ========================================== */
         .footer {
             height: 100vh;
@@ -409,45 +412,39 @@
             z-index: 10;
             overflow: hidden;
         }
-        .footer-bg-text {
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            font-family: var(--font-display);
-            font-size: 30vw;
-            color: rgba(255,255,255,0.02);
-            white-space: nowrap;
-            pointer-events: none;
-        }
         .footer-content {
             text-align: center;
             z-index: 2;
         }
-        .footer h2 {
+        .footer-heading {
             font-family: var(--font-display);
-            font-size: clamp(60px, 12vw, 150px);
-            line-height: 0.9;
-            margin-bottom: 40px;
+            font-size: clamp(60px, 12vw, 200px);
+            line-height: 0.85;
+            margin-bottom: 6vh;
             text-transform: uppercase;
+            transform-origin: center center;
+            will-change: transform, opacity;
         }
         .contact-links {
             display: flex;
-            gap: 40px;
+            gap: 20px;
             justify-content: center;
+            flex-wrap: wrap;
         }
         .contact-links a {
             font-family: var(--font-mono);
-            font-size: 14px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.1em;
             color: var(--text);
             text-decoration: none;
-            padding: 15px 30px;
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 50px;
+            padding: 16px 32px;
+            border: 1px solid rgba(255,255,255,0.1);
+            border-radius: 4px; /* Premium hard edge */
             position: relative;
             overflow: hidden;
-            transition: border-color 0.3s, color 0.3s;
+            transition: border-color 0.4s var(--ease-smooth), color 0.4s var(--ease-smooth);
+            background: transparent;
         }
         .contact-links a::before {
             content: '';
@@ -457,7 +454,7 @@
             background: var(--text);
             transform: scaleY(0);
             transform-origin: bottom;
-            transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: transform 0.5s var(--ease-cinematic);
             z-index: -1;
         }
         .contact-links a:hover {
@@ -469,21 +466,22 @@
         }
         .footer-bottom {
             position: absolute;
-            bottom: 4vw;
+            bottom: 2.5vw;
             width: 100%;
             display: flex;
             justify-content: space-between;
             padding: 0 4vw;
             font-family: var(--font-mono);
-            font-size: 10px;
-            color: rgba(255,255,255,0.3);
+            font-size: 9px;
+            color: var(--text-muted);
             text-transform: uppercase;
+            letter-spacing: 0.1em;
         }
     </style>
 </head>
 <body>
 
-    <!-- CUSTOM CURSOR -->
+    <!-- REFINED CURSOR -->
     <div class="cursor-wrapper">
         <div class="cursor-dot"></div>
         <div class="cursor-outline"></div>
@@ -492,8 +490,8 @@
     <!-- CINEMATIC LOADER -->
     <div class="loader">
         <div class="loader-top">
-            <span>System Initialization</span>
-            <span>Est. 2021</span>
+            <span>System Initialize</span>
+            <span>DaVinci Engine</span>
         </div>
         <div class="loader-center">
             <div class="loader-counter">
@@ -502,17 +500,17 @@
             </div>
         </div>
         <div class="loader-bottom">
-            <span>DaVinci Resolve Engine</span>
-            <span>Loading...</span>
+            <span>Vyan Merchant</span>
+            <span>Est. 2021</span>
         </div>
     </div>
 
-    <!-- WEBGL LIQUID SHADER -->
+    <!-- WEBGL OBSIDIAN SHADER -->
     <div id="webgl-container"></div>
 
-    <!-- NAVIGATION -->
+    <!-- MINIMAL NAVIGATION -->
     <nav>
-        <div class="magnetic-wrap hover-target" data-cursor="HOME">
+        <div class="magnetic-wrap hover-target" data-cursor="INDEX">
             <div class="nav-logo">VM<span>.</span></div>
         </div>
         <div class="magnetic-wrap hover-target" data-cursor="SCROLL">
@@ -523,28 +521,28 @@
     <main id="smooth-wrapper">
         <div id="smooth-content">
             
-            <!-- WOW MOMENT 1: HERO -->
+            <!-- HERO -->
             <section class="hero">
                 <div class="hero-title-container">
-                    <h1 id="hero-text-1">VYAN</h1>
-                    <h1 id="hero-text-2">MER<span class="accent">CHANT</span></h1>
+                    <div class="hero-line"><h1 class="hero-title">VYAN</h1></div>
+                    <div class="hero-line"><h1 class="hero-title">MER<span class="accent">CHANT</span></h1></div>
                 </div>
                 <div class="hero-details">
-                    <div class="hero-tag">Est. 2021 // 4 Years Experience</div>
+                    <div class="hero-tag"><span class="hero-detail-inner">Est. 2021 // 4 Years Exp</span></div>
                     <div class="hero-desc">
-                        Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages.
+                        <span class="hero-detail-inner">Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages.</span>
                     </div>
                 </div>
             </section>
 
-            <!-- WOW MOMENT 2: SCROLL TRANSFORMATION (ABOUT) -->
+            <!-- EDITORIAL ABOUT REVEAL -->
             <section class="about">
                 <h2 class="about-text" id="scrub-text">
                     I'm Vyan, a 17-year-old video editor obsessed with making gaming content that actually slaps. I've been editing for 4 years using DaVinci Resolve to create montages that keep viewers locked in from the first frame to the last.
                 </h2>
             </section>
 
-            <!-- WOW MOMENT 3: 3D INTERACTIVE SHOWCASE -->
+            <!-- 3D SHOWCASE -->
             <section class="work-wrapper">
                 <div class="work-container">
                     
@@ -557,7 +555,6 @@
                         <a href="https://www.youtube.com/watch?v=d0qvLlFEEH8" target="_blank" class="project-card hover-target tilt-target" data-cursor="PLAY">
                             <div class="project-image-wrap">
                                 <div class="project-image" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg');"></div>
-                                <div class="project-glare"></div>
                             </div>
                             <div class="project-info">
                                 <span class="project-num">01 // RECENT</span>
@@ -572,7 +569,6 @@
                         <a href="https://www.youtube.com/watch?v=4ZcBnbLWxvU" target="_blank" class="project-card hover-target tilt-target" data-cursor="PLAY">
                             <div class="project-image-wrap">
                                 <div class="project-image" style="background-image: url('https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg');"></div>
-                                <div class="project-glare"></div>
                             </div>
                             <div class="project-info">
                                 <span class="project-num">02 // ARCHIVE</span>
@@ -587,7 +583,6 @@
                         <a href="montage.mp4" target="_blank" class="project-card hover-target tilt-target" data-cursor="PLAY">
                             <div class="project-image-wrap">
                                 <div class="project-image" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80');"></div>
-                                <div class="project-glare"></div>
                             </div>
                             <div class="project-info">
                                 <span class="project-num">03 // EXPERIMENTAL</span>
@@ -600,17 +595,16 @@
                 </div>
             </section>
 
-            <!-- WOW MOMENT 4: VELOCITY MARQUEE -->
+            <!-- VELOCITY MARQUEE -->
             <section class="marquee-section">
                 <div class="marquee-track">
-                    <span>DaVinci Resolve ✦ Gaming Montages ✦ Color Grading ✦ Fast Edits ✦ Content Creation ✦ Valorant ✦ Motion Design ✦</span>
-                    <span>DaVinci Resolve ✦ Gaming Montages ✦ Color Grading ✦ Fast Edits ✦ Content Creation ✦ Valorant ✦ Motion Design ✦</span>
+                    <span>DaVinci Resolve <span class="dot">✦</span> Gaming Montages <span class="dot">✦</span> Color Grading <span class="dot">✦</span> Fast Edits <span class="dot">✦</span> Content Creation <span class="dot">✦</span> Valorant <span class="dot">✦</span> Motion Design <span class="dot">✦</span></span>
+                    <span>DaVinci Resolve <span class="dot">✦</span> Gaming Montages <span class="dot">✦</span> Color Grading <span class="dot">✦</span> Fast Edits <span class="dot">✦</span> Content Creation <span class="dot">✦</span> Valorant <span class="dot">✦</span> Motion Design <span class="dot">✦</span></span>
                 </div>
             </section>
 
-            <!-- WOW MOMENT 5: CINEMATIC FOOTER -->
+            <!-- CINEMATIC FOOTER -->
             <section class="footer">
-                <div class="footer-bg-text">CONTACT</div>
                 <div class="footer-content">
                     <h2 class="footer-heading">LET'S BUILD<br>SOMETHING.</h2>
                     <div class="contact-links">
@@ -635,28 +629,15 @@
     <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
 
     <script>
+        // ==========================================
+        // 1. GSAP & UTILITIES
+        // ==========================================
         gsap.registerPlugin(ScrollTrigger);
+        
+        // Custom Easing for premium feel
+        CustomEase = gsap.parseEase("cubic-bezier(0.19, 1, 0.22, 1)"); // Expo-like smooth out
 
-        // ==========================================
-        // 1. UTILS: TEXT SPLITTER
-        // ==========================================
-        function splitText(selector) {
-            const elements = document.querySelectorAll(selector);
-            elements.forEach(el => {
-                const text = el.innerText;
-                el.innerHTML = '';
-                text.split('').forEach(char => {
-                    if (char === ' ') {
-                        el.innerHTML += `<span class="char" style="width: 2vw;">&nbsp;</span>`;
-                    } else {
-                        el.innerHTML += `<span style="overflow: hidden; display: inline-block;"><span class="char">${char}</span></span>`;
-                    }
-                });
-            });
-        }
-        splitText('#hero-text-1');
-        splitText('#hero-text-2');
-
+        // Split text for about section
         const scrubText = document.getElementById('scrub-text');
         const words = scrubText.innerText.split(' ');
         scrubText.innerHTML = '';
@@ -672,6 +653,7 @@
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             direction: 'vertical',
             smooth: true,
+            smoothTouch: false,
         });
 
         function raf(time) {
@@ -681,7 +663,7 @@
         requestAnimationFrame(raf);
 
         // ==========================================
-        // 3. CINEMATIC LIQUID WEBGL SHADER
+        // 3. CINEMATIC LIQUID OBSIDIAN SHADER (Subtle & Elegant)
         // ==========================================
         const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
@@ -706,7 +688,7 @@
             uniform float uScroll;
             varying vec2 vUv;
             
-            // Simplex noise function
+            // Simplex Noise 2D
             vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
             vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
             vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
@@ -721,8 +703,7 @@
                 i = mod289(i);
                 vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
                 vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
-                m = m*m ;
-                m = m*m ;
+                m = m*m ; m = m*m ;
                 vec3 x = 2.0 * fract(p * C.www) - 1.0;
                 vec3 h = abs(x) - 0.5;
                 vec3 ox = floor(x + 0.5);
@@ -737,19 +718,20 @@
             void main() {
                 vec2 uv = vUv;
                 
-                // Distort UVs based on noise, time, mouse, and scroll
-                float noise = snoise(uv * 3.0 + uTime * 0.2 + uScroll * 0.001);
-                uv.x += noise * 0.1 * uMouse.x;
-                uv.y += noise * 0.1 * uMouse.y;
+                // Slow, elegant distortion
+                float noise = snoise(uv * 2.0 + uTime * 0.05 + uScroll * 0.0005);
+                uv.x += noise * 0.05 * uMouse.x;
+                uv.y += noise * 0.05 * uMouse.y;
                 
-                float liquid = snoise(uv * 4.0 - uTime * 0.3);
-                float glow = smoothstep(0.2, 0.8, liquid);
+                // Liquid layers
+                float liquid = snoise(uv * 3.0 - uTime * 0.08);
+                float glow = smoothstep(0.1, 0.9, liquid);
                 
-                // Cyan / Dark Obsidian Palette matching Vyan's Brand
-                vec3 color1 = vec3(0.01, 0.01, 0.01); // Dark bg
-                vec3 color2 = vec3(0.22, 0.74, 0.99); // Accent cyan (#38bdf8)
+                // Extremely subtle dark obsidian to deep cyan
+                vec3 baseColor = vec3(0.01, 0.01, 0.01); // Obsidian
+                vec3 highlightColor = vec3(0.03, 0.1, 0.15); // Deep Cyan
                 
-                vec3 finalColor = mix(color1, color2, glow * 0.25);
+                vec3 finalColor = mix(baseColor, highlightColor, glow * 0.6);
                 
                 gl_FragColor = vec4(finalColor, 1.0);
             }
@@ -778,8 +760,8 @@
 
         const clock = new THREE.Clock();
         function renderWebGL() {
-            mouseX += (targetX - mouseX) * 0.05;
-            mouseY += (targetY - mouseY) * 0.05;
+            mouseX += (targetX - mouseX) * 0.03; // Heavy easing on mouse
+            mouseY += (targetY - mouseY) * 0.03;
             
             material.uniforms.uTime.value = clock.getElapsedTime();
             material.uniforms.uMouse.value.set(mouseX, mouseY);
@@ -795,7 +777,7 @@
         });
 
         // ==========================================
-        // 4. CUSTOM CURSOR & MAGNETIC LOGIC
+        // 4. ELEGANT CURSOR & MAGNETIC LOGIC
         // ==========================================
         const cursorDot = document.querySelector('.cursor-dot');
         const cursorOutline = document.querySelector('.cursor-outline');
@@ -808,10 +790,10 @@
         });
 
         function animateCursor() {
-            dot.x += (cursor.x - dot.x) * 0.3;
-            dot.y += (cursor.y - dot.y) * 0.3;
-            outline.x += (cursor.x - outline.x) * 0.15;
-            outline.y += (cursor.y - outline.y) * 0.15;
+            dot.x += (cursor.x - dot.x) * 0.8; // Instant feeling dot
+            dot.y += (cursor.y - dot.y) * 0.8;
+            outline.x += (cursor.x - outline.x) * 0.12; // Fluid dragging outline
+            outline.y += (cursor.y - outline.y) * 0.12;
 
             cursorDot.style.transform = `translate(${dot.x}px, ${dot.y}px)`;
             cursorOutline.style.transform = `translate(${outline.x}px, ${outline.y}px) translate(-50%, -50%)`;
@@ -819,26 +801,28 @@
         }
         animateCursor();
 
-        // Hover Logic
+        // High-end Hover Logic
         document.querySelectorAll('.hover-target').forEach(el => {
             el.addEventListener('mouseenter', () => {
                 const text = el.getAttribute('data-cursor');
-                cursorOutline.style.width = '70px';
-                cursorOutline.style.height = '70px';
-                cursorOutline.style.background = 'var(--text)';
-                cursorOutline.style.color = 'var(--bg)';
+                cursorOutline.style.width = '64px';
+                cursorOutline.style.height = '64px';
+                cursorOutline.style.backgroundColor = 'rgba(255, 255, 255, 0.9)';
                 cursorOutline.style.borderColor = 'transparent';
+                cursorOutline.style.backdropFilter = 'blur(4px)';
+                cursorOutline.style.color = '#000';
                 if(text) cursorOutline.innerHTML = text;
-                cursorDot.style.opacity = 0;
+                cursorDot.style.transform = 'translate(-50%, -50%) scale(0)';
             });
             el.addEventListener('mouseleave', () => {
-                cursorOutline.style.width = '50px';
-                cursorOutline.style.height = '50px';
-                cursorOutline.style.background = 'transparent';
+                cursorOutline.style.width = '40px';
+                cursorOutline.style.height = '40px';
+                cursorOutline.style.backgroundColor = 'transparent';
+                cursorOutline.style.borderColor = 'rgba(255, 255, 255, 0.15)';
+                cursorOutline.style.backdropFilter = 'blur(0px)';
                 cursorOutline.style.color = 'transparent';
-                cursorOutline.style.borderColor = 'var(--text)';
                 cursorOutline.innerHTML = '';
-                cursorDot.style.opacity = 1;
+                cursorDot.style.transform = 'translate(-50%, -50%) scale(1)';
             });
         });
 
@@ -848,14 +832,14 @@
                 const rect = el.getBoundingClientRect();
                 const x = e.clientX - rect.left - rect.width / 2;
                 const y = e.clientY - rect.top - rect.height / 2;
-                gsap.to(el.children[0], { x: x * 0.4, y: y * 0.4, duration: 0.5, ease: "power2.out" });
+                gsap.to(el.children[0] || el, { x: x * 0.3, y: y * 0.3, duration: 0.6, ease: "power2.out" });
             });
             el.addEventListener('mouseleave', () => {
-                gsap.to(el.children[0], { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" });
+                gsap.to(el.children[0] || el, { x: 0, y: 0, duration: 0.8, ease: "elastic.out(1, 0.4)" });
             });
         });
 
-        // 3D Card Tilt Logic
+        // Subtle 3D Card Tilt
         document.querySelectorAll('.tilt-target').forEach(card => {
             const image = card.querySelector('.project-image');
             card.addEventListener('mousemove', (e) => {
@@ -865,30 +849,31 @@
                 const centerX = rect.width / 2;
                 const centerY = rect.height / 2;
                 
-                const rotateX = ((y - centerY) / centerY) * -10;
-                const rotateY = ((x - centerX) / centerX) * 10;
+                // Very constrained rotation for a premium feel
+                const rotateX = ((y - centerY) / centerY) * -4; 
+                const rotateY = ((x - centerX) / centerX) * 4;
                 
-                gsap.to(card, { rotateX, rotateY, duration: 0.5, ease: "power2.out" });
-                gsap.to(image, { x: -rotateY * 2, y: rotateX * 2, duration: 0.5 });
+                gsap.to(card, { rotateX, rotateY, duration: 0.7, ease: "power2.out" });
+                gsap.to(image, { x: -rotateY * 1.5, y: rotateX * 1.5, duration: 0.7, ease: "power2.out" });
             });
             card.addEventListener('mouseleave', () => {
-                gsap.to(card, { rotateX: 0, rotateY: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" });
-                gsap.to(image, { x: 0, y: 0, duration: 0.7 });
+                gsap.to(card, { rotateX: 0, rotateY: 0, duration: 1, ease: "power2.out" });
+                gsap.to(image, { x: 0, y: 0, duration: 1, ease: "power2.out" });
             });
         });
 
         // ==========================================
-        // 5. GSAP CHOREOGRAPHY (THE WOW MOMENTS)
+        // 5. CHOREOGRAPHY (Smooth & Staggered)
         // ==========================================
         
-        // --- WOW 1: Cinematic Loader ---
+        // --- Loader & Initial Reveal ---
         let counter = { value: 0 };
         const tlLoader = gsap.timeline({ onComplete: () => document.body.style.overflow = "auto" });
-        document.body.style.overflow = "hidden"; // Lock scroll
+        document.body.style.overflow = "hidden";
 
         tlLoader.to(counter, {
             value: 100,
-            duration: 2.5,
+            duration: 2.2,
             ease: "expo.inOut",
             onUpdate: () => {
                 const val = Math.round(counter.value).toString().padStart(2, '0');
@@ -898,51 +883,43 @@
         })
         .to('.loader-counter-fill', {
             clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0 100%)",
-            duration: 2.5,
+            duration: 2.2,
             ease: "expo.inOut"
         }, 0)
         .to('.loader', {
-            clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)", // Split screen open
-            duration: 1.5,
-            ease: "power4.inOut"
+            clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)", // Elegant vertical wipe
+            duration: 1.4,
+            ease: "cubic-bezier(0.86, 0, 0.07, 1)" 
         })
-        .to('.hero h1 .char', {
+        .to('.hero-title', {
             y: "0%",
-            rotation: 0,
+            duration: 1.4,
+            stagger: 0.08,
+            ease: "cubic-bezier(0.19, 1, 0.22, 1)"
+        }, "-=0.8")
+        .to('.hero-detail-inner', {
+            y: "0%",
             opacity: 1,
             duration: 1.2,
-            stagger: 0.03,
-            ease: "power3.out"
-        }, "-=1")
-        .to('.hero-tag, .hero-desc', {
-            y: "0%",
-            opacity: 1,
-            duration: 1,
             stagger: 0.1,
-            ease: "power2.out"
-        }, "-=0.8");
+            ease: "power3.out"
+        }, "-=1.0");
 
-        // --- HERO PARALLAX ---
-        document.addEventListener('mousemove', (e) => {
-            const x = (e.clientX / window.innerWidth - 0.5) * 30;
-            const y = (e.clientY / window.innerHeight - 0.5) * 30;
-            gsap.to('.hero h1', { x, y, duration: 1, ease: "power2.out" });
-        });
-
-        // --- WOW 2: Scroll Text Reveal ---
+        // --- About Text Reveal (Editorial Fade) ---
         gsap.to('.about-text .word', {
             scrollTrigger: {
                 trigger: '.about',
-                start: "top 60%",
-                end: "bottom 80%",
-                scrub: 1
+                start: "top 75%",
+                end: "center 50%",
+                scrub: 1.5 // Smooth dampening on scroll
             },
-            backgroundPosition: "0% 0",
-            stagger: 0.1,
-            ease: "none"
+            opacity: 1,
+            y: 0,
+            stagger: 0.05,
+            ease: "power2.out"
         });
 
-        // --- WOW 3: Horizontal 3D Scroll ---
+        // --- Horizontal 3D Scroll (Subtle Transitions) ---
         const workContainer = document.querySelector('.work-container');
         const workPanels = gsap.utils.toArray('.work-panel');
         
@@ -955,57 +932,39 @@
             }
         });
 
-        // Move the container
         tlWork.to(workContainer, {
             x: () => -(workContainer.scrollWidth - window.innerWidth),
             ease: "none"
         });
 
-        // Add 3D rotation to panels as they enter/leave
-        workPanels.forEach((panel, i) => {
+        workPanels.forEach((panel) => {
             gsap.from(panel, {
-                rotationY: 45,
-                scale: 0.8,
-                z: -500,
-                opacity: 0,
+                rotationY: 10, // Subtle entry rotation
+                scale: 0.9,
+                opacity: 0.2,
                 scrollTrigger: {
                     trigger: panel,
                     containerAnimation: tlWork,
-                    start: "left right",
+                    start: "left 90%",
                     end: "center center",
                     scrub: true
                 }
             });
             gsap.to(panel, {
-                rotationY: -45,
-                scale: 0.8,
-                z: -500,
-                opacity: 0,
+                rotationY: -10, // Subtle exit rotation
+                scale: 0.9,
+                opacity: 0.2,
                 scrollTrigger: {
                     trigger: panel,
                     containerAnimation: tlWork,
                     start: "center center",
-                    end: "right left",
+                    end: "right 10%",
                     scrub: true
                 }
             });
         });
 
-        // --- WOW 4: Velocity Marquee & Skew ---
-        let proxy = { skew: 0 },
-            skewSetter = gsap.quickSetter(".hero h1, .marquee-track", "skewY", "deg"),
-            clamp = gsap.utils.clamp(-15, 15);
-
-        ScrollTrigger.create({
-            onUpdate: (self) => {
-                let skew = clamp(self.getVelocity() / -100);
-                if (Math.abs(skew) > Math.abs(proxy.skew)) {
-                    proxy.skew = skew;
-                    gsap.to(proxy, {skew: 0, duration: 0.8, ease: "power3", overwrite: true, onUpdate: () => skewSetter(proxy.skew)});
-                }
-            }
-        });
-
+        // --- Marquee (Silky Smooth) ---
         gsap.to('.marquee-track', {
             xPercent: -50,
             ease: "none",
@@ -1013,33 +972,37 @@
                 trigger: ".marquee-section",
                 start: "top bottom",
                 end: "bottom top",
-                scrub: 1
+                scrub: 1.5
+            }
+        });
+        
+        // Very subtle velocity scale to replace the twitchy skew
+        let proxy = { scale: 1 },
+            scaleSetter = gsap.quickSetter(".marquee-track", "scale", ""),
+            clamp = gsap.utils.clamp(0.98, 1.02);
+
+        ScrollTrigger.create({
+            onUpdate: (self) => {
+                let scale = clamp(1 + (self.getVelocity() / -5000));
+                if (Math.abs(scale - 1) > Math.abs(proxy.scale - 1)) {
+                    proxy.scale = scale;
+                    gsap.to(proxy, {scale: 1, duration: 1.2, ease: "power3", overwrite: true, onUpdate: () => scaleSetter(proxy.scale)});
+                }
             }
         });
 
-        // --- WOW 5: Cinematic Footer ---
+        // --- Epic Cinematic Footer Reveal ---
         gsap.from('.footer-heading', {
             scrollTrigger: {
                 trigger: ".footer",
                 start: "top bottom",
                 end: "center center",
-                scrub: 1
+                scrub: 1.5
             },
-            scale: 5,
+            scale: 2.5,
             opacity: 0,
-            y: -200,
+            y: -100,
             ease: "power2.out"
-        });
-        
-        gsap.from('.footer-bg-text', {
-            scrollTrigger: {
-                trigger: ".footer",
-                start: "top bottom",
-                end: "bottom bottom",
-                scrub: 1
-            },
-            y: 200,
-            opacity: 0
         });
     </script>
 </body>
