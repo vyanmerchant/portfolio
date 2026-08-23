@@ -88,7 +88,6 @@
         }
 
         @media (pointer: coarse) {
-            /* Disable custom cursor on touch devices */
             .cursor-dot, .cursor-outline { display: none !important; }
             * { cursor: auto !important; }
         }
@@ -143,7 +142,7 @@
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: -1;
-            opacity: 0.4; /* Softened for premium feel */
+            opacity: 0.4;
             pointer-events: none;
         }
 
@@ -165,24 +164,42 @@
             letter-spacing: 0.15em;
         }
         
-        /* Fixed Vertical Text Issue */
-        .vertical-text {
+        /* Fixed Vertical Text Architecture */
+        .vertical-tracker {
             position: fixed;
             right: 4vw;
             bottom: 4vw;
+            z-index: 90;
+            pointer-events: none;
+            mix-blend-mode: difference;
+            overflow: hidden; /* Enables the slide-up mask effect */
+            padding: 20px 0; /* Buffer for the animation */
+        }
+        .vertical-tracker-rotate {
             writing-mode: vertical-rl;
-            transform: rotate(180deg);
+            transform: rotate(180deg); /* Isolated rotation so GSAP doesn't overwrite it */
+        }
+        .vertical-tracker-text {
             font-family: var(--font-mono);
             font-size: 10px;
             letter-spacing: 0.2em;
             color: var(--text);
-            mix-blend-mode: difference;
-            z-index: 90;
-            pointer-events: none;
-            opacity: 0; /* Animated in via GSAP */
+            text-transform: uppercase;
+            opacity: 0;
+            transform: translateY(-30px); /* Negative Y due to 180deg parent rotation */
+            will-change: transform, opacity;
         }
+
         @media (max-width: 768px) {
-            .vertical-text { display: none; }
+            .vertical-tracker {
+                right: 2vw;
+                bottom: 2vw;
+            }
+            .vertical-tracker-text {
+                font-size: 8px;
+                letter-spacing: 0.15em;
+                opacity: 0.6; /* Subtler integration on mobile */
+            }
         }
 
         /* ==========================================
@@ -262,10 +279,9 @@
             border-color: rgba(255,255,255,0.2);
         }
         
-        /* Thumbnail System */
         .project-bg {
             position: absolute;
-            inset: -5%; /* Overbleed for parallax */
+            inset: -5%;
             width: 110%; height: 110%;
             z-index: 0;
         }
@@ -291,7 +307,6 @@
             z-index: 1;
         }
         
-        /* Project Typography */
         .project-num {
             position: absolute;
             top: 3vw; right: 3vw;
@@ -345,7 +360,7 @@
                 height: 60vh;
                 padding: 6vw;
             }
-            .project-info { transform: translateY(0); } /* Always visible on mobile */
+            .project-info { transform: translateY(0); }
             .project-bg img, .project-bg video { opacity: 0.6; filter: grayscale(50%); }
         }
 
@@ -446,7 +461,13 @@
         <div class="magnetic-target hover-target" data-cursor="INDEX">V. MERCHANT</div>
         <div class="magnetic-target hover-target" data-cursor="ABOUT">EST. 2021</div>
     </nav>
-    <div class="vertical-text">EST. 2021 // PORTFOLIO</div>
+    
+    <!-- FIX: Isolated Rotation & Masking Container for Vertical Text -->
+    <div class="vertical-tracker">
+        <div class="vertical-tracker-rotate">
+            <div class="vertical-tracker-text">EST. 2021 // PORTFOLIO</div>
+        </div>
+    </div>
 
     <!-- MAIN SCROLL CONTENT (Lenis) -->
     <main id="smooth-wrapper">
@@ -496,11 +517,10 @@
                         </a>
                     </div>
 
-                    <!-- PANEL 3: Practice Edit (Video Thumbnail Fix) -->
+                    <!-- PANEL 3: Practice Edit -->
                     <div class="work-panel">
                         <a href="montage.mp4" target="_blank" class="project-card hover-target" data-cursor="PLAY">
                             <div class="project-bg">
-                                <!-- Seamless muted loop directly using user's asset -->
                                 <video autoplay muted loop playsinline poster="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80">
                                     <source src="montage.mp4" type="video/mp4">
                                 </video>
@@ -582,7 +602,7 @@
         requestAnimationFrame(raf);
 
         // ==========================================
-        // 3. THREE.JS BACKGROUND (Subtle Geometry)
+        // 3. THREE.JS BACKGROUND
         // ==========================================
         const canvas = document.querySelector('#webgl-canvas');
         const scene = new THREE.Scene();
@@ -597,7 +617,7 @@
             color: 0x444444, 
             wireframe: true,
             transparent: true,
-            opacity: 0.15 // Very subtle
+            opacity: 0.15 
         });
         const sphere = new THREE.Mesh(geometry, material);
         scene.add(sphere);
@@ -618,7 +638,7 @@
             
             sphere.rotation.y += 0.05 * (targetX - sphere.rotation.y);
             sphere.rotation.x += 0.05 * (targetY - sphere.rotation.x);
-            sphere.rotation.z += 0.001; // Slower, calmer rotation
+            sphere.rotation.z += 0.001; 
 
             renderer.render(scene, camera);
             requestAnimationFrame(animateThree);
@@ -701,7 +721,7 @@
             onComplete: () => { document.body.style.overflow = "auto"; }
         });
 
-        document.body.style.overflow = "hidden"; // Lock during load
+        document.body.style.overflow = "hidden";
 
         tlLoader.to(counter, {
             value: 100,
@@ -736,10 +756,12 @@
             duration: 1,
             ease: "power2.out"
         }, "-=1")
-        .to('.vertical-text', {
+        // FIX: The vertical text smoothly slides in alongside the hero content
+        .to('.vertical-tracker-text', {
             opacity: 1,
-            duration: 1,
-            ease: "power2.out"
+            y: 0,
+            duration: 1.2,
+            ease: "cubic-bezier(0.19, 1, 0.22, 1)"
         }, "-=1");
 
         // Responsive Horizontal Scroll Setup
@@ -748,7 +770,6 @@
         const workPanels = gsap.utils.toArray('.work-panel');
 
         mm.add("(min-width: 769px)", () => {
-            // Desktop: Horizontal Scroll
             let tlWork = gsap.timeline({
                 scrollTrigger: {
                     trigger: ".work-wrapper",
@@ -764,7 +785,6 @@
                 ease: "none"
             });
 
-            // Card entry/exit parallax
             workPanels.forEach((panel) => {
                 gsap.fromTo(panel.querySelector('.project-card'), 
                     { scale: 0.85, rotationY: 10 },
@@ -785,7 +805,6 @@
         });
 
         mm.add("(max-width: 768px)", () => {
-            // Mobile: Standard Vertical Scroll Fade-ups
             workPanels.forEach(panel => {
                 gsap.from(panel.querySelector('.project-card'), {
                     scrollTrigger: {
