@@ -142,7 +142,7 @@
             top: 0; left: 0;
             width: 100vw; height: 100vh;
             z-index: -1;
-            opacity: 0.15; /* Subtler to keep focus on content */
+            opacity: 0.15; 
             pointer-events: none;
         }
 
@@ -164,7 +164,7 @@
         }
 
         /* ==========================================
-           6. HERO SECTION (Rebalanced & Spacious)
+           6. HERO SECTION
            ========================================== */
         .hero {
             height: 100vh;
@@ -192,7 +192,7 @@
             padding-bottom: 2vw; 
         }
         .hero-title-line:nth-child(2) h1 {
-            padding-left: 12vw; /* Rebalances the hero composition */
+            padding-left: 12vw; 
         }
         .hero .char { 
             display: inline-block; 
@@ -262,7 +262,6 @@
             background-color: #000;
         }
         
-        /* Unified Video and Image Thumbnail Styling */
         .project-bg img, .project-bg video {
             width: 100%; height: 100%;
             object-fit: cover;
@@ -277,7 +276,7 @@
         .project-card:hover .project-bg video {
             opacity: 0.8;
             filter: grayscale(0%) contrast(1);
-            transform: scale(1.03); /* Subtle, premium scale */
+            transform: scale(1.03); 
         }
         
         .project-image-overlay {
@@ -326,7 +325,7 @@
         }
 
         /* ==========================================
-           8. MOBILE RESPONSIVE OVERRIDE
+           8. MOBILE RESPONSIVE OVERRIDES
            ========================================== */
         @media (max-width: 768px) {
             .hero-title-line:nth-child(2) h1 { padding-left: 0; }
@@ -350,78 +349,147 @@
         }
 
         /* ==========================================
-           9. FOOTER & CALL TO ACTION
+           9. FOOTER & CALL TO ACTION (The Climax)
            ========================================== */
         .footer {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            flex-direction: column;
-            background: var(--text);
-            color: var(--bg);
+            min-height: 100vh;
+            background: var(--surface); /* Distinct ground for transition */
             position: relative;
             z-index: 10;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+        }
+        .footer-inner {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 4vw;
+            position: relative;
+        }
+        .footer-top {
+            margin: auto 0;
+            display: flex;
+            flex-direction: column;
         }
         .footer-title-line {
             overflow: hidden;
             display: block;
-            padding-bottom: 1vw;
+        }
+        .footer-title-line.right-align {
+            text-align: right;
         }
         .footer h2 {
-            font-size: clamp(60px, 13vw, 200px);
-            text-align: center;
-            line-height: 0.85;
+            font-size: clamp(80px, 18vw, 300px);
+            line-height: 0.8;
+            margin: 0;
             text-transform: uppercase;
+            letter-spacing: -0.02em;
         }
-        .footer-buttons {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 6vh;
-        }
-        .magnetic-btn {
-            padding: 18px 36px;
-            background: transparent;
-            color: var(--bg);
-            border: 1px solid rgba(0,0,0,0.2);
-            border-radius: 100px;
-            font-family: var(--font-mono);
-            text-transform: uppercase;
-            font-size: 11px;
-            letter-spacing: 0.15em;
-            position: relative;
+        .footer .char {
             display: inline-block;
-            transition: all 0.4s var(--ease-out);
-            overflow: hidden;
-        }
-        .magnetic-btn::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: var(--bg);
-            transform: translateY(100%);
-            transition: transform 0.4s var(--ease-out);
-            z-index: -1;
-        }
-        .magnetic-btn:hover {
-            color: var(--text);
-            border-color: var(--bg);
-        }
-        .magnetic-btn:hover::before {
-            transform: translateY(0);
+            transform: translateY(110%);
+            will-change: transform;
         }
         
-        .footer-copyright {
-            position: absolute;
-            bottom: 4vw;
+        .footer-cta-wrapper {
+            align-self: center;
+            text-align: center;
+            margin: 6vh 0;
+            z-index: 5;
+        }
+        .cta-label {
             font-family: var(--font-mono);
-            font-size: 10px;
+            font-size: clamp(10px, 1.2vw, 12px);
+            color: var(--text-muted);
+            letter-spacing: 0.2em;
+            margin-bottom: 2vh;
+            text-transform: uppercase;
+        }
+        .massive-link {
+            font-family: var(--font-display);
+            font-size: clamp(24px, 4.5vw, 70px);
+            color: var(--text);
+            text-decoration: none;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 8px;
+            transition: color 0.4s var(--ease-out);
+        }
+        .massive-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; 
+            width: 100%; height: 2px;
+            background: var(--text);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.6s var(--ease-in-out);
+        }
+        .massive-link:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            border-top: 1px solid rgba(255,255,255,0.06);
+            padding-top: 2vw;
+        }
+        .footer-socials {
+            display: flex;
+            gap: 40px;
+        }
+        .footer-socials a {
+            font-family: var(--font-mono);
+            font-size: clamp(11px, 1.2vw, 14px);
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: rgba(0,0,0,0.4);
+            color: var(--text);
+            position: relative;
+            padding: 5px 0;
+        }
+        .footer-socials a::after {
+            content: '';
+            position: absolute;
+            bottom: 0; left: 0; 
+            width: 100%; height: 1px;
+            background: var(--text);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s var(--ease-out);
+        }
+        .footer-socials a:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
+        }
+        .footer-copyright {
+            text-align: right;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            line-height: 1.6;
+        }
+        .footer-copyright span {
+            color: var(--text);
+            font-weight: 700;
+        }
+
+        @media (max-width: 768px) {
+            .footer-inner { padding: 8vw 4vw; }
+            .footer h2 { font-size: clamp(70px, 22vw, 150px); }
+            .footer-cta-wrapper { margin: 8vh 0; }
+            .massive-link { border-bottom: 1px solid rgba(255,255,255,0.2); padding-bottom: 15px; word-break: break-all; }
+            .massive-link::after { display: none; }
+            .footer-bottom { flex-direction: column; align-items: center; gap: 4vh; text-align: center; border-top: none; padding-top: 0;}
+            .footer-socials { gap: 25px; }
+            .footer-copyright { text-align: center; }
         }
     </style>
 </head>
@@ -506,7 +574,6 @@
                     <div class="work-panel">
                         <a href="montage.mp4" target="_blank" class="project-card hover-target" data-cursor="PLAY">
                             <div class="project-bg">
-                                <!-- PROPER VIDEO THUMBNAIL -->
                                 <video autoplay muted loop playsinline class="project-video">
                                     <source src="montage.mp4" type="video/mp4">
                                 </video>
@@ -523,18 +590,32 @@
                 </div>
             </section>
 
-            <!-- FOOTER -->
+            <!-- FOOTER CLIMAX -->
             <section class="footer">
-                <div class="footer-title-line"><h2 class="footer-char">LET'S</h2></div>
-                <div class="footer-title-line"><h2 class="footer-char">BUILD</h2></div>
-                
-                <div class="footer-buttons">
-                    <a href="mailto:vyanmerchant@gmail.com" class="magnetic-target magnetic-btn hover-target" data-cursor="EMAIL">Email Me</a>
-                    <a href="https://discord.com/users/1111715392461738034" target="_blank" class="magnetic-target magnetic-btn hover-target" data-cursor="CONNECT">Discord</a>
-                    <a href="https://youtube.com" target="_blank" class="magnetic-target magnetic-btn hover-target" data-cursor="WATCH">YouTube</a>
+                <div class="footer-inner">
+                    <div class="footer-top">
+                        <div class="footer-title-line"><h2 class="footer-char">LET'S</h2></div>
+                        
+                        <div class="footer-cta-wrapper">
+                            <p class="cta-label">Start A Project</p>
+                            <a href="mailto:vyanmerchant@gmail.com" class="massive-link magnetic-target hover-target" data-cursor="EMAIL">
+                                vyanmerchant@gmail.com
+                            </a>
+                        </div>
+                        
+                        <div class="footer-title-line right-align"><h2 class="footer-char">BUILD</h2></div>
+                    </div>
+
+                    <div class="footer-bottom">
+                        <div class="footer-socials">
+                            <a href="https://discord.com/users/1111715392461738034" target="_blank" class="magnetic-target hover-target" data-cursor="CONNECT">Discord</a>
+                            <a href="https://youtube.com" target="_blank" class="magnetic-target hover-target" data-cursor="WATCH">YouTube</a>
+                        </div>
+                        <div class="footer-copyright">
+                            © 2026 VYAN MERCHANT<br><span>GAMING VIDEO EDITOR</span>
+                        </div>
+                    </div>
                 </div>
-                
-                <div class="footer-copyright">© 2026 VYAN MERCHANT</div>
             </section>
 
         </div>
@@ -728,7 +809,7 @@
             yPercent: -100,
             duration: 1.4,
             ease: "power4.inOut"
-        }, "+=0.1") // Small cinematic pause at 100%
+        }, "+=0.1") 
         .to('.hero .char', {
             y: "0%",
             opacity: 1,
@@ -764,7 +845,6 @@
                 ease: "none"
             });
 
-            // Smooth parallax transition between cards
             workPanels.forEach((panel) => {
                 gsap.fromTo(panel.querySelector('.project-card'), 
                     { scale: 0.9, opacity: 0.5 },
@@ -800,18 +880,42 @@
             });
         });
 
-        // Footer Text Reveal
-        gsap.to('.footer .char', {
+        // Cinematic Footer Reveal
+        gsap.from('.footer-inner', {
             scrollTrigger: {
                 trigger: '.footer',
-                start: "top 75%",
+                start: "top bottom",
                 end: "center center",
                 scrub: 1
             },
-            y: "0%",
-            opacity: 1,
-            stagger: 0.05,
+            yPercent: -15,
+            opacity: 0,
             ease: "power2.out"
+        });
+
+        gsap.from('.footer .char', {
+            scrollTrigger: {
+                trigger: '.footer',
+                start: "top 80%",
+                end: "center center",
+                scrub: 1.2
+            },
+            y: "110%",
+            stagger: 0.05,
+            ease: "cubic-bezier(0.19, 1, 0.22, 1)"
+        });
+
+        gsap.from('.footer-cta-wrapper', {
+            scrollTrigger: {
+                trigger: '.footer',
+                start: "top 60%",
+                end: "center center",
+                scrub: 1
+            },
+            scale: 0.95,
+            opacity: 0,
+            y: 20,
+            ease: "power3.out"
         });
 
         // Velocity Skew on Hero Text
