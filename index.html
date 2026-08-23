@@ -3,549 +3,638 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Vyan Merchant | Video Editor</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@700;800&display=swap" rel="stylesheet">
+    <title>MANN PANJABI | Creative Technologist</title>
     <style>
+        /* ==========================================
+           RESET & CORE VARIABLES
+           ========================================== */
         :root {
-            --primary: #0a1929;
-            --secondary: #1a3a5f;
-            --accent: #00c6ff;
-            --accent-light: #00f2fe;
-            --text: #e6f1ff;
-            --text-secondary: #a0b8d7;
-            --transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            --shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            --radius: 12px;
+            --bg: #050505;
+            --text: #e0e0e0;
+            --accent: #ff3366;
+            --font-main: 'Clash Display', sans-serif;
+            --font-mono: 'Space Mono', monospace;
         }
 
-        /* ─── RESET & BASE ─── */
-        *, *::before, *::after {
+        * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-        }
-
-        html { 
-            scroll-behavior: smooth; 
+            cursor: none; /* Custom cursor overriding */
         }
 
         body {
-            font-family: 'Inter', sans-serif;
-            background: var(--primary);
+            background-color: var(--bg);
             color: var(--text);
+            font-family: var(--font-main);
             overflow-x: hidden;
-            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
         }
 
-        h1, h2, h3, h4 {
-            font-family: 'Playfair Display', serif;
-            font-weight: 700;
-            line-height: 1.2;
+        /* ==========================================
+           CUSTOM CURSOR & MAGNETIC EFFECTS
+           ========================================== */
+        .cursor-dot, .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
         }
-
-        .container {
-            width: 90%;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-            position: relative;
-            z-index: 2;
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--accent);
         }
-
-        /* ─── DAMASCUS BACKGROUND & PROGRESS ─── */
-        #damascus-bg {
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: width 0.2s, height 0.2s, background-color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: black;
+            text-transform: uppercase;
+        }
+        
+        /* ==========================================
+           LOADER (CINEMATIC)
+           ========================================== */
+        .loader {
             position: fixed;
             inset: 0;
-            width: 100%; 
-            height: 100%;
-            z-index: 0; 
-            opacity: 0.8;
+            background: #000;
+            z-index: 9000;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding: 4vw;
+        }
+        .loader-counter {
+            font-size: 15vw;
+            font-weight: 700;
+            line-height: 1;
+            align-self: flex-end;
+            margin-top: auto;
+            color: transparent;
+            -webkit-text-stroke: 1px var(--text);
+        }
+        .loader-text {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            overflow: hidden;
         }
 
-        #progress {
-            position: fixed; 
-            top: 0; left: 0;
-            height: 3px; 
-            width: 0%;
-            background: var(--accent);
-            z-index: 9999;
-            transition: width 0.05s linear; 
-        }
-
-        /* Cursor Styles */
-        #cursor {
+        /* ==========================================
+           THREE.JS WEBGL CANVAS
+           ========================================== */
+        #webgl-canvas {
             position: fixed;
-            width: 36px;
-            height: 36px;
-            border-radius: 50%;
-            border: 1px solid rgba(0, 198, 255, 0.6);
-            background: transparent;
-            pointer-events: none;
-            transform: translate(-50%, -50%);
-            z-index: 9999;
-            transition: width 0.3s ease, height 0.3s ease, background-color 0.3s ease;
-            mix-blend-mode: difference;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            opacity: 0.6;
         }
 
-        /* Header Styles */
-        header {
+        /* ==========================================
+           TYPOGRAPHY & LAYOUT
+           ========================================== */
+        .char {
+            display: inline-block;
+            transform: translateY(100%);
+            opacity: 0;
+        }
+        .line-mask {
+            overflow: hidden;
+            display: block;
+        }
+
+        nav {
             position: fixed;
-            top: 0; left: 0;
+            top: 0;
             width: 100%;
-            padding: 30px 0;
-            z-index: 1000;
-            transition: all 0.4s ease;
-            backdrop-filter: blur(10px);
-            background: rgba(10, 25, 41, 0.7);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-        }
-
-        header.scrolled {
-            padding: 15px 0;
-            box-shadow: var(--shadow);
-        }
-
-        .header-container {
+            padding: 2vw 4vw;
             display: flex;
             justify-content: space-between;
-            align-items: center;
+            z-index: 100;
+            mix-blend-mode: difference;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--text);
-            text-decoration: none;
-        }
-
-        .logo span { color: var(--accent); }
-
-        nav ul {
-            display: flex;
-            list-style: none;
-        }
-
-        nav ul li { margin: 0 15px; }
-
-        nav ul li a {
-            color: var(--text);
-            text-decoration: none;
-            font-weight: 500;
-            position: relative;
-            padding: 5px 0;
-            transition: var(--transition);
-        }
-
-        nav ul li a:hover { color: var(--accent); }
-
-        /* Hero Section */
+        /* ==========================================
+           SECTIONS
+           ========================================== */
         .hero {
             height: 100vh;
             display: flex;
-            align-items: center;
+            flex-direction: column;
+            justify-content: center;
+            padding: 0 4vw;
             position: relative;
-            padding-top: 80px;
         }
-
         .hero h1 {
-            font-size: 4.5rem;
-            margin-bottom: 20px;
-        }
-
-        .hero h1 span { color: var(--accent); }
-
-        .hero p {
-            font-size: 1.2rem;
-            margin-bottom: 30px;
-            color: var(--text-secondary);
-            max-width: 600px;
-        }
-
-        .btn {
-            display: inline-block;
-            padding: 14px 32px;
-            background: transparent;
-            border: 2px solid var(--accent);
-            color: var(--text);
+            font-size: 12vw;
             font-weight: 600;
-            text-decoration: none;
-            border-radius: 50px;
-            transition: var(--transition);
-            position: relative;
+            line-height: 0.85;
+            text-transform: uppercase;
+            letter-spacing: -0.04em;
+        }
+        .hero .sub-hero {
+            margin-top: 4vh;
+            font-family: var(--font-mono);
+            max-width: 400px;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #a0a0a0;
+        }
+
+        /* ==========================================
+           HORIZONTAL SCROLL WORK SECTION
+           ========================================== */
+        .work-wrapper {
             overflow: hidden;
+            background: var(--bg);
         }
-
-        .btn:hover {
-            background: var(--accent);
-            color: var(--primary);
-            box-shadow: 0 10px 20px rgba(0, 198, 255, 0.3);
+        .work-container {
+            display: flex;
+            width: 300vw; /* 3 sections */
+            height: 100vh;
         }
-
-        /* Sections */
-        section { padding: 120px 0; position: relative; }
-
-        .section-title {
-            text-align: center;
-            margin-bottom: 80px;
-        }
-
-        .section-title h2 {
-            font-size: 3rem;
-            margin-bottom: 15px;
-        }
-
-        /* About */
-        .about-content {
+        .work-panel {
+            width: 100vw;
+            height: 100vh;
             display: flex;
             align-items: center;
-            gap: 50px;
-        }
-
-        .about-text { flex: 1; }
-        
-        .stats-grid {
-            display: flex;
-            gap: 30px;
-            margin-top: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stat-item {
-            background: rgba(26, 58, 95, 0.5);
-            padding: 20px 30px;
-            border-radius: var(--radius);
-            text-align: center;
-            border: 1px solid rgba(0, 198, 255, 0.2);
-        }
-        
-        .stat-num {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            color: var(--accent);
-            font-weight: 700;
-            display: block;
-        }
-
-        .skills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            margin-top: 30px;
-        }
-
-        .skill-tag {
-            background: rgba(0, 198, 255, 0.1);
-            color: var(--accent);
-            padding: 8px 20px;
-            border-radius: 50px;
-            font-size: 0.9rem;
-        }
-
-        /* Portfolio */
-        .portfolio-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 30px;
-        }
-
-        .portfolio-item {
-            border-radius: var(--radius);
-            overflow: hidden;
+            justify-content: center;
+            padding: 10vw;
             position: relative;
-            height: 300px;
-            background: var(--secondary);
-            display: block;
-            text-decoration: none;
-            color: white;
         }
-
-        .portfolio-item img {
+        .project-card {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: var(--transition);
-        }
-
-        .portfolio-item:hover img { transform: scale(1.1); }
-
-        .portfolio-overlay {
-            position: absolute;
-            inset: 0;
-            background: linear-gradient(to top, rgba(10, 25, 41, 0.95), rgba(10, 25, 41, 0.2));
+            height: 70vh;
+            position: relative;
+            background: rgba(25, 25, 25, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.1);
+            overflow: hidden;
             display: flex;
             flex-direction: column;
             justify-content: flex-end;
-            padding: 30px;
-            opacity: 0;
-            transition: var(--transition);
+            padding: 4vw;
+            transform-origin: center;
+            will-change: transform;
+        }
+        .project-image-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(45deg, rgba(255,51,102,0.1), transparent);
+            z-index: 1;
+            transition: 0.5s ease;
+        }
+        .project-card:hover .project-image-overlay {
+            background: linear-gradient(45deg, rgba(255,51,102,0.3), transparent);
+        }
+        .project-num {
+            position: absolute;
+            top: 2vw;
+            right: 4vw;
+            font-size: 8vw;
+            font-weight: 700;
+            color: transparent;
+            -webkit-text-stroke: 1px rgba(255,255,255,0.2);
+            z-index: 2;
+        }
+        .project-info {
+            z-index: 2;
+        }
+        .project-info h2 {
+            font-size: 6vw;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+        .project-info p {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            max-width: 60%;
+            color: #b0b0b0;
         }
 
-        .portfolio-item:hover .portfolio-overlay { opacity: 1; }
-        
-        .portfolio-overlay h3 { margin-bottom: 5px; color: var(--text); }
-        .portfolio-overlay p { color: var(--accent); font-family: monospace; font-size: 0.9rem; }
-
-        /* REVEAL ANIMATION */
-        .reveal {
-            opacity: 0;
-            transform: translateY(60px);
-            transition: opacity 0.9s cubic-bezier(0.16,1,0.3,1), transform 0.9s cubic-bezier(0.16,1,0.3,1); 
+        /* ==========================================
+           FOOTER / CTA
+           ========================================== */
+        .footer {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background: #fff;
+            color: #000;
         }
-        
-        .reveal.visible {
-            opacity: 1;
-            transform: none; 
+        .footer h2 {
+            font-size: 10vw;
+            text-align: center;
+            line-height: 0.9;
         }
-
-        /* Contact & Footer Styling */
-        .contact-container { display: flex; gap: 50px; }
-        .contact-info, .contact-form { flex: 1; }
-        .contact-links { display: flex; flex-direction: column; gap: 20px; margin-top: 30px;}
-        .contact-link { display: flex; align-items: center; gap: 15px; color: var(--text-secondary); text-decoration: none; transition: var(--transition); font-size: 1.1rem; }
-        .contact-link i { font-size: 1.5rem; color: var(--accent); }
-        .contact-link:hover { color: var(--accent); transform: translateX(5px); }
-        .contact-email { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--text); text-decoration: none; transition: var(--transition); display: inline-block; margin-top: 20px; }
-        .contact-email:hover { color: var(--accent); }
-        
-        footer { background: var(--secondary); padding: 40px 0; text-align: center; position: relative; z-index: 2; border-top: 1px solid rgba(255, 255, 255, 0.05); }
-        footer p { color: var(--text-secondary); margin-bottom: 5px; }
+        .magnetic-btn {
+            margin-top: 5vh;
+            padding: 20px 40px;
+            background: var(--bg);
+            color: #fff;
+            border-radius: 50px;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            font-size: 14px;
+            position: relative;
+            display: inline-block;
+        }
     </style>
+    
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://api.fontshare.com/v2/css?f[]=clash-display@200,400,600,700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <!-- Scroll Progress Bar -->
-    <div id="progress"></div> 
+    <!-- CUSTOM CURSOR -->
+    <div class="cursor-dot"></div>
+    <div class="cursor-outline"></div>
 
-    <!-- Dynamic Damascus Canvas Background -->
-    <canvas id="damascus-bg"></canvas> 
-
-    <!-- Custom Cursor -->
-    <div id="cursor"></div>
-
-    <!-- Header -->
-    <header id="header">
-        <div class="container header-container">
-            <a href="#" class="logo">VM<span>.</span></a>
-            <nav>
-                <ul>
-                    <li><a href="#home">Home</a></li>
-                    <li><a href="#about">About</a></li>
-                    <li><a href="#portfolio">Work</a></li>
-                    <li><a href="#contact">Contact</a></li>
-                </ul>
-            </nav>
+    <!-- LOADER -->
+    <div class="loader">
+        <div class="loader-text">
+            <span class="line-mask"><span class="char-loader">System Initialize</span></span><br>
+            <span class="line-mask"><span class="char-loader">Booting environment...</span></span>
         </div>
-    </header>
+        <div class="loader-counter">00</div>
+    </div>
 
-    <!-- Hero Section -->
-    <section id="home" class="hero">
-        <div class="container">
-            <p class="reveal" style="color: var(--accent); font-family: monospace; letter-spacing: 2px;">GAMING VIDEO EDITOR · DAVINCI RESOLVE</p>
-            <h1 class="reveal" style="transition-delay: 0.1s">VYAN<br>MER<span>CHANT</span></h1>
-            <p class="reveal" style="transition-delay: 0.2s">Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages.</p>
-            <a href="#portfolio" class="btn reveal" style="transition-delay: 0.3s">View My Work</a>
-        </div>
-    </section>
+    <!-- WEBGL BACKGROUND -->
+    <canvas id="webgl-canvas"></canvas>
 
-    <!-- About Section -->
-    <section id="about" class="section">
-        <div class="container">
-            <div class="section-title reveal">
-                <h2>About Me</h2>
-            </div>
-            <div class="about-content">
-                <div class="about-text reveal">
-                    <p>I'm <b>Vyan</b>, a 17-year-old video editor obsessed with making gaming content that actually slaps. I've been editing for 4 years using DaVinci Resolve — cutting, grading, and syncing footage to create montages that keep viewers locked in from the first frame to the last.</p>
-                    <p style="margin-top: 15px; color: var(--text-secondary);">Worked with multiple creators, shipped a video editing internship, and I'm always looking for the next collab that pushes what gaming edits can be.</p>
-                    
-                    <div class="stats-grid">
-                        <div class="stat-item">
-                            <span class="stat-num">4</span>
-                            <span style="font-family: monospace; color: var(--text-secondary); font-size: 0.8rem;">YEARS EDITING</span>
-                        </div>
-                        <div class="stat-item">
-                            <span class="stat-num">∞</span>
-                            <span style="font-family: monospace; color: var(--text-secondary); font-size: 0.8rem;">HOURS IN RESOLVE</span>
-                        </div>
-                    </div>
+    <!-- NAVIGATION -->
+    <nav>
+        <div class="magnetic-target">M. PANJABI</div>
+        <div class="magnetic-target">INDEX (03)</div>
+    </nav>
 
-                    <div class="skills">
-                        <span class="skill-tag">DaVinci Resolve</span>
-                        <span class="skill-tag">Gaming Montages</span>
-                        <span class="skill-tag">Color Grading</span>
-                        <span class="skill-tag">Motion & SFX</span>
-                        <span class="skill-tag">Content Creation</span>
-                        <span class="skill-tag">Valorant</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Portfolio Section -->
-    <section id="portfolio" class="section">
-        <div class="container">
-            <div class="section-title reveal">
-                <h2>My Work</h2>
-            </div>
-            <div class="portfolio-grid">
-                
-                <!-- Project 1 (Pulls YouTube Thumbnail automatically) -->
-                <a href="https://www.youtube.com/watch?v=d0qvLlFEEH8" target="_blank" class="portfolio-item reveal" style="transition-delay: 0.1s;">
-                    <img src="https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg" alt="Valorant Montage">
-                    <div class="portfolio-overlay">
-                        <h3>Valorant Montage</h3>
-                        <p>DaVinci Resolve · Fast Edits · Color Grade</p>
-                    </div>
-                </a>
-
-                <!-- Project 2 (Pulls YouTube Thumbnail automatically) -->
-                <a href="https://www.youtube.com/watch?v=4ZcBnbLWxvU" target="_blank" class="portfolio-item reveal" style="transition-delay: 0.2s;">
-                    <img src="https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg" alt="Valorant Montage (Old)">
-                    <div class="portfolio-overlay">
-                        <h3>Valorant Montage (Old)</h3>
-                        <p>Gaming Montage · DaVinci Resolve</p>
-                    </div>
-                </a>
-
-                <!-- Project 3 -->
-                <a href="montage.mp4" target="_blank" class="portfolio-item reveal" style="transition-delay: 0.3s;">
-                    <img src="https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80" alt="Practice Edit">
-                    <div class="portfolio-overlay">
-                        <h3>Practice Edit</h3>
-                        <p>Creative Edit · Motion Design</p>
-                    </div>
-                </a>
-
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="section">
-        <div class="container">
-            <div class="section-title reveal">
-                <h2>Get In Touch</h2>
-            </div>
-            <div class="contact-container">
-                <div class="contact-info reveal">
-                    <h3 style="font-size: 2.5rem; margin-bottom: 20px;">LET'S BUILD <br><span style="color: var(--accent);">SOMETHING.</span></h3>
-                    <p>Looking for an editor for your next gaming project? Feel free to reach out via email or connect with me on Discord.</p>
-                    
-                    <a href="mailto:vyanmerchant@gmail.com" class="contact-email">vyanmerchant@gmail.com</a>
-                    
-                    <div class="contact-links">
-                        <a href="https://youtube.com" target="_blank" class="contact-link">
-                            <i class="fab fa-youtube"></i> YouTube
-                        </a>
-                        <a href="https://discord.com/users/1111715392461738034" target="_blank" class="contact-link">
-                            <i class="fab fa-discord"></i> Discord
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer>
-        <div class="container reveal">
-            <p>© 2026 Vyan Merchant. All rights reserved.</p>
-            <p style="font-family: monospace; font-size: 0.8rem; opacity: 0.6;">Gaming Video Editor · DaVinci Resolve</p>
-        </div>
-    </footer>
-
-    <!-- Scripts -->
-    <script>
-        /* ─── CUSTOM CURSOR ─── */
-        const cursor = document.getElementById('cursor');
-        document.addEventListener('mousemove', (e) => {
-            cursor.style.left = e.clientX + 'px';
-            cursor.style.top = e.clientY + 'px';
-        });
-
-        /* ─── SCROLL PROGRESS BAR ─── */
-        window.addEventListener('scroll', () => {
-            const st = document.documentElement.scrollTop;
-            const h = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-            document.getElementById('progress').style.width = (st / h * 100) + '%'; 
+    <!-- MAIN SCROLL CONTENT (Lenis) -->
+    <main id="smooth-wrapper">
+        <div id="smooth-content">
             
-            // Header blur effect
-            const header = document.getElementById('header');
-            if (st > 50) header.classList.add('scrolled');
-            else header.classList.remove('scrolled');
-        });
+            <!-- HERO -->
+            <section class="hero">
+                <h1 class="split-text">CYBER</h1>
+                <h1 class="split-text" style="margin-left: 10vw;">PHYSICAL</h1>
+                <h1 class="split-text">INTERFACES</h1>
+                <div class="sub-hero">
+                    <p>Fusing high-velocity mechanics with algorithmic precision. Developing edge systems—from ESP32 hardware prototypes to complex AI routing architectures.</p>
+                </div>
+            </section>
 
-        /* ─── REVEAL ANIMATIONS (Intersection Observer) ─── */
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(e => {
-                if (e.isIntersecting) {
-                    e.target.classList.add('visible'); 
-                    observer.unobserve(e.target); 
+            <!-- HORIZONTAL SCROLL WORK SECTION -->
+            <section class="work-wrapper">
+                <div class="work-container">
+                    
+                    <!-- PANEL 1 -->
+                    <div class="work-panel">
+                        <div class="project-card hover-target" data-cursor="DRAG">
+                            <div class="project-image-overlay"></div>
+                            <div class="project-num">01</div>
+                            <div class="project-info">
+                                <h2>Nazar AI</h2>
+                                <p>Smart India Hackathon project. A predictive modeling system utilizing deep learning algorithms to process and analyze massive datasets in real-time.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL 2 -->
+                    <div class="work-panel">
+                        <div class="project-card hover-target" data-cursor="DRAG">
+                            <div class="project-image-overlay" style="background: linear-gradient(45deg, rgba(51,255,153,0.1), transparent);"></div>
+                            <div class="project-num">02</div>
+                            <div class="project-info">
+                                <h2>GreenRoute</h2>
+                                <p>Techmanjari prototype. Sustainable route optimization software engineered to minimize carbon footprints via dynamic, real-time node calculation.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- PANEL 3 -->
+                    <div class="work-panel">
+                        <div class="project-card hover-target" data-cursor="DRAG">
+                            <div class="project-image-overlay" style="background: linear-gradient(45deg, rgba(51,153,255,0.1), transparent);"></div>
+                            <div class="project-num">03</div>
+                            <div class="project-info">
+                                <h2>Kinetic Rig</h2>
+                                <p>Robotics & Sim Racing crossover. Interfacing 16-channel PWM servo drivers with custom mechanical arms for immersive, high-velocity haptic feedback.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- FOOTER -->
+            <section class="footer">
+                <h2 class="split-text">INITIATE</h2>
+                <h2 class="split-text">SEQUENCE</h2>
+                <div class="magnetic-target magnetic-btn hover-target" data-cursor="CLICK">Execute Contact</div>
+            </section>
+
+        </div>
+    </main>
+
+    <!-- DEPENDENCIES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.29/bundled/lenis.min.js"></script>
+
+    <script>
+        gsap.registerPlugin(ScrollTrigger);
+
+        // ==========================================
+        // 1. TEXT SPLITTING UTILITY
+        // ==========================================
+        document.querySelectorAll('.split-text').forEach(el => {
+            const text = el.innerText;
+            el.innerHTML = '';
+            text.split('').forEach(char => {
+                if(char === ' ') {
+                    el.innerHTML += `<span class="char" style="width: 2vw;">&nbsp;</span>`;
+                } else {
+                    el.innerHTML += `<span class="line-mask"><span class="char">${char}</span></span>`;
                 }
             });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }); 
+        });
 
-        document.querySelectorAll('.reveal').forEach(el => observer.observe(el)); 
+        // ==========================================
+        // 2. SMOOTH SCROLLING (Lenis)
+        // ==========================================
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            direction: 'vertical',
+            gestureDirection: 'vertical',
+            smooth: true,
+            mouseMultiplier: 1,
+            smoothTouch: false,
+        });
 
-        /* ─── CUSTOM DAMASCUS BACKGROUND ─── */
-        (function() {
-            const canvas = document.getElementById('damascus-bg');
-            const ctx = canvas.getContext('2d');
-            const SCALE = 3; 
-            let W, H, t = 0;
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
 
-            function resize() {
-                W = Math.floor(window.innerWidth / SCALE); 
-                H = Math.floor(window.innerHeight / SCALE); 
-                canvas.width = W;
-                canvas.height = H;
+        // ==========================================
+        // 3. THREE.JS BACKGROUND
+        // ==========================================
+        const canvas = document.querySelector('#webgl-canvas');
+        const scene = new THREE.Scene();
+        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
+        
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+        // Create a complex wireframe shape
+        const geometry = new THREE.IcosahedronGeometry(2, 2);
+        const material = new THREE.MeshBasicMaterial({ 
+            color: 0x444444, 
+            wireframe: true,
+            transparent: true,
+            opacity: 0.3
+        });
+        const sphere = new THREE.Mesh(geometry, material);
+        scene.add(sphere);
+
+        camera.position.z = 5;
+
+        // Mouse interaction for WebGL
+        let mouseX = 0;
+        let mouseY = 0;
+        let targetX = 0;
+        let targetY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
+            mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
+        });
+
+        const clock = new THREE.Clock();
+
+        function animateThree() {
+            targetX = mouseX * 0.5;
+            targetY = mouseY * 0.5;
+            
+            // Smoothly rotate towards mouse
+            sphere.rotation.y += 0.05 * (targetX - sphere.rotation.y);
+            sphere.rotation.x += 0.05 * (targetY - sphere.rotation.x);
+            
+            // Continuous slow rotation
+            sphere.rotation.z += 0.002;
+
+            // Pulse geometry
+            const time = clock.getElapsedTime();
+            const positionAttribute = geometry.getAttribute('position');
+            const vertex = new THREE.Vector3();
+            for (let i = 0; i < positionAttribute.count; i++) {
+                vertex.fromBufferAttribute(positionAttribute, i);
+                vertex.normalize().multiplyScalar(2 + Math.sin(time * 2 + vertex.y * 5) * 0.1);
+                positionAttribute.setXYZ(i, vertex.x, vertex.y, vertex.z);
             }
-            resize();
-            window.addEventListener('resize', resize); 
+            geometry.attributes.position.needsUpdate = true;
 
-            function draw() {
-                t += 0.003; 
-                const img = ctx.createImageData(W, H);
-                const d = img.data;
+            renderer.render(scene, camera);
+            requestAnimationFrame(animateThree);
+        }
+        animateThree();
 
-                for (let y = 0; y < H; y++) {
-                    for (let x = 0; x < W; x++) {
-                        const nx = x / W;
-                        const ny = y / H;
+        window.addEventListener('resize', () => {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        });
 
-                        const warp = Math.sin(ny * 8 + t + Math.sin(nx * 5 + t * 0.6) * 1.4) * 0.18
-                                   + Math.cos(nx * 6 - t * 0.5 + Math.sin(ny * 4 + t * 0.8) * 1.2) * 0.12; 
+        // ==========================================
+        // 4. CUSTOM CURSOR & MAGNETIC INTERACTIONS
+        // ==========================================
+        const cursorDot = document.querySelector('.cursor-dot');
+        const cursorOutline = document.querySelector('.cursor-outline');
+        let cursor = { x: 0, y: 0 };
+        let dot = { x: 0, y: 0 };
+        let outline = { x: 0, y: 0 };
 
-                        const wx = nx + warp * 0.5; 
-                        const wy = ny + warp * 0.3; 
+        window.addEventListener('mousemove', (e) => {
+            cursor.x = e.clientX;
+            cursor.y = e.clientY;
+        });
 
-                        const band1 = Math.sin(wx * 14 + wy * 9  + t * 0.4) * 0.5 + 0.5; 
-                        const band2 = Math.sin(wx * 7  - wy * 11 + t * 0.25 + 1.8) * 0.5 + 0.5; 
+        // Animation loop for cursor lerping
+        function renderCursor() {
+            dot.x += (cursor.x - dot.x) * 1; // Instant
+            dot.y += (cursor.y - dot.y) * 1;
+            outline.x += (cursor.x - outline.x) * 0.15; // Smooth trailing
+            outline.y += (cursor.y - outline.y) * 0.15;
 
-                        const v = band1 * 0.55 + band2 * 0.45; 
-                        const base = 6 + v * 16; 
-                        const shimmer = Math.pow(Math.max(0, Math.sin(wx * 30 + wy * 12 + t * 1.8)), 14) * 18; 
+            cursorDot.style.transform = `translate(${dot.x}px, ${dot.y}px)`;
+            cursorOutline.style.transform = `translate(${outline.x}px, ${outline.y}px) translate(-50%, -50%)`;
+            
+            requestAnimationFrame(renderCursor);
+        }
+        renderCursor();
 
-                        /* Blue / Cyan color tones */
-                        const r = (base + shimmer * 0.9) * 0.2; 
-                        const g = (base + shimmer * 0.85) * 0.6;
-                        const b = (base + shimmer * 0.7) * 1.5;
+        // Hover States
+        document.querySelectorAll('.hover-target').forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                const text = el.getAttribute('data-cursor');
+                cursorOutline.style.width = '80px';
+                cursorOutline.style.height = '80px';
+                cursorOutline.style.backgroundColor = 'var(--text)';
+                cursorOutline.style.mixBlendMode = 'difference';
+                if(text) cursorOutline.innerHTML = text;
+                cursorDot.style.opacity = 0;
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorOutline.style.width = '40px';
+                cursorOutline.style.height = '40px';
+                cursorOutline.style.backgroundColor = 'transparent';
+                cursorOutline.style.mixBlendMode = 'normal';
+                cursorOutline.innerHTML = '';
+                cursorDot.style.opacity = 1;
+            });
+        });
 
-                        const i = (y * W + x) * 4; 
-                        d[i]   = r;
-                        d[i+1] = g;
-                        d[i+2] = b;
-                        d[i+3] = 255;
+        // Magnetic Elements
+        document.querySelectorAll('.magnetic-target').forEach(el => {
+            el.addEventListener('mousemove', (e) => {
+                const rect = el.getBoundingClientRect();
+                const x = e.clientX - rect.left - rect.width / 2;
+                const y = e.clientY - rect.top - rect.height / 2;
+                gsap.to(el, { x: x * 0.4, y: y * 0.4, duration: 0.5, ease: "power2.out" });
+            });
+            el.addEventListener('mouseleave', () => {
+                gsap.to(el, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" });
+            });
+        });
+
+        // ==========================================
+        // 5. ANIMATION CHOREOGRAPHY (LOADER & SCROLL)
+        // ==========================================
+        let counter = { value: 0 };
+        const loaderCounter = document.querySelector('.loader-counter');
+        
+        const tlLoader = gsap.timeline({
+            onComplete: () => {
+                document.body.style.overflow = "auto";
+            }
+        });
+
+        // Lock scroll during load
+        document.body.style.overflow = "hidden";
+
+        tlLoader.to(counter, {
+            value: 100,
+            duration: 2.5,
+            ease: "expo.inOut",
+            onUpdate: () => {
+                loaderCounter.innerText = Math.round(counter.value).toString().padStart(2, '0');
+            }
+        })
+        .to('.loader', {
+            yPercent: -100,
+            duration: 1.5,
+            ease: "power4.inOut"
+        }, "-=0.5")
+        .to('.hero .char', {
+            y: "0%",
+            opacity: 1,
+            duration: 1,
+            stagger: 0.02,
+            ease: "power3.out"
+        }, "-=1")
+        .from('.sub-hero', {
+            opacity: 0,
+            y: 30,
+            duration: 1,
+            ease: "power2.out"
+        }, "-=0.8");
+
+        // Horizontal Scroll Section
+        const workContainer = document.querySelector('.work-container');
+        const workPanels = gsap.utils.toArray('.work-panel');
+
+        gsap.to(workPanels, {
+            xPercent: -100 * (workPanels.length - 1),
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".work-wrapper",
+                pin: true,
+                scrub: 1,
+                snap: 1 / (workPanels.length - 1),
+                end: () => "+=" + workContainer.offsetWidth
+            }
+        });
+
+        // Project Cards Parallax inside horizontal scroll
+        workPanels.forEach((panel, i) => {
+            gsap.fromTo(panel.querySelector('.project-card'), 
+                { scale: 0.8, rotationY: 15 },
+                { 
+                    scale: 1, 
+                    rotationY: 0,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: panel,
+                        containerAnimation: gsap.getById("horizontal-scroll"),
+                        start: "left center",
+                        end: "right center",
+                        scrub: true
                     }
                 }
-                ctx.putImageData(img, 0, 0); 
-                requestAnimationFrame(draw); 
+            );
+        });
+
+        // Footer Text Reveal
+        gsap.to('.footer .char', {
+            scrollTrigger: {
+                trigger: '.footer',
+                start: "top center",
+                end: "center center",
+                scrub: 1
+            },
+            y: "0%",
+            opacity: 1,
+            stagger: 0.05,
+            ease: "power2.out"
+        });
+
+        // Global Parallax on Scroll Velocity
+        ScrollTrigger.create({
+            start: 0,
+            end: "max",
+            onUpdate: (self) => {
+                const velocity = Math.abs(self.getVelocity() / 100);
+                gsap.to('.hero h1', {
+                    skewY: Math.min(velocity, 10), // Distort text based on scroll speed
+                    duration: 0.2
+                });
             }
-            draw();
-        })();
+        });
     </script>
 </body>
 </html>
