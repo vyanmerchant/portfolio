@@ -172,12 +172,11 @@
             z-index: 90;
             pointer-events: none;
             mix-blend-mode: difference;
-            overflow: hidden; /* Enables the slide-up mask effect */
-            padding: 20px 0; /* Buffer for the animation */
+            /* overflow: hidden removed to prevent bounding box clipping */
         }
         .vertical-tracker-rotate {
             writing-mode: vertical-rl;
-            transform: rotate(180deg); /* Isolated rotation so GSAP doesn't overwrite it */
+            transform: rotate(180deg); /* Bottom to top reading */
         }
         .vertical-tracker-text {
             font-family: var(--font-mono);
@@ -186,8 +185,9 @@
             color: var(--text);
             text-transform: uppercase;
             opacity: 0;
-            transform: translateY(-30px); /* Negative Y due to 180deg parent rotation */
+            transform: translateY(-30px);
             will-change: transform, opacity;
+            white-space: nowrap; /* Prevents text from breaking into multiple columns */
         }
 
         @media (max-width: 768px) {
@@ -237,7 +237,7 @@
         .sub-hero strong { color: var(--text); font-weight: 700; }
 
         /* ==========================================
-           7. HORIZONTAL WORK SHOWCASE (Refined)
+           7. HORIZONTAL WORK SHOWCASE
            ========================================== */
         .work-wrapper {
             background: transparent;
@@ -456,13 +456,13 @@
     <!-- WEBGL BACKGROUND -->
     <canvas id="webgl-canvas"></canvas>
 
-    <!-- NAVIGATION & VERTICAL TRACKER -->
+    <!-- NAVIGATION -->
     <nav>
         <div class="magnetic-target hover-target" data-cursor="INDEX">V. MERCHANT</div>
         <div class="magnetic-target hover-target" data-cursor="ABOUT">EST. 2021</div>
     </nav>
     
-    <!-- FIX: Isolated Rotation & Masking Container for Vertical Text -->
+    <!-- VERTICAL TEXT TRACKER -->
     <div class="vertical-tracker">
         <div class="vertical-tracker-rotate">
             <div class="vertical-tracker-text">EST. 2021 // PORTFOLIO</div>
@@ -756,7 +756,6 @@
             duration: 1,
             ease: "power2.out"
         }, "-=1")
-        // FIX: The vertical text smoothly slides in alongside the hero content
         .to('.vertical-tracker-text', {
             opacity: 1,
             y: 0,
