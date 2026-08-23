@@ -3,20 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>VYAN MERCHANT | Video Editor</title>
-    
-    <!-- Premium Fonts matching your brand -->
+    <title>VYAN MERCHANT | Award-Winning Video Editor</title>
+
+    <!-- Premium Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Space+Mono:wght@400;700&family=Syne:wght@400;600;800&display=swap" rel="stylesheet">
     
     <style>
         /* ==========================================
-           RESET & CORE
+           RESET, VARIABLES & CORE UTILS
            ========================================== */
         :root {
-            --bg: #050505;
-            --text: #f0ede8;
-            --accent: #7dd3fc;
+            --bg: #030303;
+            --text: #f4f4f4;
+            --accent: #38bdf8;
+            --accent-dim: rgba(56, 189, 248, 0.2);
             --font-display: 'Anton', sans-serif;
             --font-sans: 'Syne', sans-serif;
             --font-mono: 'Space Mono', monospace;
@@ -26,7 +27,7 @@
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            cursor: none;
+            cursor: none; /* Custom cursor override */
         }
 
         body {
@@ -35,83 +36,112 @@
             font-family: var(--font-sans);
             overflow-x: hidden;
             -webkit-font-smoothing: antialiased;
+            overscroll-behavior: none;
+        }
+
+        ::selection {
+            background: var(--accent);
+            color: var(--bg);
         }
 
         /* ==========================================
-           CUSTOM CURSOR
+           CUSTOM CURSOR SYSTEM
            ========================================== */
-        .cursor-dot, .cursor-outline {
+        .cursor-wrapper {
             position: fixed;
-            top: 0;
-            left: 0;
-            transform: translate(-50%, -50%);
-            border-radius: 50%;
-            z-index: 9999;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
             pointer-events: none;
+            z-index: 10000;
+            mix-blend-mode: difference;
         }
         .cursor-dot {
-            width: 6px;
-            height: 6px;
-            background-color: var(--accent);
+            position: absolute;
+            width: 8px; height: 8px;
+            background: var(--text);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            will-change: transform;
         }
         .cursor-outline {
-            width: 40px;
-            height: 40px;
-            border: 1px solid rgba(125, 211, 252, 0.5);
-            transition: width 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-                        height 0.3s cubic-bezier(0.16, 1, 0.3, 1), 
-                        background-color 0.3s;
+            position: absolute;
+            width: 50px; height: 50px;
+            border: 1px solid var(--text);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            will-change: transform, width, height;
             display: flex;
             align-items: center;
             justify-content: center;
             font-family: var(--font-mono);
-            font-size: 10px;
-            color: var(--bg);
+            font-size: 9px;
             text-transform: uppercase;
             font-weight: 700;
+            letter-spacing: 1px;
+            color: var(--bg);
+            background: transparent;
+            transition: width 0.4s cubic-bezier(0.16, 1, 0.3, 1), 
+                        height 0.4s cubic-bezier(0.16, 1, 0.3, 1),
+                        background 0.4s ease;
         }
 
         /* ==========================================
-           LOADER
+           CINEMATIC LOADER
            ========================================== */
         .loader {
             position: fixed;
             inset: 0;
-            background: var(--bg);
+            background: #000;
             z-index: 9000;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            padding: 4vw;
+            padding: 2vw;
+            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+        }
+        .loader-top, .loader-bottom {
+            display: flex;
+            justify-content: space-between;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            overflow: hidden;
+        }
+        .loader-center {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100%;
+            text-align: center;
         }
         .loader-counter {
             font-family: var(--font-display);
-            font-size: 20vw;
+            font-size: clamp(100px, 25vw, 400px);
             line-height: 0.8;
-            align-self: flex-end;
-            margin-top: auto;
             color: transparent;
-            -webkit-text-stroke: 2px var(--text);
+            -webkit-text-stroke: 1px rgba(255,255,255,0.1);
+            position: relative;
         }
-        .loader-text {
-            font-family: var(--font-mono);
-            font-size: 12px;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            color: var(--accent);
+        .loader-counter-fill {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            color: var(--text);
+            -webkit-text-stroke: 0px;
+            clip-path: polygon(0 100%, 100% 100%, 100% 100%, 0 100%);
         }
 
         /* ==========================================
-           THREE.JS CANVAS
+           WEBGL BACKGROUND
            ========================================== */
-        #webgl-canvas {
+        #webgl-container {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
             z-index: -1;
-            opacity: 0.4;
+            pointer-events: none;
         }
 
         /* ==========================================
@@ -119,19 +149,27 @@
            ========================================== */
         nav {
             position: fixed;
-            top: 0;
-            width: 100%;
-            padding: 2vw 4vw;
+            top: 0; width: 100%;
+            padding: 2vw;
             display: flex;
             justify-content: space-between;
             z-index: 100;
-            mix-blend-mode: difference;
             font-family: var(--font-mono);
             font-size: 11px;
             text-transform: uppercase;
-            letter-spacing: 0.14em;
+            letter-spacing: 0.1em;
+            mix-blend-mode: difference;
+        }
+        .nav-logo {
+            font-family: var(--font-display);
+            font-size: 24px;
+            letter-spacing: 0;
         }
         .nav-logo span { color: var(--accent); }
+        
+        .magnetic-wrap {
+            display: inline-block;
+        }
 
         /* ==========================================
            HERO SECTION
@@ -140,100 +178,117 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
-            padding: 0 4vw;
+            justify-content: flex-end;
+            padding: 4vw;
             position: relative;
+            z-index: 1;
         }
-        .hero-title-wrapper {
-            overflow: hidden;
+        .hero-title-container {
+            position: relative;
+            margin-bottom: 2vh;
         }
         .hero h1 {
             font-family: var(--font-display);
-            font-size: clamp(80px, 16vw, 220px);
+            font-size: clamp(60px, 15vw, 250px);
             line-height: 0.85;
-            letter-spacing: 0.02em;
+            letter-spacing: -0.02em;
             text-transform: uppercase;
-            color: var(--text);
             margin: 0;
+            will-change: transform;
         }
-        .hero h1 .accent {
-            color: var(--accent);
+        .hero h1 .char {
+            display: inline-block;
+            transform: translateY(110%) rotate(10deg);
+            transform-origin: bottom left;
+            opacity: 0;
         }
-        .hero-tag {
-            font-family: var(--font-mono);
-            font-size: 11px;
-            letter-spacing: 0.2em;
-            text-transform: uppercase;
-            color: var(--accent);
-            margin-bottom: 20px;
+        .hero-details {
             display: flex;
-            align-items: center;
-            gap: 12px;
+            justify-content: space-between;
+            align-items: flex-end;
+            width: 100%;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            padding-top: 20px;
             overflow: hidden;
         }
-        .hero-tag::before {
-            content: '';
-            display: inline-block;
-            width: 32px; height: 1px;
-            background: var(--accent);
+        .hero-tag, .hero-desc {
+            font-family: var(--font-mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--accent);
+            transform: translateY(100%);
+            opacity: 0;
         }
-        .hero-sub {
+        .hero-desc {
             font-family: var(--font-sans);
-            font-size: 20px;
-            color: var(--gray-text);
+            font-size: 16px;
+            color: var(--text);
             max-width: 400px;
-            margin-top: 30px;
-            line-height: 1.6;
+            text-align: right;
+            text-transform: none;
+            letter-spacing: 0;
         }
 
         /* ==========================================
-           ABOUT TEXT REVEAL
+           EXPERIMENTAL ABOUT SECTION (SCRUB TEXT)
            ========================================== */
-        .about-section {
-            min-height: 100vh;
+        .about {
+            min-height: 150vh;
+            position: relative;
             display: flex;
             align-items: center;
-            padding: 10vw 4vw;
+            justify-content: center;
+            padding: 0 4vw;
+            z-index: 2;
         }
         .about-text {
             font-family: var(--font-display);
-            font-size: clamp(40px, 8vw, 100px);
-            line-height: 1.1;
-            max-width: 90%;
-        }
-        .about-text span {
-            color: rgba(255,255,255,0.1);
-            transition: color 0.1s;
-        }
-        .skills-marquee {
-            font-family: var(--font-mono);
-            font-size: 14px;
-            letter-spacing: 0.1em;
+            font-size: clamp(40px, 8vw, 120px);
+            line-height: 1;
+            text-align: center;
+            max-width: 1400px;
             text-transform: uppercase;
-            background: var(--accent);
-            color: var(--bg);
-            padding: 15px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            display: flex;
         }
-        .marquee-inner {
-            display: flex;
-            gap: 40px;
-            padding-right: 40px;
+        .about-text .word {
+            display: inline-block;
+            color: rgba(255, 255, 255, 0.05);
+            background: linear-gradient(to right, var(--text) 50%, rgba(255, 255, 255, 0.05) 50%);
+            background-size: 200% 100%;
+            background-position: 100% 0;
+            -webkit-background-clip: text;
+            background-clip: text;
+            will-change: background-position;
         }
 
         /* ==========================================
-           HORIZONTAL SCROLL - PROJECTS
+           HORIZONTAL 3D WORK SHOWCASE
            ========================================== */
         .work-wrapper {
-            overflow: hidden;
             background: var(--bg);
+            overflow: hidden;
+            position: relative;
+            z-index: 5;
         }
         .work-container {
             display: flex;
-            width: 300vw; 
+            width: 400vw; /* 4 panels (1 intro + 3 projects) */
             height: 100vh;
+            perspective: 1000px;
+        }
+        .work-intro {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 4vw;
+        }
+        .work-intro h2 {
+            font-family: var(--font-display);
+            font-size: 15vw;
+            line-height: 0.8;
+            color: transparent;
+            -webkit-text-stroke: 2px var(--accent);
         }
         .work-panel {
             width: 100vw;
@@ -241,190 +296,302 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 8vw;
-            position: relative;
+            padding: 10vw;
+            transform-style: preserve-3d;
         }
         .project-card {
             width: 100%;
-            height: 75vh;
+            max-width: 1200px;
+            height: 70vh;
             position: relative;
-            overflow: hidden;
-            border: 1px solid rgba(255,255,255,0.1);
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
+            justify-content: flex-end;
             padding: 3vw;
+            text-decoration: none;
+            transform-style: preserve-3d;
+            will-change: transform;
         }
-        .project-bg {
+        .project-image-wrap {
             position: absolute;
             inset: 0;
-            background: rgba(20, 20, 20, 0.8);
-            z-index: 0;
-            transform: scale(1.2);
-            transform-origin: center;
+            overflow: hidden;
+            z-index: -1;
+            transform: translateZ(-50px);
+        }
+        .project-image {
+            width: 110%;
+            height: 110%;
+            position: absolute;
+            top: -5%; left: -5%;
+            background-size: cover;
+            background-position: center;
+            transition: transform 0.1s;
+            filter: grayscale(100%) brightness(0.4);
+            will-change: transform, filter;
+        }
+        .project-card:hover .project-image {
+            filter: grayscale(0%) brightness(0.8);
+        }
+        .project-glare {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,0.2) 25%, transparent 30%);
+            z-index: 1;
+            transform: translateX(-100%);
+            transition: transform 0.6s ease;
+            mix-blend-mode: overlay;
+        }
+        .project-card:hover .project-glare {
+            transform: translateX(100%);
+        }
+        .project-info {
+            transform: translateZ(50px); /* 3D pop out */
+            color: var(--text);
         }
         .project-num {
             font-family: var(--font-mono);
             font-size: 14px;
             color: var(--accent);
-            z-index: 2;
+            margin-bottom: 20px;
+            display: block;
         }
-        .project-info {
-            z-index: 2;
-        }
-        .project-info h2 {
+        .project-info h3 {
             font-family: var(--font-display);
-            font-size: 7vw;
+            font-size: 6vw;
             line-height: 0.9;
             text-transform: uppercase;
             margin-bottom: 10px;
         }
         .project-info p {
             font-family: var(--font-mono);
-            font-size: 12px;
+            font-size: 11px;
             text-transform: uppercase;
             letter-spacing: 0.1em;
-            color: #777;
+            color: rgba(255,255,255,0.5);
         }
 
         /* ==========================================
-           FOOTER / CONTACT
+           VELOCITY MARQUEE
+           ========================================== */
+        .marquee-section {
+            padding: 10vh 0;
+            background: var(--accent);
+            color: var(--bg);
+            overflow: hidden;
+            position: relative;
+            z-index: 6;
+        }
+        .marquee-track {
+            display: flex;
+            white-space: nowrap;
+            font-family: var(--font-display);
+            font-size: 8vw;
+            text-transform: uppercase;
+            line-height: 1;
+            will-change: transform;
+        }
+        .marquee-track span {
+            padding: 0 40px;
+        }
+
+        /* ==========================================
+           CINEMATIC FOOTER
            ========================================== */
         .footer {
             height: 100vh;
+            background: var(--bg);
             display: flex;
             flex-direction: column;
             justify-content: center;
-            padding: 0 4vw;
+            align-items: center;
             position: relative;
-            background: var(--text);
-            color: var(--bg);
+            z-index: 10;
+            overflow: hidden;
+        }
+        .footer-bg-text {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            font-family: var(--font-display);
+            font-size: 30vw;
+            color: rgba(255,255,255,0.02);
+            white-space: nowrap;
+            pointer-events: none;
+        }
+        .footer-content {
+            text-align: center;
+            z-index: 2;
         }
         .footer h2 {
             font-family: var(--font-display);
             font-size: clamp(60px, 12vw, 150px);
             line-height: 0.9;
+            margin-bottom: 40px;
+            text-transform: uppercase;
         }
         .contact-links {
-            margin-top: 5vh;
             display: flex;
             gap: 40px;
+            justify-content: center;
+        }
+        .contact-links a {
             font-family: var(--font-mono);
             font-size: 14px;
             text-transform: uppercase;
-        }
-        .contact-links a {
-            color: var(--bg);
+            letter-spacing: 0.1em;
+            color: var(--text);
             text-decoration: none;
+            padding: 15px 30px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50px;
             position: relative;
             overflow: hidden;
-            display: inline-block;
+            transition: border-color 0.3s, color 0.3s;
         }
-        .contact-links a::after {
+        .contact-links a::before {
             content: '';
             position: absolute;
-            bottom: 0; left: 0;
-            width: 100%; height: 2px;
-            background: var(--bg);
-            transform: translateX(-100%);
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: var(--text);
+            transform: scaleY(0);
+            transform-origin: bottom;
             transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            z-index: -1;
         }
-        .contact-links a:hover::after {
-            transform: translateX(0);
+        .contact-links a:hover {
+            color: var(--bg);
+            border-color: var(--text);
+        }
+        .contact-links a:hover::before {
+            transform: scaleY(1);
+        }
+        .footer-bottom {
+            position: absolute;
+            bottom: 4vw;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 4vw;
+            font-family: var(--font-mono);
+            font-size: 10px;
+            color: rgba(255,255,255,0.3);
+            text-transform: uppercase;
         }
     </style>
 </head>
 <body>
 
-    <!-- CURSOR -->
-    <div class="cursor-dot"></div>
-    <div class="cursor-outline"></div>
-
-    <!-- LOADER -->
-    <div class="loader">
-        <div class="loader-text magnetic-target">
-            DAVINCI RESOLVE // ENGINE INITIALIZATION<br>
-            LOADING ASSETS...
-        </div>
-        <div class="loader-counter">00</div>
+    <!-- CUSTOM CURSOR -->
+    <div class="cursor-wrapper">
+        <div class="cursor-dot"></div>
+        <div class="cursor-outline"></div>
     </div>
 
-    <!-- WEBGL BACKGROUND -->
-    <canvas id="webgl-canvas"></canvas>
+    <!-- CINEMATIC LOADER -->
+    <div class="loader">
+        <div class="loader-top">
+            <span>System Initialization</span>
+            <span>Est. 2021</span>
+        </div>
+        <div class="loader-center">
+            <div class="loader-counter">
+                00
+                <div class="loader-counter-fill">00</div>
+            </div>
+        </div>
+        <div class="loader-bottom">
+            <span>DaVinci Resolve Engine</span>
+            <span>Loading...</span>
+        </div>
+    </div>
 
-    <!-- NAV -->
+    <!-- WEBGL LIQUID SHADER -->
+    <div id="webgl-container"></div>
+
+    <!-- NAVIGATION -->
     <nav>
-        <div class="nav-logo magnetic-target">VM<span>.</span></div>
-        <div class="magnetic-target">GAMING VIDEO EDITOR</div>
+        <div class="magnetic-wrap hover-target" data-cursor="HOME">
+            <div class="nav-logo">VM<span>.</span></div>
+        </div>
+        <div class="magnetic-wrap hover-target" data-cursor="SCROLL">
+            <div>GAMING VIDEO EDITOR</div>
+        </div>
     </nav>
 
     <main id="smooth-wrapper">
         <div id="smooth-content">
             
-            <!-- HERO -->
+            <!-- WOW MOMENT 1: HERO -->
             <section class="hero">
-                <div class="hero-tag magnetic-target">Est. 2021 // 4 Years Experience</div>
-                <div class="hero-title-wrapper">
-                    <h1 class="hero-title">VYAN</h1>
+                <div class="hero-title-container">
+                    <h1 id="hero-text-1">VYAN</h1>
+                    <h1 id="hero-text-2">MER<span class="accent">CHANT</span></h1>
                 </div>
-                <div class="hero-title-wrapper">
-                    <h1 class="hero-title">MER<span class="accent">CHANT</span></h1>
-                </div>
-                <div class="hero-sub magnetic-target">
-                    Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages.
+                <div class="hero-details">
+                    <div class="hero-tag">Est. 2021 // 4 Years Experience</div>
+                    <div class="hero-desc">
+                        Crafting fast-paced gaming edits that hit different — from clutch montages to full creator packages.
+                    </div>
                 </div>
             </section>
 
-            <!-- MARQUEE -->
-            <div class="skills-marquee">
-                <div class="marquee-inner">
-                    <span>DaVinci Resolve ✦ Gaming Montages ✦ Color Grading ✦ Fast Edits ✦ Content Creation ✦ Valorant ✦ Motion Design ✦</span>
-                    <span>DaVinci Resolve ✦ Gaming Montages ✦ Color Grading ✦ Fast Edits ✦ Content Creation ✦ Valorant ✦ Motion Design ✦</span>
-                </div>
-            </div>
-
-            <!-- ABOUT -->
-            <section class="about-section">
-                <p class="about-text" id="scrub-text">
-                    I'M VYAN, A 17-YEAR-OLD VIDEO EDITOR OBSESSED WITH MAKING GAMING CONTENT THAT ACTUALLY SLAPS. I'VE BEEN EDITING FOR 4 YEARS USING DAVINCI RESOLVE TO CREATE MONTAGES THAT KEEP VIEWERS LOCKED IN FROM THE FIRST FRAME TO THE LAST.
-                </p>
+            <!-- WOW MOMENT 2: SCROLL TRANSFORMATION (ABOUT) -->
+            <section class="about">
+                <h2 class="about-text" id="scrub-text">
+                    I'm Vyan, a 17-year-old video editor obsessed with making gaming content that actually slaps. I've been editing for 4 years using DaVinci Resolve to create montages that keep viewers locked in from the first frame to the last.
+                </h2>
             </section>
 
-            <!-- HORIZONTAL SCROLL WORK -->
+            <!-- WOW MOMENT 3: 3D INTERACTIVE SHOWCASE -->
             <section class="work-wrapper">
                 <div class="work-container">
                     
-                    <!-- PANEL 01 -->
+                    <div class="work-intro">
+                        <h2>SELECTED<br>WORKS</h2>
+                    </div>
+
+                    <!-- Panel 1 -->
                     <div class="work-panel">
-                        <a href="https://www.youtube.com/watch?v=d0qvLlFEEH8" target="_blank" class="project-card hover-target" data-cursor="PLAY">
-                            <div class="project-bg" style="background: linear-gradient(to top, #080808, transparent), url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg') center/cover;"></div>
-                            <div class="project-num">01 // RECENT</div>
+                        <a href="https://www.youtube.com/watch?v=d0qvLlFEEH8" target="_blank" class="project-card hover-target tilt-target" data-cursor="PLAY">
+                            <div class="project-image-wrap">
+                                <div class="project-image" style="background-image: url('https://img.youtube.com/vi/d0qvLlFEEH8/maxresdefault.jpg');"></div>
+                                <div class="project-glare"></div>
+                            </div>
                             <div class="project-info">
-                                <h2>Valorant<br>Montage</h2>
+                                <span class="project-num">01 // RECENT</span>
+                                <h3>Valorant<br>Montage</h3>
                                 <p>DaVinci Resolve · Fast Edits · Color Grade</p>
                             </div>
                         </a>
                     </div>
 
-                    <!-- PANEL 02 -->
+                    <!-- Panel 2 -->
                     <div class="work-panel">
-                        <a href="https://www.youtube.com/watch?v=4ZcBnbLWxvU" target="_blank" class="project-card hover-target" data-cursor="PLAY">
-                            <div class="project-bg" style="background: linear-gradient(to top, #080808, transparent), url('https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg') center/cover;"></div>
-                            <div class="project-num">02 // ARCHIVE</div>
+                        <a href="https://www.youtube.com/watch?v=4ZcBnbLWxvU" target="_blank" class="project-card hover-target tilt-target" data-cursor="PLAY">
+                            <div class="project-image-wrap">
+                                <div class="project-image" style="background-image: url('https://img.youtube.com/vi/4ZcBnbLWxvU/maxresdefault.jpg');"></div>
+                                <div class="project-glare"></div>
+                            </div>
                             <div class="project-info">
-                                <h2>Valorant<br>Montage (Old)</h2>
+                                <span class="project-num">02 // ARCHIVE</span>
+                                <h3>Valorant<br>Montage (Old)</h3>
                                 <p>Gaming Montage · DaVinci Resolve</p>
                             </div>
                         </a>
                     </div>
 
-                    <!-- PANEL 03 -->
+                    <!-- Panel 3 -->
                     <div class="work-panel">
-                        <a href="montage.mp4" target="_blank" class="project-card hover-target" data-cursor="PLAY">
-                            <div class="project-bg" style="background: linear-gradient(to top, #080808, transparent), url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80') center/cover;"></div>
-                            <div class="project-num">03 // EXPERIMENTAL</div>
+                        <a href="montage.mp4" target="_blank" class="project-card hover-target tilt-target" data-cursor="PLAY">
+                            <div class="project-image-wrap">
+                                <div class="project-image" style="background-image: url('https://images.unsplash.com/photo-1542751371-adc38448a05e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1170&q=80');"></div>
+                                <div class="project-glare"></div>
+                            </div>
                             <div class="project-info">
-                                <h2>Practice<br>Edit</h2>
+                                <span class="project-num">03 // EXPERIMENTAL</span>
+                                <h3>Practice<br>Edit</h3>
                                 <p>Creative Edit · Motion Design</p>
                             </div>
                         </a>
@@ -433,21 +600,35 @@
                 </div>
             </section>
 
-            <!-- CONTACT -->
+            <!-- WOW MOMENT 4: VELOCITY MARQUEE -->
+            <section class="marquee-section">
+                <div class="marquee-track">
+                    <span>DaVinci Resolve ✦ Gaming Montages ✦ Color Grading ✦ Fast Edits ✦ Content Creation ✦ Valorant ✦ Motion Design ✦</span>
+                    <span>DaVinci Resolve ✦ Gaming Montages ✦ Color Grading ✦ Fast Edits ✦ Content Creation ✦ Valorant ✦ Motion Design ✦</span>
+                </div>
+            </section>
+
+            <!-- WOW MOMENT 5: CINEMATIC FOOTER -->
             <section class="footer">
-                <div class="hero-tag" style="color: var(--bg);">Initiate Sequence</div>
-                <h2>LET'S BUILD<br>SOMETHING.</h2>
-                <div class="contact-links">
-                    <a href="mailto:vyanmerchant@gmail.com" class="hover-target" data-cursor="EMAIL">vyanmerchant@gmail.com</a>
-                    <a href="https://discord.com/users/1111715392461738034" target="_blank" class="hover-target" data-cursor="DISCORD">Discord</a>
-                    <a href="https://youtube.com" target="_blank" class="hover-target" data-cursor="WATCH">YouTube</a>
+                <div class="footer-bg-text">CONTACT</div>
+                <div class="footer-content">
+                    <h2 class="footer-heading">LET'S BUILD<br>SOMETHING.</h2>
+                    <div class="contact-links">
+                        <a href="mailto:vyanmerchant@gmail.com" class="magnetic-wrap hover-target" data-cursor="EMAIL">vyanmerchant@gmail.com</a>
+                        <a href="https://discord.com/users/1111715392461738034" target="_blank" class="magnetic-wrap hover-target" data-cursor="DISCORD">Discord</a>
+                        <a href="https://youtube.com" target="_blank" class="magnetic-wrap hover-target" data-cursor="WATCH">YouTube</a>
+                    </div>
+                </div>
+                <div class="footer-bottom">
+                    <span>© 2026 Vyan Merchant</span>
+                    <span>Gaming Video Editor</span>
                 </div>
             </section>
 
         </div>
     </main>
 
-    <!-- SCRIPTS -->
+    <!-- DEPENDENCIES -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
@@ -457,14 +638,42 @@
         gsap.registerPlugin(ScrollTrigger);
 
         // ==========================================
-        // SMOOTH SCROLLING (Lenis)
+        // 1. UTILS: TEXT SPLITTER
+        // ==========================================
+        function splitText(selector) {
+            const elements = document.querySelectorAll(selector);
+            elements.forEach(el => {
+                const text = el.innerText;
+                el.innerHTML = '';
+                text.split('').forEach(char => {
+                    if (char === ' ') {
+                        el.innerHTML += `<span class="char" style="width: 2vw;">&nbsp;</span>`;
+                    } else {
+                        el.innerHTML += `<span style="overflow: hidden; display: inline-block;"><span class="char">${char}</span></span>`;
+                    }
+                });
+            });
+        }
+        splitText('#hero-text-1');
+        splitText('#hero-text-2');
+
+        const scrubText = document.getElementById('scrub-text');
+        const words = scrubText.innerText.split(' ');
+        scrubText.innerHTML = '';
+        words.forEach(word => {
+            scrubText.innerHTML += `<span class="word">${word}</span> `;
+        });
+
+        // ==========================================
+        // 2. SMOOTH SCROLLING (LENIS)
         // ==========================================
         const lenis = new Lenis({
-            duration: 1.2,
+            duration: 1.5,
             easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
             direction: 'vertical',
             smooth: true,
         });
+
         function raf(time) {
             lenis.raf(time);
             requestAnimationFrame(raf);
@@ -472,184 +681,365 @@
         requestAnimationFrame(raf);
 
         // ==========================================
-        // THREE.JS PARTICLES (Render simulation)
+        // 3. CINEMATIC LIQUID WEBGL SHADER
         // ==========================================
-        const canvas = document.querySelector('#webgl-canvas');
+        const container = document.getElementById('webgl-container');
         const scene = new THREE.Scene();
-        const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
-        
+        const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 100);
+        camera.position.z = 1;
+        const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
         renderer.setSize(window.innerWidth, window.innerHeight);
         renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+        container.appendChild(renderer.domElement);
 
-        const geometry = new THREE.BufferGeometry();
-        const particlesCount = 2000;
-        const posArray = new Float32Array(particlesCount * 3);
+        const vertexShader = `
+            varying vec2 vUv;
+            void main() {
+                vUv = uv;
+                gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+            }
+        `;
 
-        for(let i = 0; i < particlesCount * 3; i++) {
-            posArray[i] = (Math.random() - 0.5) * 10;
-        }
-        geometry.setAttribute('position', new THREE.BufferAttribute(posArray, 3));
-        const material = new THREE.PointsMaterial({
-            size: 0.02,
-            color: 0x7dd3fc,
-            transparent: true,
-            opacity: 0.6,
-            blending: THREE.AdditiveBlending
+        const fragmentShader = `
+            uniform float uTime;
+            uniform vec2 uMouse;
+            uniform float uScroll;
+            varying vec2 vUv;
+            
+            // Simplex noise function
+            vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
+            vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
+            float snoise(vec2 v) {
+                const vec4 C = vec4(0.211324865405187, 0.366025403784439, -0.577350269189626, 0.024390243902439);
+                vec2 i  = floor(v + dot(v, C.yy) );
+                vec2 x0 = v -   i + dot(i, C.xx);
+                vec2 i1;
+                i1 = (x0.x > x0.y) ? vec2(1.0, 0.0) : vec2(0.0, 1.0);
+                vec4 x12 = x0.xyxy + C.xxzz;
+                x12.xy -= i1;
+                i = mod289(i);
+                vec3 p = permute( permute( i.y + vec3(0.0, i1.y, 1.0 )) + i.x + vec3(0.0, i1.x, 1.0 ));
+                vec3 m = max(0.5 - vec3(dot(x0,x0), dot(x12.xy,x12.xy), dot(x12.zw,x12.zw)), 0.0);
+                m = m*m ;
+                m = m*m ;
+                vec3 x = 2.0 * fract(p * C.www) - 1.0;
+                vec3 h = abs(x) - 0.5;
+                vec3 ox = floor(x + 0.5);
+                vec3 a0 = x - ox;
+                m *= 1.79284291400159 - 0.85373472095314 * ( a0*a0 + h*h );
+                vec3 g;
+                g.x  = a0.x  * x0.x  + h.x  * x0.y;
+                g.yz = a0.yz * x12.xz + h.yz * x12.yw;
+                return 130.0 * dot(m, g);
+            }
+
+            void main() {
+                vec2 uv = vUv;
+                
+                // Distort UVs based on noise, time, mouse, and scroll
+                float noise = snoise(uv * 3.0 + uTime * 0.2 + uScroll * 0.001);
+                uv.x += noise * 0.1 * uMouse.x;
+                uv.y += noise * 0.1 * uMouse.y;
+                
+                float liquid = snoise(uv * 4.0 - uTime * 0.3);
+                float glow = smoothstep(0.2, 0.8, liquid);
+                
+                // Cyan / Dark Obsidian Palette matching Vyan's Brand
+                vec3 color1 = vec3(0.01, 0.01, 0.01); // Dark bg
+                vec3 color2 = vec3(0.22, 0.74, 0.99); // Accent cyan (#38bdf8)
+                
+                vec3 finalColor = mix(color1, color2, glow * 0.25);
+                
+                gl_FragColor = vec4(finalColor, 1.0);
+            }
+        `;
+
+        const geometry = new THREE.PlaneGeometry(2, 2);
+        const material = new THREE.ShaderMaterial({
+            vertexShader,
+            fragmentShader,
+            uniforms: {
+                uTime: { value: 0 },
+                uMouse: { value: new THREE.Vector2(0, 0) },
+                uScroll: { value: 0 }
+            }
         });
+        const mesh = new THREE.Mesh(geometry, material);
+        scene.add(mesh);
 
-        const particlesMesh = new THREE.Points(geometry, material);
-        scene.add(particlesMesh);
-        camera.position.z = 3;
-
-        let mouseX = 0;
-        let mouseY = 0;
-        document.addEventListener('mousemove', (e) => {
-            mouseX = (e.clientX - window.innerWidth / 2) * 0.001;
-            mouseY = (e.clientY - window.innerHeight / 2) * 0.001;
+        let mouseX = 0, mouseY = 0;
+        let targetX = 0, targetY = 0;
+        
+        window.addEventListener('mousemove', (e) => {
+            targetX = (e.clientX / window.innerWidth) * 2 - 1;
+            targetY = -(e.clientY / window.innerHeight) * 2 + 1;
         });
 
         const clock = new THREE.Clock();
-        function animateThree() {
-            const elapsedTime = clock.getElapsedTime();
-            particlesMesh.rotation.y = mouseX * 0.5 + elapsedTime * 0.05;
-            particlesMesh.rotation.x = mouseY * 0.5 + elapsedTime * 0.05;
+        function renderWebGL() {
+            mouseX += (targetX - mouseX) * 0.05;
+            mouseY += (targetY - mouseY) * 0.05;
+            
+            material.uniforms.uTime.value = clock.getElapsedTime();
+            material.uniforms.uMouse.value.set(mouseX, mouseY);
+            material.uniforms.uScroll.value = window.scrollY;
             
             renderer.render(scene, camera);
-            requestAnimationFrame(animateThree);
+            requestAnimationFrame(renderWebGL);
         }
-        animateThree();
+        renderWebGL();
 
         window.addEventListener('resize', () => {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
             renderer.setSize(window.innerWidth, window.innerHeight);
         });
 
         // ==========================================
-        // CURSOR & MAGNETIC
+        // 4. CUSTOM CURSOR & MAGNETIC LOGIC
         // ==========================================
         const cursorDot = document.querySelector('.cursor-dot');
         const cursorOutline = document.querySelector('.cursor-outline');
-        let cursor = { x: 0, y: 0 }, dot = { x: 0, y: 0 }, outline = { x: 0, y: 0 };
+        let cursor = { x: window.innerWidth/2, y: window.innerHeight/2 };
+        let dot = { x: window.innerWidth/2, y: window.innerHeight/2 };
+        let outline = { x: window.innerWidth/2, y: window.innerHeight/2 };
 
         window.addEventListener('mousemove', (e) => {
             cursor.x = e.clientX; cursor.y = e.clientY;
         });
 
-        function renderCursor() {
-            dot.x += (cursor.x - dot.x) * 1;
-            dot.y += (cursor.y - dot.y) * 1;
+        function animateCursor() {
+            dot.x += (cursor.x - dot.x) * 0.3;
+            dot.y += (cursor.y - dot.y) * 0.3;
             outline.x += (cursor.x - outline.x) * 0.15;
             outline.y += (cursor.y - outline.y) * 0.15;
 
             cursorDot.style.transform = `translate(${dot.x}px, ${dot.y}px)`;
             cursorOutline.style.transform = `translate(${outline.x}px, ${outline.y}px) translate(-50%, -50%)`;
-            requestAnimationFrame(renderCursor);
+            requestAnimationFrame(animateCursor);
         }
-        renderCursor();
+        animateCursor();
 
+        // Hover Logic
         document.querySelectorAll('.hover-target').forEach(el => {
             el.addEventListener('mouseenter', () => {
                 const text = el.getAttribute('data-cursor');
-                cursorOutline.style.width = '80px';
-                cursorOutline.style.height = '80px';
-                cursorOutline.style.backgroundColor = 'var(--accent)';
-                cursorOutline.style.mixBlendMode = 'normal';
+                cursorOutline.style.width = '70px';
+                cursorOutline.style.height = '70px';
+                cursorOutline.style.background = 'var(--text)';
+                cursorOutline.style.color = 'var(--bg)';
+                cursorOutline.style.borderColor = 'transparent';
                 if(text) cursorOutline.innerHTML = text;
                 cursorDot.style.opacity = 0;
             });
             el.addEventListener('mouseleave', () => {
-                cursorOutline.style.width = '40px';
-                cursorOutline.style.height = '40px';
-                cursorOutline.style.backgroundColor = 'transparent';
+                cursorOutline.style.width = '50px';
+                cursorOutline.style.height = '50px';
+                cursorOutline.style.background = 'transparent';
+                cursorOutline.style.color = 'transparent';
+                cursorOutline.style.borderColor = 'var(--text)';
                 cursorOutline.innerHTML = '';
                 cursorDot.style.opacity = 1;
             });
         });
 
-        document.querySelectorAll('.magnetic-target').forEach(el => {
+        // Magnetic Logic
+        document.querySelectorAll('.magnetic-wrap').forEach(el => {
             el.addEventListener('mousemove', (e) => {
                 const rect = el.getBoundingClientRect();
                 const x = e.clientX - rect.left - rect.width / 2;
                 const y = e.clientY - rect.top - rect.height / 2;
-                gsap.to(el, { x: x * 0.3, y: y * 0.3, duration: 0.5, ease: "power2.out" });
+                gsap.to(el.children[0], { x: x * 0.4, y: y * 0.4, duration: 0.5, ease: "power2.out" });
             });
             el.addEventListener('mouseleave', () => {
-                gsap.to(el, { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" });
+                gsap.to(el.children[0], { x: 0, y: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" });
+            });
+        });
+
+        // 3D Card Tilt Logic
+        document.querySelectorAll('.tilt-target').forEach(card => {
+            const image = card.querySelector('.project-image');
+            card.addEventListener('mousemove', (e) => {
+                const rect = card.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                const centerX = rect.width / 2;
+                const centerY = rect.height / 2;
+                
+                const rotateX = ((y - centerY) / centerY) * -10;
+                const rotateY = ((x - centerX) / centerX) * 10;
+                
+                gsap.to(card, { rotateX, rotateY, duration: 0.5, ease: "power2.out" });
+                gsap.to(image, { x: -rotateY * 2, y: rotateX * 2, duration: 0.5 });
+            });
+            card.addEventListener('mouseleave', () => {
+                gsap.to(card, { rotateX: 0, rotateY: 0, duration: 0.7, ease: "elastic.out(1, 0.3)" });
+                gsap.to(image, { x: 0, y: 0, duration: 0.7 });
             });
         });
 
         // ==========================================
-        // GSAP CHOREOGRAPHY
+        // 5. GSAP CHOREOGRAPHY (THE WOW MOMENTS)
         // ==========================================
         
-        // 1. Loader
+        // --- WOW 1: Cinematic Loader ---
         let counter = { value: 0 };
         const tlLoader = gsap.timeline({ onComplete: () => document.body.style.overflow = "auto" });
-        document.body.style.overflow = "hidden";
+        document.body.style.overflow = "hidden"; // Lock scroll
 
         tlLoader.to(counter, {
             value: 100,
-            duration: 2,
+            duration: 2.5,
             ease: "expo.inOut",
-            onUpdate: () => document.querySelector('.loader-counter').innerText = Math.round(counter.value).toString().padStart(2, '0')
+            onUpdate: () => {
+                const val = Math.round(counter.value).toString().padStart(2, '0');
+                document.querySelector('.loader-counter').childNodes[0].nodeValue = val;
+                document.querySelector('.loader-counter-fill').innerText = val;
+            }
         })
-        .to('.loader', { yPercent: -100, duration: 1.2, ease: "power4.inOut" }, "-=0.2")
-        .from('.hero-title', { y: 250, skewY: 10, duration: 1.5, stagger: 0.1, ease: "power4.out" }, "-=0.8")
-        .from('.hero-sub, .hero-tag', { opacity: 0, y: 20, duration: 1, stagger: 0.1 }, "-=1");
+        .to('.loader-counter-fill', {
+            clipPath: "polygon(0 0%, 100% 0%, 100% 100%, 0 100%)",
+            duration: 2.5,
+            ease: "expo.inOut"
+        }, 0)
+        .to('.loader', {
+            clipPath: "polygon(0 0, 100% 0, 100% 0, 0 0)", // Split screen open
+            duration: 1.5,
+            ease: "power4.inOut"
+        })
+        .to('.hero h1 .char', {
+            y: "0%",
+            rotation: 0,
+            opacity: 1,
+            duration: 1.2,
+            stagger: 0.03,
+            ease: "power3.out"
+        }, "-=1")
+        .to('.hero-tag, .hero-desc', {
+            y: "0%",
+            opacity: 1,
+            duration: 1,
+            stagger: 0.1,
+            ease: "power2.out"
+        }, "-=0.8");
 
-        // 2. Marquee Loop
-        gsap.to('.marquee-inner', {
-            xPercent: -50,
-            ease: "none",
-            duration: 15,
-            repeat: -1
+        // --- HERO PARALLAX ---
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 30;
+            const y = (e.clientY / window.innerHeight - 0.5) * 30;
+            gsap.to('.hero h1', { x, y, duration: 1, ease: "power2.out" });
         });
 
-        // 3. Text Scrub (About Section)
-        const scrubText = document.getElementById('scrub-text');
-        const splitText = scrubText.innerText.split(' ').map(word => `<span>${word}</span>`).join(' ');
-        scrubText.innerHTML = splitText;
-
-        gsap.to('#scrub-text span', {
+        // --- WOW 2: Scroll Text Reveal ---
+        gsap.to('.about-text .word', {
             scrollTrigger: {
-                trigger: '.about-section',
-                start: "top 70%",
+                trigger: '.about',
+                start: "top 60%",
                 end: "bottom 80%",
-                scrub: 0.5
+                scrub: 1
             },
-            color: "var(--text)",
-            stagger: 0.1
+            backgroundPosition: "0% 0",
+            stagger: 0.1,
+            ease: "none"
         });
 
-        // 4. Horizontal Scroll
+        // --- WOW 3: Horizontal 3D Scroll ---
+        const workContainer = document.querySelector('.work-container');
         const workPanels = gsap.utils.toArray('.work-panel');
-        gsap.to(workPanels, {
-            xPercent: -100 * (workPanels.length - 1),
-            ease: "none",
+        
+        let tlWork = gsap.timeline({
             scrollTrigger: {
                 trigger: ".work-wrapper",
                 pin: true,
                 scrub: 1,
-                snap: 1 / (workPanels.length - 1),
-                end: () => "+=" + document.querySelector('.work-container').offsetWidth
+                end: () => "+=" + workContainer.offsetWidth
             }
         });
 
-        // Parallax inside horizontal scroll
-        workPanels.forEach(panel => {
-            gsap.from(panel.querySelector('.project-bg'), {
-                xPercent: 30,
-                ease: "none",
+        // Move the container
+        tlWork.to(workContainer, {
+            x: () => -(workContainer.scrollWidth - window.innerWidth),
+            ease: "none"
+        });
+
+        // Add 3D rotation to panels as they enter/leave
+        workPanels.forEach((panel, i) => {
+            gsap.from(panel, {
+                rotationY: 45,
+                scale: 0.8,
+                z: -500,
+                opacity: 0,
                 scrollTrigger: {
                     trigger: panel,
-                    containerAnimation: gsap.getById("horizontal-scroll"),
+                    containerAnimation: tlWork,
                     start: "left right",
+                    end: "center center",
+                    scrub: true
+                }
+            });
+            gsap.to(panel, {
+                rotationY: -45,
+                scale: 0.8,
+                z: -500,
+                opacity: 0,
+                scrollTrigger: {
+                    trigger: panel,
+                    containerAnimation: tlWork,
+                    start: "center center",
                     end: "right left",
                     scrub: true
                 }
             });
+        });
+
+        // --- WOW 4: Velocity Marquee & Skew ---
+        let proxy = { skew: 0 },
+            skewSetter = gsap.quickSetter(".hero h1, .marquee-track", "skewY", "deg"),
+            clamp = gsap.utils.clamp(-15, 15);
+
+        ScrollTrigger.create({
+            onUpdate: (self) => {
+                let skew = clamp(self.getVelocity() / -100);
+                if (Math.abs(skew) > Math.abs(proxy.skew)) {
+                    proxy.skew = skew;
+                    gsap.to(proxy, {skew: 0, duration: 0.8, ease: "power3", overwrite: true, onUpdate: () => skewSetter(proxy.skew)});
+                }
+            }
+        });
+
+        gsap.to('.marquee-track', {
+            xPercent: -50,
+            ease: "none",
+            scrollTrigger: {
+                trigger: ".marquee-section",
+                start: "top bottom",
+                end: "bottom top",
+                scrub: 1
+            }
+        });
+
+        // --- WOW 5: Cinematic Footer ---
+        gsap.from('.footer-heading', {
+            scrollTrigger: {
+                trigger: ".footer",
+                start: "top bottom",
+                end: "center center",
+                scrub: 1
+            },
+            scale: 5,
+            opacity: 0,
+            y: -200,
+            ease: "power2.out"
+        });
+        
+        gsap.from('.footer-bg-text', {
+            scrollTrigger: {
+                trigger: ".footer",
+                start: "top bottom",
+                end: "bottom bottom",
+                scrub: 1
+            },
+            y: 200,
+            opacity: 0
         });
     </script>
 </body>
